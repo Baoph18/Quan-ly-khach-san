@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -13,6 +14,8 @@ namespace Quản_lí_khách_sạn
 {
     public partial class ĐăngNhập: Form
     {
+        // Khai báo đối tượng log
+        private static readonly ILog log = LogManager.GetLogger(typeof(ĐăngNhập));
         Function fn = new Function();
         string query;
         public ĐăngNhập()
@@ -50,7 +53,13 @@ namespace Quản_lí_khách_sạn
 
         }
 
-        private void btnLogin_Click_1(object sender, EventArgs e)
+
+        private void bntExit_Click_1(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void btnLogin_Click_2(object sender, EventArgs e)
         {
             string username = txtUserName.Text.Trim();
             string password = txtPassword.Text.Trim();
@@ -133,11 +142,7 @@ namespace Quản_lí_khách_sạn
             // ❌ Sai tài khoản/mật khẩu
             LabelError.Visible = true;
             txtPassword.Clear();
-        }
 
-        private void bntExit_Click_1(object sender, EventArgs e)
-        {
-            Application.Exit();
         }
     }
 }

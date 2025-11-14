@@ -23,19 +23,19 @@ namespace Quản_lí_khách_sạn.ksquanli
         public void LoadHoaDon()
         {
             string query = @"
-        SELECT 
-            'HD' + RIGHT('000' + CAST(MAHD AS VARCHAR), 3) AS [Mã HĐ],
-            KH.TENKH AS [Khách hàng],
-            NV.TENNV AS [Nhân viên],
-            P.SOPHONG AS [Phòng],
-            HD.NGAYTHANHTOAN AS [Ngày thanh toán],
-            HD.TONGTIEN AS [Tổng tiền],
-            HD.PHUONGTHUCTT AS [Phương thức]
-        FROM HOADON HD
-        LEFT JOIN KHACHHANG KH ON HD.MAKH = KH.MAKH
-        LEFT JOIN NHANVIEN NV ON HD.MANV = NV.MANV
-        LEFT JOIN PHONG P ON HD.MAPHONG = P.MAPHONG
-    ";
+                SELECT 
+                    'HD' + RIGHT('000' + CAST(MAHD AS VARCHAR), 3) AS [Mã HĐ],
+                    KH.TENKH AS [Khách hàng],
+                    NV.TENNV AS [Nhân viên],
+                    P.SOPHONG AS [Phòng],
+                    HD.NGAYTHANHTOAN AS [Ngày thanh toán],
+                    HD.TONGTIEN AS [Tổng tiền],
+                    HD.PHUONGTHUCTT AS [Phương thức]
+                FROM HOADON HD
+                LEFT JOIN KHACHHANG KH ON HD.MAKH = KH.MAKH
+                LEFT JOIN NHANVIEN NV ON HD.MANV = NV.MANV
+                LEFT JOIN PHONG P ON HD.MAPHONG = P.MAPHONG
+            ";
 
             DataSet ds = fn.getdata(query);
 
@@ -86,20 +86,20 @@ namespace Quản_lí_khách_sạn.ksquanli
                 DateTime ngay = dtNgayThanhToan.Value.Date;
 
                 string query = $@"
-            SELECT 
-                'HD' + RIGHT('000' + CAST(MAHD AS VARCHAR), 3) AS [Mã HĐ],
-                KH.TENKH AS [Khách hàng],
-                NV.TENNV AS [Nhân viên],
-                P.SOPHONG AS [Phòng],
-                HD.NGAYTHANHTOAN AS [Ngày thanh toán],
-                HD.TONGTIEN AS [Tổng tiền],
-                HD.PHUONGTHUCTT AS [Phương thức]
-            FROM HOADON HD
-            JOIN KHACHHANG KH ON HD.MAKH = KH.MAKH
-            JOIN NHANVIEN NV ON HD.MANV = NV.MANV
-            JOIN PHONG P ON HD.MAPHONG = P.MAPHONG
-            WHERE CAST(HD.NGAYTHANHTOAN AS DATE) = '{ngay:yyyy-MM-dd}'
-        ";
+                    SELECT 
+                        'HD' + RIGHT('000' + CAST(MAHD AS VARCHAR), 3) AS [Mã HĐ],
+                        KH.TENKH AS [Khách hàng],
+                        NV.TENNV AS [Nhân viên],
+                        P.SOPHONG AS [Phòng],
+                        HD.NGAYTHANHTOAN AS [Ngày thanh toán],
+                        HD.TONGTIEN AS [Tổng tiền],
+                        HD.PHUONGTHUCTT AS [Phương thức]
+                    FROM HOADON HD
+                    JOIN KHACHHANG KH ON HD.MAKH = KH.MAKH
+                    JOIN NHANVIEN NV ON HD.MANV = NV.MANV
+                    JOIN PHONG P ON HD.MAPHONG = P.MAPHONG
+                    WHERE CAST(HD.NGAYTHANHTOAN AS DATE) = '{ngay:yyyy-MM-dd}'
+                ";
 
                 DataSet ds = fn.getdata(query);
                 dataGridView1.DataSource = ds.Tables[0];
@@ -125,6 +125,9 @@ namespace Quản_lí_khách_sạn.ksquanli
             tk.Show();
         }
 
-        
+        private void dtNgayThanhToan_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

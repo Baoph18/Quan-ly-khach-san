@@ -51,12 +51,12 @@
             this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dataGridView1.BackgroundColor = System.Drawing.Color.White;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(44, 199);
-            this.dataGridView1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.dataGridView1.Location = new System.Drawing.Point(59, 245);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(978, 365);
+            this.dataGridView1.Size = new System.Drawing.Size(1304, 449);
             this.dataGridView1.TabIndex = 4;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             this.dataGridView1.RowHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_RowHeaderMouseClick);
@@ -71,8 +71,9 @@
             this.guna2Panel1.BackColor = System.Drawing.Color.SteelBlue;
             this.guna2Panel1.Controls.Add(this.label2);
             this.guna2Panel1.Location = new System.Drawing.Point(0, 0);
+            this.guna2Panel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.guna2Panel1.Name = "guna2Panel1";
-            this.guna2Panel1.Size = new System.Drawing.Size(1066, 119);
+            this.guna2Panel1.Size = new System.Drawing.Size(1421, 146);
             this.guna2Panel1.TabIndex = 39;
             // 
             // label2
@@ -80,10 +81,9 @@
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Segoe UI Variable Text", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.ForeColor = System.Drawing.Color.White;
-            this.label2.Location = new System.Drawing.Point(322, 26);
-            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label2.Location = new System.Drawing.Point(429, 32);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(472, 64);
+            this.label2.Size = new System.Drawing.Size(590, 80);
             this.label2.TabIndex = 22;
             this.label2.Text = "Hoá Đơn Khách Sạn";
             // 
@@ -92,9 +92,10 @@
             this.guna2HtmlLabel1.BackColor = System.Drawing.Color.Transparent;
             this.guna2HtmlLabel1.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.guna2HtmlLabel1.ForeColor = System.Drawing.Color.Black;
-            this.guna2HtmlLabel1.Location = new System.Drawing.Point(186, 607);
+            this.guna2HtmlLabel1.Location = new System.Drawing.Point(248, 747);
+            this.guna2HtmlLabel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.guna2HtmlLabel1.Name = "guna2HtmlLabel1";
-            this.guna2HtmlLabel1.Size = new System.Drawing.Size(154, 33);
+            this.guna2HtmlLabel1.Size = new System.Drawing.Size(192, 41);
             this.guna2HtmlLabel1.TabIndex = 40;
             this.guna2HtmlLabel1.Text = "Mã hóa đơn";
             // 
@@ -103,9 +104,10 @@
             this.guna2HtmlLabel2.BackColor = System.Drawing.Color.Transparent;
             this.guna2HtmlLabel2.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.guna2HtmlLabel2.ForeColor = System.Drawing.Color.Black;
-            this.guna2HtmlLabel2.Location = new System.Drawing.Point(533, 607);
+            this.guna2HtmlLabel2.Location = new System.Drawing.Point(711, 747);
+            this.guna2HtmlLabel2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.guna2HtmlLabel2.Name = "guna2HtmlLabel2";
-            this.guna2HtmlLabel2.Size = new System.Drawing.Size(164, 33);
+            this.guna2HtmlLabel2.Size = new System.Drawing.Size(202, 41);
             this.guna2HtmlLabel2.TabIndex = 41;
             this.guna2HtmlLabel2.Text = "Tổng số tiền";
             // 
@@ -114,9 +116,10 @@
             this.labelMaHD.BackColor = System.Drawing.Color.Transparent;
             this.labelMaHD.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelMaHD.ForeColor = System.Drawing.Color.Black;
-            this.labelMaHD.Location = new System.Drawing.Point(357, 607);
+            this.labelMaHD.Location = new System.Drawing.Point(476, 747);
+            this.labelMaHD.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.labelMaHD.Name = "labelMaHD";
-            this.labelMaHD.Size = new System.Drawing.Size(43, 33);
+            this.labelMaHD.Size = new System.Drawing.Size(51, 41);
             this.labelMaHD.TabIndex = 42;
             this.labelMaHD.Text = "----";
             // 
@@ -125,9 +128,10 @@
             this.labelTongTien.BackColor = System.Drawing.Color.Transparent;
             this.labelTongTien.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelTongTien.ForeColor = System.Drawing.Color.Black;
-            this.labelTongTien.Location = new System.Drawing.Point(724, 607);
+            this.labelTongTien.Location = new System.Drawing.Point(965, 747);
+            this.labelTongTien.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.labelTongTien.Name = "labelTongTien";
-            this.labelTongTien.Size = new System.Drawing.Size(43, 33);
+            this.labelTongTien.Size = new System.Drawing.Size(51, 41);
             this.labelTongTien.TabIndex = 43;
             this.labelTongTien.Text = "----";
             this.labelTongTien.Click += new System.EventHandler(this.labelTongTien_Click);
@@ -139,22 +143,25 @@
             this.dtNgayThanhToan.FillColor = System.Drawing.Color.Aqua;
             this.dtNgayThanhToan.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.dtNgayThanhToan.Format = System.Windows.Forms.DateTimePickerFormat.Long;
-            this.dtNgayThanhToan.Location = new System.Drawing.Point(186, 722);
+            this.dtNgayThanhToan.Location = new System.Drawing.Point(248, 889);
+            this.dtNgayThanhToan.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dtNgayThanhToan.MaxDate = new System.DateTime(9998, 12, 31, 0, 0, 0, 0);
             this.dtNgayThanhToan.MinDate = new System.DateTime(1753, 1, 1, 0, 0, 0, 0);
             this.dtNgayThanhToan.Name = "dtNgayThanhToan";
-            this.dtNgayThanhToan.Size = new System.Drawing.Size(200, 57);
+            this.dtNgayThanhToan.Size = new System.Drawing.Size(267, 70);
             this.dtNgayThanhToan.TabIndex = 44;
             this.dtNgayThanhToan.Value = new System.DateTime(2025, 7, 14, 19, 41, 37, 301);
+            this.dtNgayThanhToan.ValueChanged += new System.EventHandler(this.dtNgayThanhToan_ValueChanged);
             // 
             // guna2HtmlLabel3
             // 
             this.guna2HtmlLabel3.BackColor = System.Drawing.Color.Transparent;
             this.guna2HtmlLabel3.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.guna2HtmlLabel3.ForeColor = System.Drawing.Color.Black;
-            this.guna2HtmlLabel3.Location = new System.Drawing.Point(186, 675);
+            this.guna2HtmlLabel3.Location = new System.Drawing.Point(248, 831);
+            this.guna2HtmlLabel3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.guna2HtmlLabel3.Name = "guna2HtmlLabel3";
-            this.guna2HtmlLabel3.Size = new System.Drawing.Size(271, 27);
+            this.guna2HtmlLabel3.Size = new System.Drawing.Size(312, 32);
             this.guna2HtmlLabel3.TabIndex = 45;
             this.guna2HtmlLabel3.Text = "Lọc theo ngày thanh toán";
             // 
@@ -173,9 +180,10 @@
             this.btnLoc.FillColor = System.Drawing.Color.Red;
             this.btnLoc.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Bold);
             this.btnLoc.ForeColor = System.Drawing.Color.White;
-            this.btnLoc.Location = new System.Drawing.Point(450, 722);
+            this.btnLoc.Location = new System.Drawing.Point(600, 889);
+            this.btnLoc.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnLoc.Name = "btnLoc";
-            this.btnLoc.Size = new System.Drawing.Size(200, 57);
+            this.btnLoc.Size = new System.Drawing.Size(267, 70);
             this.btnLoc.TabIndex = 46;
             this.btnLoc.Text = "Lọc";
             this.btnLoc.Click += new System.EventHandler(this.btnLoc_Click);
@@ -190,16 +198,17 @@
             this.guna2Button2.FillColor = System.Drawing.Color.Lime;
             this.guna2Button2.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Bold);
             this.guna2Button2.ForeColor = System.Drawing.Color.Black;
-            this.guna2Button2.Location = new System.Drawing.Point(724, 722);
+            this.guna2Button2.Location = new System.Drawing.Point(965, 889);
+            this.guna2Button2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.guna2Button2.Name = "guna2Button2";
-            this.guna2Button2.Size = new System.Drawing.Size(200, 57);
+            this.guna2Button2.Size = new System.Drawing.Size(267, 70);
             this.guna2Button2.TabIndex = 47;
             this.guna2Button2.Text = "Xuất Hóa Đơn";
             this.guna2Button2.Click += new System.EventHandler(this.guna2Button2_Click);
             // 
             // uc_HoaDon
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.SkyBlue;
             this.Controls.Add(this.guna2Button2);
@@ -212,9 +221,9 @@
             this.Controls.Add(this.guna2HtmlLabel1);
             this.Controls.Add(this.guna2Panel1);
             this.Controls.Add(this.dataGridView1);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "uc_HoaDon";
-            this.Size = new System.Drawing.Size(1066, 823);
+            this.Size = new System.Drawing.Size(1421, 1013);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.guna2Panel1.ResumeLayout(false);
             this.guna2Panel1.PerformLayout();

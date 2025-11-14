@@ -76,45 +76,117 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         }
 
-        private void btnDelete_Click(object sender, EventArgs e)
+        // TẠO CLASS THAM SỐ 
+        public class NhanVienDeleteInfo
         {
+            public int MaNV { get; set; }
+        }
+
+        // TÁCH HÀM 
+        private bool LayVaXacNhanMaNhanVien(out NhanVienDeleteInfo info)
+        {
+            info = null;
+
             if (string.IsNullOrWhiteSpace(txtID.Text))
             {
                 MessageBox.Show("Vui lòng chọn nhân viên để xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                return false;
             }
-            // kiểm tra nhập vào có pk số nguyên hay ko
-            if (!int.TryParse(txtID.Text.Trim(), out int manv))
+
+            if (!int.TryParse(txtID.Text.Trim(), out int maNV))
             {
                 MessageBox.Show("Mã nhân viên không hợp lệ!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                return false;
             }
 
-            var confirm = MessageBox.Show("Bạn có chắc chắn muốn xóa nhân viên này?", "Xác nhận",
-                                          MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (confirm == DialogResult.Yes)
+            info = new NhanVienDeleteInfo { MaNV = maNV };
+            return true;
+        }
+
+        private bool XacNhanXoaNhanVien()
+        {
+            var confirm = MessageBox.Show(
+                "Bạn có chắc chắn muốn xóa nhân viên này?",
+                "Xác nhận",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            return confirm == DialogResult.Yes;
+        }
+
+        private void XoaNhanVien(NhanVienDeleteInfo info)
+        {
+            // Thứ tự xóa: TAIKHOAN (khóa ngoại) trước, NHANVIEN sau.
+            string query = $@"
+            DELETE FROM TAIKHOAN WHERE MANV = {info.MaNV};
+            DELETE FROM NHANVIEN WHERE MANV = {info.MaNV};";
+
+            fn.setdata(query, "Đã xóa nhân viên và tài khoản thành công!");
+        }
+
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            if (!LayVaXacNhanMaNhanVien(out NhanVienDeleteInfo info))
+                return;
+
+            if (!XacNhanXoaNhanVien())
+                return;
+
+            try
             {
-                try
-                {
-                    // 1️⃣ Nếu khóa ngoại trong HOADON KHÔNG dùng ON DELETE SET NULL
-                    // thì bạn phải xóa HOADON thủ công:
-                    // fn.setdata($"DELETE FROM HOADON WHERE MANV = {manv}", "");
+                XoaNhanVien(info);
 
-                    string query = $@"
-    DELETE FROM TAIKHOAN WHERE MANV = {manv};
-    DELETE FROM NHANVIEN WHERE MANV = {manv};";
-
-                    fn.setdata(query, "Đã xóa nhân viên và tài khoản thành công!");
-
-                    // 4️⃣ Làm mới DataGridView
-                    tabEmployee_SelectedIndexChanged(this, null);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Lỗi khi xóa nhân viên:\n" + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                // Làm mới DataGridView (Giả định rằng hàm này có sẵn)
+                tabEmployee_SelectedIndexChanged(this, null);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi xóa nhân viên:\n" + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+
+
+
+        //private void btnDelete_Click(object sender, EventArgs e)
+        //{
+        //    if (string.IsNullOrWhiteSpace(txtID.Text))
+        //    {
+        //        MessageBox.Show("Vui lòng chọn nhân viên để xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        //        return;
+        //    }
+        //    // kiểm tra nhập vào có pk số nguyên hay ko
+        //    if (!int.TryParse(txtID.Text.Trim(), out int manv))
+        //    {
+        //        MessageBox.Show("Mã nhân viên không hợp lệ!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //        return;
+        //    }
+
+        //    var confirm = MessageBox.Show("Bạn có chắc chắn muốn xóa nhân viên này?", "Xác nhận",
+        //                                  MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+        //    if (confirm == DialogResult.Yes)
+        //    {
+        //        try
+        //        {
+        //            // 1️⃣ Nếu khóa ngoại trong HOADON KHÔNG dùng ON DELETE SET NULL
+        //            // thì bạn phải xóa HOADON thủ công:
+        //            // fn.setdata($"DELETE FROM HOADON WHERE MANV = {manv}", "");
+
+        //            string query = $@"
+        //            DELETE FROM TAIKHOAN WHERE MANV = {manv};
+        //            DELETE FROM NHANVIEN WHERE MANV = {manv};";
+
+        //            fn.setdata(query, "Đã xóa nhân viên và tài khoản thành công!");
+
+        //            // 4️⃣ Làm mới DataGridView
+        //            tabEmployee_SelectedIndexChanged(this, null);
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            MessageBox.Show("Lỗi khi xóa nhân viên:\n" + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //        }
+        //    }
+        //}
 
         private void uc_Employee_Leave(object sender, EventArgs e)
         {
@@ -162,51 +234,143 @@ namespace Quản_lí_khách_sạn.ksquanli
             }
         }
 
-        private void btnRepair_Click(object sender, EventArgs e)
+        // TẠO CLASS THAM SỐ 
+        public class NhanVienUpdateInfo
         {
+            public int MaNV { get; set; }
+            public string Ten { get; set; }
+            public string SDT { get; set; }
+            public string GioiTinh { get; set; }
+            public string Email { get; set; }
+        }
+
+        // TÁCH HÀM 
+        private bool LayVaXacNhanThongTinCapNhat(out NhanVienUpdateInfo info)
+        {
+            info = null;
+
             if (string.IsNullOrWhiteSpace(txtIDNV.Text))
             {
                 MessageBox.Show("Vui lòng chọn nhân viên cần sửa.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                return false;
             }
 
             if (!checkEmail(txtEmailr.Text))
             {
                 MessageBox.Show("Email vừa nhập không hợp lệ!!!", "Thông báo",
                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtEmail.Focus();
+                txtEmailr.Focus(); // Sử dụng txtEmailr thay vì txtEmail (theo code gốc)
+                return false;
             }
-            else
+
+            // Đảm bảo MaNV là số nguyên hợp lệ (giả định đã kiểm tra khi tải)
+            if (!int.TryParse(txtIDNV.Text.Trim(), out int maNv))
             {
-                try
-                {
-                    string manv = txtIDNV.Text.Trim();
-                    string ten = txtTenNV.Text.Trim().Replace("'", "''");
-                    string sdt = txtSDTNV.Text.Trim();
-                    string gioitinh = cboGioiTinh.Text.Trim().Replace("'", "''");
-                    string email = txtEmailr.Text.Trim().Replace("'", "''");
-
-
-                    query = $"UPDATE NHANVIEN SET " +
-            $"TENNV = N'{ten}', " +
-            $"SDTNV = '{sdt}', " +
-            $"GIOITINHNV = N'{gioitinh}', " +
-            $"EMAILNV = N'{email}' " +  // ✅ không có dấu phẩy
-            $"WHERE MANV = {manv}";
-
-                    fn.setdata(query, "Cập nhật thông tin nhân viên thành công!");
-
-                    SetEmployee(dataGridView1);  // làm mới danh sách
-                    Clear1();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Lỗi khi cập nhật: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                MessageBox.Show("Mã nhân viên không hợp lệ!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
-            
-           
+
+            // Gán dữ liệu, xử lý SQL Injection (thay ' bằng '')
+            info = new NhanVienUpdateInfo
+            {
+                MaNV = maNv,
+                Ten = txtTenNV.Text.Trim().Replace("'", "''"),
+                SDT = txtSDTNV.Text.Trim(),
+                GioiTinh = cboGioiTinh.Text.Trim().Replace("'", "''"),
+                Email = txtEmailr.Text.Trim().Replace("'", "''")
+            };
+
+            return true;
         }
+
+        private void CapNhatNhanVien(NhanVienUpdateInfo info)
+        {
+            string query = $@"
+        UPDATE NHANVIEN SET 
+        TENNV = N'{info.Ten}', 
+        SDTNV = '{info.SDT}', 
+        GIOITINHNV = N'{info.GioiTinh}', 
+        EMAILNV = N'{info.Email}' 
+        WHERE MANV = {info.MaNV};"; // Sử dụng info.MaNV
+
+            fn.setdata(query, "Cập nhật thông tin nhân viên thành công!");
+        }
+
+        private void btnRepair_Click(object sender, EventArgs e)
+        {
+            // 1. Kiểm tra dữ liệu đầu vào và gom thành object
+            if (!LayVaXacNhanThongTinCapNhat(out NhanVienUpdateInfo info))
+                return;
+
+            try
+            {
+                // 2. Thực hiện cập nhật vào DB
+                CapNhatNhanVien(info);
+
+                // 3. Làm mới UI
+                SetEmployee(dataGridView1); // làm mới danh sách
+                Clear1();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi cập nhật: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+        //private void btnRepair_Click(object sender, EventArgs e)
+        //{
+        //    if (string.IsNullOrWhiteSpace(txtIDNV.Text))
+        //    {
+        //        MessageBox.Show("Vui lòng chọn nhân viên cần sửa.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        //        return;
+        //    }
+
+        //    if (!checkEmail(txtEmailr.Text))
+        //    {
+        //        MessageBox.Show("Email vừa nhập không hợp lệ!!!", "Thông báo",
+        //         MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        //        txtEmail.Focus();
+        //    }
+        //    else
+        //    {
+        //        try
+        //        {
+        //            string manv = txtIDNV.Text.Trim();
+        //            string ten = txtTenNV.Text.Trim().Replace("'", "''");
+        //            string sdt = txtSDTNV.Text.Trim();
+        //            string gioitinh = cboGioiTinh.Text.Trim().Replace("'", "''");
+        //            string email = txtEmailr.Text.Trim().Replace("'", "''");
+
+
+        //            query = $"UPDATE NHANVIEN SET " +
+        //            $"TENNV = N'{ten}', " +
+        //            $"SDTNV = '{sdt}', " +
+        //            $"GIOITINHNV = N'{gioitinh}', " +
+        //            $"EMAILNV = N'{email}' " +  // ✅ không có dấu phẩy
+        //            $"WHERE MANV = {manv}";
+
+        //            fn.setdata(query, "Cập nhật thông tin nhân viên thành công!");
+
+        //            SetEmployee(dataGridView1);  // làm mới danh sách
+        //            Clear1();
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            MessageBox.Show("Lỗi khi cập nhật: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //        }
+        //    }
+
+
+        //}
 
         private void Clear1()
         {

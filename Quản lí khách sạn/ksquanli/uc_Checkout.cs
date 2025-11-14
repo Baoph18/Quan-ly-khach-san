@@ -35,58 +35,85 @@ namespace Quản_lí_khách_sạn.ksquanli
        
 
         int id;
-      
+        /// <summary>
+        /// //////////////////////////////////////////////////////////
+        /// </summary>
+        public class ThanhToanInfo
+        {
+            public int MaKhachHang { get; set; }
+            public int MaNhanVien { get; set; }
+            public string SoPhong { get; set; }
+            public string PhuongThuc { get; set; }
+            public DateTime NgayCheckout { get; set; }
+            public decimal TongTien { get; set; }
+        }
 
-        private void btnThanhToan_Click(object sender, EventArgs e)
+        private bool XacNhanThanhToan()
         {
             if (string.IsNullOrWhiteSpace(txtName.Text))
             {
                 MessageBox.Show("Không có khách hàng để thanh toán!", "Thông Tin", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                return false;
             }
 
             if (MessageBox.Show("Bạn có chắc chắn muốn thanh toán?", "Xác nhận", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) != DialogResult.OK)
+                return false;
+
+            return true;
+        }
+
+        private int LayMaPhongTheoSoPhong(string soPhong)
+        {
+            string query = $"SELECT MAPHONG FROM PHONG WHERE SOPHONG = '{soPhong}'";
+            DataSet dsPhong = fn.getdata(query);
+
+            if (dsPhong.Tables[0].Rows.Count == 0)
+                throw new Exception($"Không tìm thấy phòng '{soPhong}'.");
+
+            return Convert.ToInt32(dsPhong.Tables[0].Rows[0]["MAPHONG"]);
+        }
+
+        private void ThucHienThanhToan(ThanhToanInfo info, int maPhong)
+        {
+            string checkoutStr = info.NgayCheckout.ToString("yyyy-MM-dd");
+
+            string query = $@"
+            UPDATE KHACHHANG 
+            SET CHEKOU = 'YES', CHECKOU = '{checkoutStr}', TONGTIEN = {info.TongTien}
+            WHERE MAKH = {info.MaKhachHang};
+
+            UPDATE PHONG 
+            SET DATPHONG = 'NO' 
+            WHERE MAPHONG = {maPhong};
+
+            INSERT INTO HOADON (MAKH, MANV, MAPHONG, NGAYTHANHTOAN, TONGTIEN, PHUONGTHUCTT)
+            VALUES ({info.MaKhachHang}, {info.MaNhanVien}, {maPhong}, '{checkoutStr}', {info.TongTien}, N'{info.PhuongThuc}');
+              ";
+
+            fn.setdata(query, "Thanh toán & cập nhật dữ liệu thành công!");
+        }
+        private void btnThanhToan_Click(object sender, EventArgs e)
+        {
+            if (!XacNhanThanhToan())
                 return;
 
             try
             {
-                int maKhachHang = id;
-                int maNhanVien = CurrentUser.Id;
-                string soPhong = txtRoomNo.Text.Trim();
-                string phuongThuc = cboPhuongthuc.Text.Trim();
-                string checkout = txtCheckout.Value.ToString("MM/dd/yyyy");
-                decimal tongTien = decimal.Parse(txtTongSoTien.Text.Replace(" VNĐ", "").Replace(",", "").Trim());
-
-                // 🔍 Lấy MAPHONG từ SOPHONG
-                string getMaphongQuery = $"SELECT MAPHONG FROM PHONG WHERE SOPHONG = '{soPhong}'";
-                DataSet dsPhong = fn.getdata(getMaphongQuery);
-
-                if (dsPhong.Tables[0].Rows.Count == 0)
+                // Gom tham số vào đối tượng ThanhToanInfo
+                ThanhToanInfo info = new ThanhToanInfo
                 {
-                    MessageBox.Show("Không tìm thấy phòng '" + soPhong + "'.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-                // số nguyên 32 bit có dấu
-                int maPhong = Convert.ToInt32(dsPhong.Tables[0].Rows[0]["MAPHONG"]);
+                    MaKhachHang = id,
+                    MaNhanVien = CurrentUser.Id,
+                    SoPhong = txtRoomNo.Text.Trim(),
+                    PhuongThuc = cboPhuongthuc.Text.Trim(),
+                    NgayCheckout = txtCheckout.Value,
+                    TongTien = decimal.Parse(txtTongSoTien.Text.Replace(" VNĐ", "").Replace(",", "").Trim())
+                };
 
-                // 🧾 Cập nhật khách hàng
-                string query = $@"
-                UPDATE KHACHHANG 
-                SET CHEKOU = 'YES', CHECKOU = '{checkout:yyyy-MM-dd}', TONGTIEN = {tongTien} 
-                WHERE MAKH = {maKhachHang};
+                int maPhong = LayMaPhongTheoSoPhong(info.SoPhong);
+                ThucHienThanhToan(info, maPhong);
 
-                UPDATE PHONG 
-                SET DATPHONG = 'NO' 
-                WHERE MAPHONG = {maPhong};
-
-                INSERT INTO HOADON (MAKH, MANV, MAPHONG, NGAYTHANHTOAN, TONGTIEN, PHUONGTHUCTT)
-                VALUES ({maKhachHang}, {maNhanVien}, {maPhong}, '{checkout:yyyy-MM-dd}', {tongTien}, N'{phuongThuc}');
-                ";
-
-                // ✅ Gọi setdata 1 lần duy nhất
-                fn.setdata(query, "Thanh toán & cập nhật dữ liệu thành công!");
-
-                // 🔁 Làm mới giao diện
+                // Làm mới giao diện
                 uc_Checkout_Load(this, null);
                 clearAll();
             }
@@ -95,6 +122,68 @@ namespace Quản_lí_khách_sạn.ksquanli
                 MessageBox.Show("Lỗi khi thanh toán:\n" + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        /// <summary>
+        /// ///////////////////////////////////////////////////////////////////////////////////
+        /// </summary>
+        //private void btnThanhToan_Click(object sender, EventArgs e)
+        //{
+        //    if (string.IsNullOrWhiteSpace(txtName.Text))
+        //    {
+        //        MessageBox.Show("Không có khách hàng để thanh toán!", "Thông Tin", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //        return;
+        //    }
+
+        //    if (MessageBox.Show("Bạn có chắc chắn muốn thanh toán?", "Xác nhận", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) != DialogResult.OK)
+        //        return;
+
+        //    try
+        //    {
+        //        int maKhachHang = id;
+        //        int maNhanVien = CurrentUser.Id;
+        //        string soPhong = txtRoomNo.Text.Trim();
+        //        string phuongThuc = cboPhuongthuc.Text.Trim();
+        //        string checkout = txtCheckout.Value.ToString("MM/dd/yyyy");
+        //        decimal tongTien = decimal.Parse(txtTongSoTien.Text.Replace(" VNĐ", "").Replace(",", "").Trim());
+
+        //         //🔍 Lấy MAPHONG từ SOPHONG
+        //        string getMaphongQuery = $"SELECT MAPHONG FROM PHONG WHERE SOPHONG = '{soPhong}'";
+        //        DataSet dsPhong = fn.getdata(getMaphongQuery);
+
+        //        if (dsPhong.Tables[0].Rows.Count == 0)
+        //        {
+        //            MessageBox.Show("Không tìm thấy phòng '" + soPhong + "'.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //            return;
+        //        }
+        //        //số nguyên 32 bit có dấu
+        //        int maPhong = Convert.ToInt32(dsPhong.Tables[0].Rows[0]["MAPHONG"]);
+
+        //        // 🧾 Cập nhật khách hàng
+        //        string query = $@"
+        //        UPDATE KHACHHANG 
+        //        SET CHEKOU = 'YES', CHECKOU = '{checkout:yyyy-MM-dd}', TONGTIEN = {tongTien} 
+        //        WHERE MAKH = {maKhachHang};
+
+        //        UPDATE PHONG 
+        //        SET DATPHONG = 'NO' 
+        //        WHERE MAPHONG = {maPhong};
+
+        //        INSERT INTO HOADON (MAKH, MANV, MAPHONG, NGAYTHANHTOAN, TONGTIEN, PHUONGTHUCTT)
+        //        VALUES ({maKhachHang}, {maNhanVien}, {maPhong}, '{checkout:yyyy-MM-dd}', {tongTien}, N'{phuongThuc}');
+        //        ";
+
+        //       //  ✅ Gọi setdata 1 lần duy nhất
+        //        fn.setdata(query, "Thanh toán & cập nhật dữ liệu thành công!");
+
+        //        // 🔁 Làm mới giao diện
+        //        uc_Checkout_Load(this, null);
+        //        clearAll();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show("Lỗi khi thanh toán:\n" + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //    }
+        //}
 
         public void clearAll()
         {

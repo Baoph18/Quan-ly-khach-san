@@ -5,6 +5,8 @@ VisualStudioVersion = 17.13.35828.75
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quản lí khách sạn", "Quản lí khách sạn\Quản lí khách sạn.csproj", "{BF5C8747-3FA2-4238-860B-501544962665}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quanlykhachsan.tests", "Quanlykhachsan.tests\Quanlykhachsan.tests.csproj", "{A9910035-8F39-4DE9-B932-47FBEB5E5191}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,18 @@ Global
 		{BF5C8747-3FA2-4238-860B-501544962665}.Release|x64.Build.0 = Release|x64
 		{BF5C8747-3FA2-4238-860B-501544962665}.Release|x86.ActiveCfg = Release|x86
 		{BF5C8747-3FA2-4238-860B-501544962665}.Release|x86.Build.0 = Release|x86
+		{A9910035-8F39-4DE9-B932-47FBEB5E5191}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9910035-8F39-4DE9-B932-47FBEB5E5191}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9910035-8F39-4DE9-B932-47FBEB5E5191}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A9910035-8F39-4DE9-B932-47FBEB5E5191}.Debug|x64.Build.0 = Debug|Any CPU
+		{A9910035-8F39-4DE9-B932-47FBEB5E5191}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A9910035-8F39-4DE9-B932-47FBEB5E5191}.Debug|x86.Build.0 = Debug|Any CPU
+		{A9910035-8F39-4DE9-B932-47FBEB5E5191}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9910035-8F39-4DE9-B932-47FBEB5E5191}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9910035-8F39-4DE9-B932-47FBEB5E5191}.Release|x64.ActiveCfg = Release|Any CPU
+		{A9910035-8F39-4DE9-B932-47FBEB5E5191}.Release|x64.Build.0 = Release|Any CPU
+		{A9910035-8F39-4DE9-B932-47FBEB5E5191}.Release|x86.ActiveCfg = Release|Any CPU
+		{A9910035-8F39-4DE9-B932-47FBEB5E5191}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
