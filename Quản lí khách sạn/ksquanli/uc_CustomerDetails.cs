@@ -131,6 +131,9 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         private KhachHangUpdateInfo LayThongTinKhachHang()
         {
+            if (!int.TryParse(txtMAKH.Text, out int maKH))
+                throw new FormatException();
+
             return new KhachHangUpdateInfo
             {
                 MaKH = Convert.ToInt32(txtMAKH.Text),
@@ -146,7 +149,9 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         private void CapNhatKhachHang(KhachHangUpdateInfo info)
         {
-            string query = $@"
+            try
+            {
+                string query = $@"
                 UPDATE KHACHHANG SET
                     TENKH = N'{info.Ten}',
                     SDT = '{info.SDT}',
@@ -158,11 +163,35 @@ namespace Quản_lí_khách_sạn.ksquanli
                 WHERE MAKH = {info.MaKH}
             ";
 
-            fn.setdata(query, "Thông tin khách hàng đã được cập nhật!");
-        }
+                fn.setdata(query, "Thông tin khách hàng đã được cập nhật!");
 
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
         private void btnRepair_Click(object sender, EventArgs e)
         {
+            //    if (!XacNhanSuaKhachHang())
+            //        return;
+
+            //    try
+            //    {
+            //        KhachHangUpdateInfo info = LayThongTinKhachHang();
+            //        CapNhatKhachHang(info);
+
+            //        load();
+            //        ClearInputs();
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        MessageBox.Show("Lỗi khi cập nhật: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //    }
             if (!XacNhanSuaKhachHang())
                 return;
 
@@ -181,9 +210,30 @@ namespace Quản_lí_khách_sạn.ksquanli
                 load();
                 ClearInputs();
             }
+            catch (NullReferenceException)
+            {
+                MessageBox.Show("Một đối tượng đang null. Có thể bạn chưa chọn khách hàng hoặc control chưa được khởi tạo.",
+                    "Null Reference", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show("Sai định dạng dữ liệu! Vui lòng kiểm tra lại các trường số (MAKH, Số đêm...).",
+                    "Format Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (ArgumentNullException)
+            {
+                MessageBox.Show("Dữ liệu truyền vào bị null. Kiểm tra lại các ô nhập liệu.",
+                    "Argument Null", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (InvalidOperationException)
+            {
+                MessageBox.Show("Thao tác không hợp lệ. Có thể kết nối CSDL đã bị đóng hoặc câu truy vấn sai.",
+                    "Invalid Operation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi cập nhật: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi không xác định: " + ex.Message,
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
