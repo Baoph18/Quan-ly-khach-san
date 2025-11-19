@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net.NetworkInformation;
+using System.Data.SqlClient;
 
 namespace Quản_lí_khách_sạn.ksquanli
 {
@@ -49,18 +50,32 @@ namespace Quản_lí_khách_sạn.ksquanli
             txtPassword.Clear();
         }
 
-        
+
         private void tabEmployee_SelectedIndexChanged(object sender, EventArgs e)
         {
-           if (tabEmployee.SelectedIndex == 1)
-           {
-                SetEmployee(dataGridView1);
-           }
-           else if(tabEmployee.SelectedIndex == 2)
-           {
-                SetEmployee(dataGridView2);
-           }
+            try
+            {
+                if (tabEmployee.SelectedIndex == 1)
+                {
+                    if (dataGridView1 != null)
+                        SetEmployee(dataGridView1);
+                }
+                else if (tabEmployee.SelectedIndex == 2)
+                {
+                    if (dataGridView2 != null)
+                        SetEmployee(dataGridView2);
+                }
+            }
+            catch (NullReferenceException)
+            {
+                MessageBox.Show("Một bảng dữ liệu chưa được khởi tạo!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi chuyển tab: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
+
 
         public void SetEmployee(DataGridView dgv)
         {
@@ -116,13 +131,49 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         private void XoaNhanVien(NhanVienDeleteInfo info)
         {
-            // Thứ tự xóa: TAIKHOAN (khóa ngoại) trước, NHANVIEN sau.
-            string query = $@"
+            try
+            {
+                string query = $@"
             DELETE FROM TAIKHOAN WHERE MANV = {info.MaNV};
-            DELETE FROM NHANVIEN WHERE MANV = {info.MaNV};";
+            DELETE FROM NHANVIEN WHERE MANV = {info.MaNV};
+        ";
 
-            fn.setdata(query, "Đã xóa nhân viên và tài khoản thành công!");
+                fn.setdata(query, "Đã xóa nhân viên và tài khoản thành công!");
+            }
+            catch (SqlException ex)
+            {
+                MessageBox.Show(
+                    "Không thể xóa nhân viên vì có ràng buộc dữ liệu.\nChi tiết: " + ex.Message,
+                    "Lỗi SQL",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+            catch (InvalidOperationException)
+            {
+                MessageBox.Show(
+                    "Kết nối cơ sở dữ liệu gặp lỗi hoặc bị đóng!",
+                    "Lỗi CSDL",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+            catch (NullReferenceException)
+            {
+                MessageBox.Show(
+                    "Dữ liệu nhân viên để xóa đang null!",
+                    "Lỗi",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "Lỗi không xác định: " + ex.Message,
+                    "Lỗi",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }//fđf
         }
+//jkjkjk
 
         private void btnDelete_Click(object sender, EventArgs e)
         {

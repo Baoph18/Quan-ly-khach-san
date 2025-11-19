@@ -166,6 +166,7 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         private KhachHangAddInfo LayThongTinKhachHangMoi()
         {
+
             return new KhachHangAddInfo
             {
                 Ten = txtName.Text.Trim(),
@@ -181,22 +182,54 @@ namespace Quản_lí_khách_sạn.ksquanli
             };
         }
 
+        //private void ThemKhachHang(KhachHangAddInfo info)
+        //{
+        //    string checkinStr = info.NgayCheckin.ToString("MM/dd/yyyy");
+
+        //    string query = $@"
+        //        INSERT INTO KHACHHANG (TENKH, SDT, NUOC, GIOITINH, MADD, DIACHI, SODEM, CHECKIN, MAPHONG)
+        //        VALUES (N'{info.Ten}', '{info.SDT}', N'{info.QuocTich}', N'{info.GioiTinh}', 
+        //                N'{info.MaDD}', N'{info.DiaChi}', '{info.SoDem}', '{checkinStr}', {info.MaPhong});
+
+        //        UPDATE PHONG 
+        //        SET DATPHONG = 'YES' 
+        //        WHERE SOPHONG = '{info.SoPhong}';
+        //    ";
+
+        //    fn.setdata(query, $"Khách hàng đã được đăng ký và phòng {info.SoPhong} đã được đánh dấu là đã đặt!");
+        //}
         private void ThemKhachHang(KhachHangAddInfo info)
         {
-            string checkinStr = info.NgayCheckin.ToString("MM/dd/yyyy");
+            try
+            {
+                string checkinStr = info.NgayCheckin.ToString("MM/dd/yyyy");
 
-            string query = $@"
-                INSERT INTO KHACHHANG (TENKH, SDT, NUOC, GIOITINH, MADD, DIACHI, SODEM, CHECKIN, MAPHONG)
-                VALUES (N'{info.Ten}', '{info.SDT}', N'{info.QuocTich}', N'{info.GioiTinh}', 
-                        N'{info.MaDD}', N'{info.DiaChi}', '{info.SoDem}', '{checkinStr}', {info.MaPhong});
+                string query = $@"
+            INSERT INTO KHACHHANG (TENKH, SDT, NUOC, GIOITINH, MADD, DIACHI, SODEM, CHECKIN, MAPHONG)
+            VALUES (N'{info.Ten}', '{info.SDT}', N'{info.QuocTich}', N'{info.GioiTinh}', 
+                    N'{info.MaDD}', N'{info.DiaChi}', '{info.SoDem}', '{checkinStr}', {info.MaPhong});
 
-                UPDATE PHONG 
-                SET DATPHONG = 'YES' 
-                WHERE SOPHONG = '{info.SoPhong}';
-            ";
+            UPDATE PHONG 
+            SET DATPHONG = 'YES' 
+            WHERE SOPHONG = '{info.SoPhong}';
+        ";
 
-            fn.setdata(query, $"Khách hàng đã được đăng ký và phòng {info.SoPhong} đã được đánh dấu là đã đặt!");
+                fn.setdata(query, $"Khách hàng đã được đăng ký và phòng {info.SoPhong} đã được đánh dấu là đã đặt!");
+            }
+            catch (InvalidOperationException)
+            {
+                throw new InvalidOperationException("Kết nối CSDL bị lỗi hoặc truy vấn không hợp lệ!");
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("Lỗi SQL: " + ex.Message);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
+
 
         private void btnAdd_Khachhang_Click_1(object sender, EventArgs e)
         {
