@@ -8,11 +8,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using log4net;
+using log4net.Config;
+using System.IO;
 
 namespace Quản_lí_khách_sạn.ksquanli
 {
     public partial class uc_CustomerDetails: UserControl
     {
+        //// Khai báo một logger cho Program.cs 
+        private static readonly ILog log = LogManager.GetLogger(typeof(uc_CustomerDetails));
+
         Function fn = new Function();
         string query;
         public uc_CustomerDetails()
@@ -95,6 +101,9 @@ namespace Quản_lí_khách_sạn.ksquanli
                 txtSoDem.Text = row.Cells[7].Value.ToString(); // Số Đêm
             }
         }
+        /// <summary>
+        /// /////////////////////////////////////
+        /// </summary>
         // TẠO CLASS THAM SỐ 
         public class KhachHangUpdateInfo
         {
@@ -161,6 +170,13 @@ namespace Quản_lí_khách_sạn.ksquanli
             {
                 KhachHangUpdateInfo info = LayThongTinKhachHang();
                 CapNhatKhachHang(info);
+                // Yêu cầu Log4net đọc file config 
+                XmlConfigurator.Configure(new FileInfo("log4net.config"));
+                log.Info(
+                  $"Sua thong tin khach hang thanh cong: " +
+                  $"MaKH='{info.MaKH}', Ten='{info.Ten}', SDT='{info.SDT}', " +
+                  $"QuocTich='{info.QuocTich}', GioiTinh='{info.GioiTinh}', " +
+                  $"MaDD='{info.MaDD}', DiaChi='{info.DiaChi}', SoDem='{info.SoDem}'");
 
                 load();
                 ClearInputs();
@@ -297,6 +313,12 @@ namespace Quản_lí_khách_sạn.ksquanli
                 // CHỈ cho nhập chữ cái (có dấu) và khoảng trắng
                 if (!char.IsLetter(c) && !char.IsWhiteSpace(c))
                 {
+                    // Yêu cầu Log4net đọc file config 
+                    XmlConfigurator.Configure(new FileInfo("log4net.config"));
+                    // GHI LOG ERROR
+                    log.Error($"Loi nhap lieu: Nguoi dung nhap quoc tich khong hop le: '{input}'. " +
+                               "Chi duoc phep nhap chu cai va khoang trang.");
+
                     MessageBox.Show("Chỉ được nhập chữ cái tiếng Việt và khoảng trắng. Không cho phép số hoặc ký tự đặc biệt.",
                                     "Lỗi nhập liệu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtQUOCTICH.Text = ""; // Xóa dữ liệu sai

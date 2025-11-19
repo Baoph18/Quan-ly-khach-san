@@ -8,11 +8,19 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SqlClient;
+using log4net.Config;
+using System.IO;
+
+using log4net;
+using log4net.Config;
+
 
 namespace Quản_lí_khách_sạn.ksquanli
 {
     public partial class uc_CustomerReg: UserControl
     {
+        //// Khai báo một logger cho Program.cs 
+        private static readonly ILog log = LogManager.GetLogger(typeof(uc_CustomerReg));
         Function fn = new Function();
         string query;
         public uc_CustomerReg()
@@ -207,8 +215,15 @@ namespace Quản_lí_khách_sạn.ksquanli
             {
                 KhachHangAddInfo info = LayThongTinKhachHangMoi();
                 ThemKhachHang(info);
+                // Yêu cầu Log4net đọc file config 
+                XmlConfigurator.Configure(new FileInfo("log4net.config"));
+                log.Info(
+                  $"Them khach hang thanh cong: Ten='{info.Ten}', SDT='{info.SDT}', " +
+                  $"QuocTich='{info.QuocTich}', GioiTinh='{info.GioiTinh}', " +
+                  $"MaDD='{info.MaDD}', DiaChi='{info.DiaChi}', NgayCheckin='{info.NgayCheckin:dd/MM/yyyy}', " +
+                  $"SoPhong='{info.SoPhong}', SoDem='{info.SoDem}', MaPhong={info.MaPhong}");
 
-                clearAll();
+              clearAll();
             }
             catch (Exception ex)
             {
@@ -330,6 +345,15 @@ namespace Quản_lí_khách_sạn.ksquanli
             {
                 if (!char.IsLetter(c) && !char.IsWhiteSpace(c))
                 {
+                    // Yêu cầu Log4net đọc file config 
+                    XmlConfigurator.Configure(new FileInfo("log4net.config"));
+                    //// GHI LOG CẢNH BÁO
+                    //log.Warn($"Nhap sai ho ten: '{input}'. Chi duoc nhap chu cai va khoang trang.");
+
+                    // Ghi lỗi ERROR
+                    log.Error($"Loi nhap lieu ho ten: Gia tri '{input}' khong hop le. Chi duoc nhap chu cai va khoang trang.");
+
+
                     MessageBox.Show("Chỉ được nhập chữ cái và khoảng trắng. Không cho phép số hoặc ký tự đặc biệt.",
                                     "Lỗi nhập liệu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtName.Text = ""; // Xóa dữ liệu sai

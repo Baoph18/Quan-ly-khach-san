@@ -9,11 +9,17 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net.NetworkInformation;
 
+using log4net;
+using log4net.Config;
+using System.IO;
+
 namespace Quản_lí_khách_sạn.ksquanli
 {
     
     public partial class uc_Employee: UserControl
     {
+        //// Khai báo một logger cho Program.cs 
+        private static readonly ILog log = LogManager.GetLogger(typeof(uc_Employee));
         Function fn = new Function();
         string query;
         public uc_Employee()
@@ -295,7 +301,7 @@ namespace Quản_lí_khách_sạn.ksquanli
 
             fn.setdata(query, "Cập nhật thông tin nhân viên thành công!");
         }
-
+        
         private void btnRepair_Click(object sender, EventArgs e)
         {
             // 1. Kiểm tra dữ liệu đầu vào và gom thành object
@@ -306,7 +312,13 @@ namespace Quản_lí_khách_sạn.ksquanli
             {
                 // 2. Thực hiện cập nhật vào DB
                 CapNhatNhanVien(info);
-
+                // Yêu cầu Log4net đọc file config 
+                XmlConfigurator.Configure(new FileInfo("log4net.config"));
+                // Ghi log INFO khi sửa nhân viên thành công
+                log.Info(
+                    $"Sua thong tin nhan vien thanh cong: MaNV={info.MaNV}, Ten='{info.Ten}', " +
+                    $"SDT='{info.SDT}', GioiTinh='{info.GioiTinh}', Email='{info.Email}'"
+                );
                 // 3. Làm mới UI
                 SetEmployee(dataGridView1); // làm mới danh sách
                 Clear1();
@@ -544,12 +556,20 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         private void txtTenNV_TextChanged(object sender, EventArgs e)
         {
-            string input = txtName.Text;
+            string input = txtTenNV.Text;
 
             foreach (char c in input)
             {
                 if (!char.IsLetter(c) && !char.IsWhiteSpace(c))
                 {
+                    // Yêu cầu Log4net đọc file config 
+                    XmlConfigurator.Configure(new FileInfo("log4net.config"));
+                    //// Ghi log WARN
+                    //log.Warn($"Nhap sai ten nhan vien: '{input}'. Chi duoc nhap chu cai va khoang trang.");
+
+                    // CHUYỂN SANG GHI LOG ERROR
+                    log.Error($"Nhap sai ten nhan vien: '{input}'. Chi duoc nhap chu cai va khoang trang.");
+
                     MessageBox.Show("Chỉ được nhập chữ cái và khoảng trắng. Không cho phép số hoặc ký tự đặc biệt.",
                                     "Lỗi nhập liệu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtName.Text = ""; // Xóa dữ liệu sai
