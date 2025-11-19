@@ -17,12 +17,12 @@ namespace Quản_lí_khách_sạn
             //Tạo một đối tượng kết nối đến SQL Server tên là con.
             SqlConnection con = new SqlConnection();
             //Gán chuỗi kết nối (Connection String) cho đối tượng con.
-            con.ConnectionString = "Data Source=LAPTOP-GHEUHM8V\\SQLEXPRESS01;Initial Catalog = QL_KS; Integrated Security = True"; 
+            con.ConnectionString = "Data Source=LAPTOP-B25HVS2V\\CSDL;Initial Catalog = QL_KS; Integrated Security = True"; 
             return con;
             
         }
 
-
+        //Duy Bao is gay
         // LẤY DATA 
         public DataSet getdata(string query)
         {
