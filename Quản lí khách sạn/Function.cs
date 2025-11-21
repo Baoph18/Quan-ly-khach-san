@@ -21,7 +21,7 @@ namespace Quản_lí_khách_sạn
             return con;
             
         }
-        //duyhuynh
+        
 
         // LẤY DATA 
         public DataSet getdata(string query)
@@ -75,6 +75,11 @@ namespace Quản_lí_khách_sạn
             // mục đích là dùng để đọc kết quả truy vấn từ CSDL theo từng dòng một; 
             SqlDataReader sdr = cmd.ExecuteReader();
             return sdr;
+        }
+
+        internal void setDataWithParameters(string query, Dictionary<string, object> parameters, string v)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Runtime.InteropServices;
+using System.Data.SqlClient;
 
 namespace Quản_lí_khách_sạn.ksquanli
 {
@@ -20,7 +21,7 @@ namespace Quản_lí_khách_sạn.ksquanli
         {
             InitializeComponent();
         }
-       // duy sửa
+        
         private void uc_Addroom_Load(object sender, EventArgs e)
         {
             query = "select MAPHONG AS [Mã Phòng], SOPHONG AS [Số Phòng],LOAIPHONG AS [Loại Phòng], GIUONG AS [Giường], GIA AS [Gía], DATPHONG AS [Trạng thái đặt phòng] from PHONG";
@@ -34,39 +35,136 @@ namespace Quản_lí_khách_sạn.ksquanli
         {
 
 
-            if ( txtSophong.Text != "" && txtLoaiphong.Text != "" && txtLoaigiuong.Text != "" && txtGiatien.Text != "")
-            {         
-                // gán vào biến sophong
-                String sophong = txtSophong.Text;
-                String loaiphong = txtLoaiphong.Text;
-                String loaigiuong = txtLoaigiuong.Text;
-                Int64 giatien = Int64.Parse(txtGiatien.Text);
+            //if ( txtSophong.Text != "" && txtLoaiphong.Text != "" && txtLoaigiuong.Text != "" && txtGiatien.Text != "")
+            //{         
+            //    // gán vào biến sophong
+            //    String sophong = txtSophong.Text;
+            //    String loaiphong = txtLoaiphong.Text;
+            //    String loaigiuong = txtLoaigiuong.Text;
+            //    Int64 giatien = Int64.Parse(txtGiatien.Text);
 
-                // 🔍 Kiểm tra trùng số phòng
-                string checkQuery = $"SELECT COUNT(*) FROM PHONG WHERE SOPHONG = '{sophong}'";
-                DataSet dsCheck = fn.getdata(checkQuery);
-                int count = Convert.ToInt32(dsCheck.Tables[0].Rows[0][0]);
+            //    // 🔍 Kiểm tra trùng số phòng
+            //    string checkQuery = $"SELECT COUNT(*) FROM PHONG WHERE SOPHONG = '{sophong}'";
+            //    DataSet dsCheck = fn.getdata(checkQuery);
+            //    int count = Convert.ToInt32(dsCheck.Tables[0].Rows[0][0]);
 
-                if (count > 0)
+            //    if (count > 0)
+            //    {
+            //        MessageBox.Show("Số phòng đã tồn tại! Vui lòng nhập số phòng khác.", "Trùng dữ liệu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            //        txtSophong.Focus();
+            //        return;
+            //    }
+            //    query = "insert into PHONG (SOPHONG, LOAIPHONG, GIUONG, GIA) values ('" + sophong + "', N'" + loaiphong + "', '" + loaigiuong + "', '" + giatien + "')";
+            //    fn.setdata(query, "Đã thêm phòng");
+
+            //    uc_Addroom_Load(this, null);
+            //    clearAll();
+
+            //}
+            //else
+            //{
+            //    MessageBox.Show("Vui lòng điền đầy đủ thông tin", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            //}
+
+            try
+            {
+                
+                string sophong = txtSophong.Text.Trim();
+                string loaiphong = txtLoaiphong.Text.Trim();
+                string loaigiuong = txtLoaigiuong.Text.Trim();
+                long giatien = ParseGiaTien(txtGiatien.Text); // có throw
+
+                if (IsRoomExist(sophong))
                 {
-                    MessageBox.Show("Số phòng đã tồn tại! Vui lòng nhập số phòng khác.", "Trùng dữ liệu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    txtSophong.Focus();
-                    return;
+                    throw new ApplicationException("Số phòng đã tồn tại! Vui lòng nhập số phòng khác.");
                 }
-                query = "insert into PHONG (SOPHONG, LOAIPHONG, GIUONG, GIA) values ('" + sophong + "', N'" + loaiphong + "', '" + loaigiuong + "', '" + giatien + "')";
-                fn.setdata(query, "Đã thêm phòng");
+
+                AddRoomToDatabase(sophong, loaiphong, loaigiuong, giatien);
+
+                MessageBox.Show("Thêm phòng thành công!",
+                                "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 uc_Addroom_Load(this, null);
-                clearAll();
-
             }
-            else
+            catch (FormatException ex)
             {
-                MessageBox.Show("Vui lòng điền đầy đủ thông tin", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Lỗi định dạng dữ liệu: " + ex.Message,
+                                "Lỗi nhập liệu", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-
+            catch (ApplicationException ex)
+            {
+                MessageBox.Show(ex.Message,
+                                "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi hệ thống: " + ex.Message,
+                                "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // Luôn chạy dù có lỗi hay không
+                clearAll();
+            }
         }
+
+//       private void ValidateInput()
+//{
+//    if (string.IsNullOrWhiteSpace(txtSophong.Text) ||
+//        string.IsNullOrWhiteSpace(txtLoaiphong.Text) ||
+//        string.IsNullOrWhiteSpace(txtLoaigiuong.Text) ||
+//        string.IsNullOrWhiteSpace(txtGiatien.Text))
+//    {
+//        throw new ApplicationException("Vui lòng điền đầy đủ thông tin.");
+//    }
+//}
+
+        private long ParseGiaTien(string text)
+        {
+            if (!long.TryParse(text, out long giatien))
+            {
+                throw new FormatException("Giá tiền phải là số nguyên.");
+            }
+            return giatien;
+        }
+
+        private bool IsRoomExist(string sophong)
+        {
+            string query = $"SELECT COUNT(*) FROM PHONG WHERE SOPHONG = '{sophong}'";
+            DataSet ds = fn.getdata(query);
+
+            return Convert.ToInt32(ds.Tables[0].Rows[0][0]) > 0;
+        }
+
+
+        private bool IsInputValid()
+        {
+            return !string.IsNullOrWhiteSpace(txtSophong.Text) &&
+                   !string.IsNullOrWhiteSpace(txtLoaiphong.Text) &&
+                   !string.IsNullOrWhiteSpace(txtLoaigiuong.Text) &&
+                   !string.IsNullOrWhiteSpace(txtGiatien.Text);
+        }
+
+
+        private void AddRoomToDatabase(string sophong, string loaiphong, string loaigiuong, long giatien)
+        {
+            string insertQuery =
+                "INSERT INTO PHONG (SOPHONG, LOAIPHONG, GIUONG, GIA) VALUES " +
+                $"('{sophong}', N'{loaiphong}', '{loaigiuong}', '{giatien}')";
+
+            try
+            {
+                fn.setdata(insertQuery, null);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Không thể thêm phòng vào cơ sở dữ liệu. Chi tiết: " + ex.Message);
+            }
+        }
+
+
+
+
 
         public void clearAll()
         {
@@ -75,7 +173,6 @@ namespace Quản_lí_khách_sạn.ksquanli
             txtLoaigiuong.SelectedIndex = -1;
             txtGiatien.Clear();
             selectedRoomId = -1;
-
         }
 
         private void uc_Addroom_Leave(object sender, EventArgs e)
@@ -114,38 +211,192 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         private void btnRepair_Click(object sender, EventArgs e)
         {
+            //if (selectedRoomId == -1)
+            //{
+            //    MessageBox.Show("Vui lòng chọn phòng cần chỉnh sửa.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            //    return;
+            //}
+
+            //if (txtSophong.Text != "" && txtLoaiphong.Text != "" && txtLoaigiuong.Text != "" && txtGiatien.Text != "")
+            //{
+            //    string sophong = txtSophong.Text;
+            //    string loaiphong = txtLoaiphong.Text;
+            //    string loaigiuong = txtLoaigiuong.Text;
+
+            //    long gia = long.Parse(txtGiatien.Text);
+
+            //    string query = $"UPDATE PHONG SET SOPHONG = '{sophong}', LOAIPHONG = '{loaiphong}', GIUONG = '{loaigiuong}', GIA = {gia} WHERE MAPHONG = {selectedRoomId}";
+            //    fn.setdata(query, "Cập nhật thông tin phòng thành công!");
+
+            //    uc_Addroom_Load(this, null);
+            //    clearAll();
+            //    selectedRoomId = -1; // reset lại
+
+            //}
+            //else
+            //{
+            //    MessageBox.Show("Vui lòng nhập đầy đủ thông tin", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            //}
+            try
+            {
+                if (!IsRoomSelected())
+                    return;
+
+
+
+                UpdateRoom();
+
+                ResetForm();
+            }
+            catch (FormatException ex)
+            {
+                MessageBox.Show($"Lỗi định dạng dữ liệu: {ex.Message}",
+                                "Lỗi nhập liệu",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+            }
+            catch (SqlException ex)
+            {
+                MessageBox.Show($"Lỗi SQL: {ex.Message}",
+                                "Lỗi hệ thống",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi không xác định: {ex.Message}",
+                                "Lỗi",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // luôn chạy dù có lỗi hay không
+                Console.WriteLine("btnRepair_Click đã kết thúc.");
+            }
+
+
+        }
+
+        private bool IsRoomSelected()
+        {
             if (selectedRoomId == -1)
             {
-                MessageBox.Show("Vui lòng chọn phòng cần chỉnh sửa.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                MessageBox.Show("Vui lòng chọn phòng cần chỉnh sửa.",
+                                "Thông báo",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning);
+                return false;
+            }
+            return true;
+        }
+
+        private bool ValidateInput()
+        {
+            if (string.IsNullOrWhiteSpace(txtSophong.Text) ||
+        string.IsNullOrWhiteSpace(txtLoaiphong.Text) ||
+        string.IsNullOrWhiteSpace(txtLoaigiuong.Text) ||
+        string.IsNullOrWhiteSpace(txtGiatien.Text))
+            {
+                MessageBox.Show("Vui lòng nhập đầy đủ thông tin.", "Cảnh báo",
+                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
             }
 
-            if ( txtSophong.Text != "" && txtLoaiphong.Text != "" && txtLoaigiuong.Text != "" && txtGiatien.Text != "")
+            if (!long.TryParse(txtGiatien.Text, out _))
             {
-                string sophong = txtSophong.Text;
-                string loaiphong = txtLoaiphong.Text;
-                string loaigiuong = txtLoaigiuong.Text;
-                
-                long gia = long.Parse(txtGiatien.Text);
-
-                string query = $"UPDATE PHONG SET SOPHONG = '{sophong}', LOAIPHONG = '{loaiphong}', GIUONG = '{loaigiuong}', GIA = {gia} WHERE MAPHONG = {selectedRoomId}";
-                fn.setdata(query, "Cập nhật thông tin phòng thành công!");
-
-                uc_Addroom_Load(this, null);
-                clearAll();
-                selectedRoomId = -1; // reset lại
-
+                MessageBox.Show("Giá tiền phải là số hợp lệ!", "Lỗi",
+                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
-            else
+
+            return true;
+        }
+
+
+        public void setDataWithParameters(string query, Dictionary<string, object> parameters, string message)
+        {
+            SqlConnection con = new SqlConnection("your_connection_string_here");
+            SqlCommand cmd = null;
+
+            try
             {
-                MessageBox.Show("Vui lòng nhập đầy đủ thông tin", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                con.Open();
+                cmd = new SqlCommand(query, con);
+
+                foreach (var param in parameters)
+                {
+                    cmd.Parameters.AddWithValue(param.Key, param.Value);
+                }
+
+                cmd.ExecuteNonQuery();
+
+                if (!string.IsNullOrEmpty(message))
+                {
+                    MessageBox.Show(message, "Thông báo",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("Lỗi truy vấn SQL: " + ex.Message);
+            }
+            catch (Exception)
+            {
+                throw; // giữ nguyên lỗi
+            }
+            finally
+            {
+                if (cmd != null)
+                    cmd.Dispose();
+
+                if (con.State == ConnectionState.Open)
+                    con.Close();
             }
         }
 
-       
 
-       
-        
+        private void UpdateRoom()
+        {
+            try
+            {
+                string query = @"UPDATE PHONG 
+                         SET SOPHONG=@sophong, LOAIPHONG=@loaiphong, 
+                             GIUONG=@giuong, GIA=@gia 
+                         WHERE MAPHONG=@id";
+
+                Dictionary<string, object> parameters = new Dictionary<string, object>()
+        {
+            {"@sophong", txtSophong.Text },
+            {"@loaiphong", txtLoaiphong.Text },
+            {"@giuong", txtLoaigiuong.Text },
+            {"@gia", long.Parse(txtGiatien.Text) },
+            {"@id", selectedRoomId }
+        };
+
+                fn.setDataWithParameters(query, parameters, "Cập nhật thông tin phòng thành công!");
+            }
+            catch
+            {
+                // ném lỗi lên cho btnRepair_Click xử lý
+                throw;
+            }
+        }
+
+
+        private void ResetForm()
+        {
+            uc_Addroom_Load(this, null);
+            clearAll();
+            selectedRoomId = -1;
+        }
+
+
+
+
+
+
         private void txtLoaigiuong_SelectedIndexChanged(object sender, EventArgs e)
         {
 
@@ -185,61 +436,178 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         private void btnexporttoexel_Click(object sender, EventArgs e)
         {
-            // Kiểm tra nếu không có dữ liệu
+            //// Kiểm tra nếu không có dữ liệu
+            //if (Datagridview.Rows.Count == 0)
+            //{
+            //    MessageBox.Show("Không có dữ liệu để xuất!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            //    return;
+            //}
+
+            //// Tạo ứng dụng Excel
+            //Excel.Application excelApp = new Excel.Application();
+            //if (excelApp == null)
+            //{
+            //    MessageBox.Show("Excel chưa được cài đặt trên máy tính!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //    return;
+            //}
+            //// tạo mới , lấy workship đầu tiên
+            //Excel.Workbook workbook = excelApp.Workbooks.Add(Type.Missing);
+            //Excel.Worksheet worksheet = (Excel.Worksheet)workbook.ActiveSheet;
+            //worksheet.Name = "DanhSachPhong";
+
+            //// Đặt tiêu đề cột
+            //worksheet.Cells[1, 1] = "Mã phòng";
+            //worksheet.Cells[1, 2] = "Loại phòng";
+
+            //worksheet.Cells[1, 3] = "Loại giường";
+            //worksheet.Cells[1, 4] = "Giá tiền";
+
+            //// Xuất dữ liệu từ DataGridView vào Excel
+            //for (int i = 0; i < Datagridview.Rows.Count; i++)
+            //{
+            //    worksheet.Cells[i + 2, 1] = Datagridview.Rows[i].Cells["MAPHONG"].Value?.ToString();
+            //    worksheet.Cells[i + 2, 2] = Datagridview.Rows[i].Cells["LOAIPHONG"].Value?.ToString();
+
+            //    worksheet.Cells[i + 2, 4] = Datagridview.Rows[i].Cells["GIUONG"].Value?.ToString();
+            //    worksheet.Cells[i + 2, 5] = Datagridview.Rows[i].Cells["GIA"].Value?.ToString();
+            //}
+
+            //// Hộp thoại lưu file
+            //SaveFileDialog saveFileDialog = new SaveFileDialog();
+            //saveFileDialog.Filter = "Excel file (*.xlsx)|*.xlsx";
+            //saveFileDialog.FileName = "DanhSachPhong.xlsx";
+
+            //if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            //{
+            //    workbook.SaveAs(saveFileDialog.FileName);
+            //    workbook.Close();
+            //    excelApp.Quit();
+
+            //    // Giải phóng bộ nhớ thư viện excel chạy ngầm 
+            //    Marshal.ReleaseComObject(worksheet);
+            //    Marshal.ReleaseComObject(workbook);
+            //    Marshal.ReleaseComObject(excelApp);
+
+            //    MessageBox.Show("Xuất file Excel thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //}
+
+            if (!HasDataToExport())
+                return;
+
+            Excel.Application excelApp = CreateExcelApp();
+            if (excelApp == null)
+                return;
+
+            Excel.Workbook workbook = excelApp.Workbooks.Add(Type.Missing);
+            Excel.Worksheet sheet = InitializeWorksheet(workbook, "DanhSachPhong");
+
+            WriteHeader(sheet);
+            WriteData(sheet);
+
+            SaveWorkbook(workbook, excelApp, sheet);
+        }
+
+
+        private bool HasDataToExport()
+        {
             if (Datagridview.Rows.Count == 0)
             {
-                MessageBox.Show("Không có dữ liệu để xuất!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                MessageBox.Show("Không có dữ liệu để xuất!",
+                                "Thông báo",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning);
+                return false;
             }
+            return true;
+        }
 
-            // Tạo ứng dụng Excel
-            Excel.Application excelApp = new Excel.Application();
-            if (excelApp == null)
+
+        private Excel.Application CreateExcelApp()
+        {
+            Excel.Application app = new Excel.Application();
+
+            if (app == null)
             {
-                MessageBox.Show("Excel chưa được cài đặt trên máy tính!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                MessageBox.Show("Excel chưa được cài đặt!",
+                                "Lỗi",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                return null;
             }
-            // tạo mới , lấy workship đầu tiên
-            Excel.Workbook workbook = excelApp.Workbooks.Add(Type.Missing);
-            Excel.Worksheet worksheet = (Excel.Worksheet)workbook.ActiveSheet;
-            worksheet.Name = "DanhSachPhong";
 
-            // Đặt tiêu đề cột
-            worksheet.Cells[1, 1] = "Mã phòng";
-            worksheet.Cells[1, 2] = "Loại phòng";
-            
-            worksheet.Cells[1, 3] = "Loại giường";
-            worksheet.Cells[1, 4] = "Giá tiền";
+            return app;
+        }
 
-            // Xuất dữ liệu từ DataGridView vào Excel
+
+        private Excel.Worksheet InitializeWorksheet(Excel.Workbook workbook, string sheetName)
+        {
+            Excel.Worksheet sheet = (Excel.Worksheet)workbook.ActiveSheet;
+            sheet.Name = sheetName;
+            return sheet;
+        }
+        private void WriteHeader(Excel.Worksheet sheet)
+        {
+            sheet.Cells[1, 1] = "Mã phòng";
+            sheet.Cells[1, 2] = "Loại phòng";
+            sheet.Cells[1, 3] = "Loại giường";
+            sheet.Cells[1, 4] = "Giá tiền";
+        }
+
+
+
+        private void WriteData(Excel.Worksheet sheet)
+        {
             for (int i = 0; i < Datagridview.Rows.Count; i++)
             {
-                worksheet.Cells[i + 2, 1] = Datagridview.Rows[i].Cells["MAPHONG"].Value?.ToString();
-                worksheet.Cells[i + 2, 2] = Datagridview.Rows[i].Cells["LOAIPHONG"].Value?.ToString();
-                
-                worksheet.Cells[i + 2, 4] = Datagridview.Rows[i].Cells["GIUONG"].Value?.ToString();
-                worksheet.Cells[i + 2, 5] = Datagridview.Rows[i].Cells["GIA"].Value?.ToString();
-            }
-
-            // Hộp thoại lưu file
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Excel file (*.xlsx)|*.xlsx";
-            saveFileDialog.FileName = "DanhSachPhong.xlsx";
-
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                workbook.SaveAs(saveFileDialog.FileName);
-                workbook.Close();
-                excelApp.Quit();
-
-                // Giải phóng bộ nhớ thư viện excel chạy ngầm 
-                Marshal.ReleaseComObject(worksheet);
-                Marshal.ReleaseComObject(workbook);
-                Marshal.ReleaseComObject(excelApp);
-
-                MessageBox.Show("Xuất file Excel thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                sheet.Cells[i + 2, 1] = Datagridview.Rows[i].Cells[0].Value?.ToString();
+                sheet.Cells[i + 2, 2] = Datagridview.Rows[i].Cells[2].Value?.ToString();
+                sheet.Cells[i + 2, 3] = Datagridview.Rows[i].Cells[3].Value?.ToString();
+                sheet.Cells[i + 2, 4] = Datagridview.Rows[i].Cells[4].Value?.ToString();
             }
         }
+
+
+        private void SaveWorkbook(Excel.Workbook workbook, Excel.Application app, Excel.Worksheet sheet)
+        {
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.Filter = "Excel file (*.xlsx)|*.xlsx";
+            dialog.FileName = "DanhSachPhong.xlsx";
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                workbook.SaveAs(dialog.FileName);
+
+                workbook.Close();
+                app.Quit();
+
+                ReleaseComObject(sheet);
+                ReleaseComObject(workbook);
+                ReleaseComObject(app);
+
+                MessageBox.Show("Xuất file Excel thành công!",
+                                "Thông báo",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+            }
+        }
+
+
+        private void ReleaseComObject(object obj)
+        {
+            try
+            {
+                if (obj != null)
+                    Marshal.ReleaseComObject(obj);
+            }
+            catch { }
+            finally
+            {
+                obj = null;
+            }
+        }
+
+
+
 
         private void txtSophong_TextChanged(object sender, EventArgs e)
         {
