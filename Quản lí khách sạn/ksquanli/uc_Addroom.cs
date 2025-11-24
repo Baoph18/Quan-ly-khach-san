@@ -4,14 +4,43 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Data;
 using System.Linq;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Runtime.InteropServices;
+using log4net.Repository.Hierarchy;
+using log4net.Config;
 
 namespace Quản_lí_khách_sạn.ksquanli
 {
+    public static class Logger
+    {
+        private static readonly string path = "log.txt";
+
+        private static void Write(string level, string message)
+        {
+            string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            string log = $"{time} [{level}] {message}";
+            File.AppendAllText(path, log + Environment.NewLine);
+        }
+
+        public static void Info(string message)
+        {
+            Write("INFO", message);
+        }
+
+        public static void Warn(string message)
+        {
+            Write("WARN", message);
+        }
+
+        public static void Error(string message)
+        {
+            Write("ERROR", message);
+        }
+    }
     public partial class uc_Addroom : UserControl
     {
         Function fn = new Function();
@@ -114,38 +143,84 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         private void btnRepair_Click(object sender, EventArgs e)
         {
-            if (selectedRoomId == -1)
+            try
             {
-                MessageBox.Show("Vui lòng chọn phòng cần chỉnh sửa.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if ( txtSophong.Text != "" && txtLoaiphong.Text != "" && txtLoaigiuong.Text != "" && txtGiatien.Text != "")
-            {
-                string sophong = txtSophong.Text;
-                string loaiphong = txtLoaiphong.Text;
-                string loaigiuong = txtLoaigiuong.Text;
                 
-                long gia = long.Parse(txtGiatien.Text);
+                XmlConfigurator.Configure(new FileInfo("Log4net.config"));
 
-                string query = $"UPDATE PHONG SET SOPHONG = '{sophong}', LOAIPHONG = '{loaiphong}', GIUONG = '{loaigiuong}', GIA = {gia} WHERE MAPHONG = {selectedRoomId}";
-                fn.setdata(query, "Cập nhật thông tin phòng thành công!");
+                if (!KiemTraDaChonPhong()) return;
+                if (!KiemTraDuLieuNhap()) return;
 
-                uc_Addroom_Load(this, null);
-                clearAll();
-                selectedRoomId = -1; // reset lại
-
+                CapNhatPhong();
+                LamMoiSauKhiSua();
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Vui lòng nhập đầy đủ thông tin", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                XuLyLoi(ex);
             }
         }
 
-       
+        private bool KiemTraDaChonPhong()
+        {
+            if (selectedRoomId == -1)
+            {
+                Logger.Error("Người dùng nhấn sửa nhưng chưa chọn phòng.");
+                MessageBox.Show("Vui lòng chọn phòng cần chỉnh sửa.",
+                                "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+            return true;
+        }
 
-       
-        
+        private bool KiemTraDuLieuNhap()
+        {
+            if (txtSophong.Text == "" || txtLoaiphong.Text == "" ||
+                txtLoaigiuong.Text == "" || txtGiatien.Text == "")
+            {
+                Logger.Warn("Người dùng nhập thiếu dữ liệu khi sửa phòng.");
+                MessageBox.Show("Vui lòng nhập đầy đủ thông tin.",
+                                "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+            return true;
+        }
+
+        private void CapNhatPhong()
+        {
+            string sophong = txtSophong.Text;
+            string loaiphong = txtLoaiphong.Text;
+            string loaigiuong = txtLoaigiuong.Text;
+            long gia = long.Parse(txtGiatien.Text);
+
+            Logger.Info($"Dữ liệu nhập: SOPHONG={sophong}, LOAIPHONG={loaiphong}, LOAIGIUONG={loaigiuong}, GIA={gia}");
+
+            string query =
+                $"UPDATE PHONG SET SOPHONG='{sophong}', LOAIPHONG='{loaiphong}', GIUONG='{loaigiuong}', GIA={gia} WHERE MAPHONG={selectedRoomId}";
+
+            Logger.Info("Sửa thông tin phòng thành công: " + query);
+
+            fn.setdata(query, "Cập nhật thông tin phòng thành công!");
+        }
+
+        private void LamMoiSauKhiSua()
+        {
+            uc_Addroom_Load(this, null);
+            clearAll();
+            selectedRoomId = -1;
+
+           
+        }
+
+        private void XuLyLoi(Exception ex)
+        {
+            Logger.Error("Lỗi khi sửa phòng: " + ex.Message);
+            Logger.Error("StackTrace: " + ex.StackTrace);
+
+            MessageBox.Show("Đã xảy ra lỗi khi cập nhật phòng!",
+                            "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+
         private void txtLoaigiuong_SelectedIndexChanged(object sender, EventArgs e)
         {
 
@@ -245,12 +320,16 @@ namespace Quản_lí_khách_sạn.ksquanli
         {
             try
             {
+
                 string input = txtSophong.Text;
 
                 // Kiểm tra nếu nhập không phải là số nguyên
                 if (!System.Text.RegularExpressions.Regex.IsMatch(input, @"^\d*$"))
                 {
+                    XmlConfigurator.Configure(new FileInfo("Log4net.config"));
+                    Logger.Warn("Sai định dạng.Yêu cầu nhập số,không được nhập chữ");
                     throw new Exception("Chỉ được nhập số, không cho phép chữ hoặc ký tự đặc biệt.");
+                    
                 }
             }
             catch (Exception ex)

@@ -129,9 +129,7 @@
     <Compile Include="ksquanli\uc_HoaDon.Designer.cs">
       <DependentUpon>uc_HoaDon.cs</DependentUpon>
     </Compile>
-    <Compile Include="ksquanli\uc_Addroom.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="ksquanli\uc_Addroom.cs" />
     <Compile Include="ksquanli\uc_Addroom.Designer.cs">
       <DependentUpon>uc_Addroom.cs</DependentUpon>
     </Compile>

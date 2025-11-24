@@ -16,7 +16,7 @@ using System.IO;
 
 namespace Quản_lí_khách_sạn.ksquanli
 {
-    
+    //Log bth5
     public partial class uc_Employee: UserControl
     {
         //// Khai báo một logger cho Program.cs 
@@ -312,7 +312,7 @@ namespace Quản_lí_khách_sạn.ksquanli
                 return false;
             }
 
-            if (!checkEmail(txtEmailr.Text))
+            if (!KiemTraEmail(txtEmailr.Text))
             {
                 MessageBox.Show("Email vừa nhập không hợp lệ!!!", "Thông báo",
                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -450,70 +450,82 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         private void btnDangKy_Click_1(object sender, EventArgs e)
         {
-            if (txtName.Text != "" && txtMobile.Text != "" && txtGender.Text != "" &&
-        txtEmail.Text != "" && txtUserName.Text != "" && txtPassword.Text != "")
+            XmlConfigurator.Configure(new FileInfo("Log4net.config"));
+
+            if (!NhapDuLieuDayDu())
             {
-
-                if (!checkEmail(txtEmail.Text))
-                {    
-                    MessageBox.Show("Email vừa nhập không hợp lệ!!!", "Thông báo",
-                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    txtEmail.Focus();
-                }
-                else
-                {
-                    try
-                    {
-
-                        string name = txtName.Text.Trim().Replace("'", "''");
-                        string mobile = txtMobile.Text.Trim();
-                        string gender = txtGender.Text.Trim().Replace("'", "''");
-                        string email = txtEmail.Text.Trim().Replace("'", "''");
-                        string username = txtUserName.Text.Trim().Replace("'", "''");
-                        string pass = txtPassword.Text.Trim().Replace("'", "''");
-                        string chucvu = "nhanvien";
-
-                        string checkEmailQuery = $"SELECT COUNT(*) FROM NHANVIEN WHERE EMAILNV = '{email}'";
-                        DataSet checkDs = fn.getdata(checkEmailQuery);
-                        int count = Convert.ToInt32(checkDs.Tables[0].Rows[0][0]);
-
-                        if (count > 0)
-                        {
-                            MessageBox.Show("Email này đã tồn tại. Vui lòng nhập email khác!", "Trùng Email", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            txtEmail.Focus();
-                            return;
-                        }
-                        // 1️⃣ Thêm nhân viên mới (chưa có tài khoản)
-                        query = $"INSERT INTO NHANVIEN (TENNV, SDTNV, GIOITINHNV, EMAILNV, CHUCVU) " +
-                                $"VALUES (N'{name}', '{mobile}', N'{gender}', '{email}', '{chucvu}')";
-                        fn.setdata(query, "Đăng ký nhân viên thành công!");
-
-                        // 2️⃣ Lấy MANV mới nhất
-                        string getIdQuery = "SELECT MAX(MANV) FROM NHANVIEN";
-                        DataSet ds = fn.getdata(getIdQuery);
-
-                        // SỬA chỗ này: dùng long (Int64) thay vì int
-                        int manv = Convert.ToInt32(ds.Tables[0].Rows[0][0]);
-
-                        // 3️⃣ Thêm vào bảng tài khoản
-                        query = $"INSERT INTO TAIKHOAN (TENTK, MATKHAU, MANV) VALUES ('{username}', '{pass}', {manv})";
-                        fn.setdata(query, "Tạo tài khoản thành công!");
-
-                        clearAll();
-                        getMaxID();
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Lỗi khi đăng ký: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }    
-                
-            }
-            else
-            {
+                Logger.Warn("Thiếu dữ liệu đăng ký.");
                 MessageBox.Show("Vui lòng nhập đầy đủ thông tin!", "Thiếu dữ liệu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
 
+            if (!KiemTraEmail(txtEmail.Text))
+                return;
+
+            try
+            {
+                DangKyNhanVien();
+            }
+            catch (Exception ex)
+            {
+                XuLyLoi(ex);
+            }
+
+
+        }
+
+        private bool NhapDuLieuDayDu()
+        {
+            return txtName.Text != "" && txtMobile.Text != "" && txtGender.Text != "" &&
+                   txtEmail.Text != "" && txtUserName.Text != "" && txtPassword.Text != "";
+        }
+
+        // 2️⃣ Kiểm tra email hợp lệ và chưa tồn tại
+        
+
+        // 3️⃣ Thực hiện đăng ký nhân viên và tạo tài khoản
+        private void DangKyNhanVien()
+        {
+            string ten = txtName.Text.Trim().Replace("'", "''");
+            string sdt = txtMobile.Text.Trim();
+            string gioiTinh = txtGender.Text.Trim().Replace("'", "''");
+            string email = txtEmail.Text.Trim().Replace("'", "''");
+            string taiKhoan = txtUserName.Text.Trim().Replace("'", "''");
+            string matKhau = txtPassword.Text.Trim().Replace("'", "''");
+            string chucVu = "nhanvien";
+
+            Logger.Info($"Dữ liệu nhập: TENNV={ten}, SDTNV={sdt}, GIOITINHNV={gioiTinh}, EMAILNV={email}, TENTK={taiKhoan}");
+
+            // Thêm nhân viên mới
+            string query = $"INSERT INTO NHANVIEN (TENNV, SDTNV, GIOITINHNV, EMAILNV, CHUCVU) " +
+                           $"VALUES (N'{ten}', '{sdt}', N'{gioiTinh}', '{email}', '{chucVu}')";
+            fn.setdata(query, "Đăng ký nhân viên thành công!");
+            Logger.Info("Đăng ký nhân viên thành công: " + ten);
+
+            // Lấy MANV mới nhất
+            int maNV = LayMaNhanVienMoiNhat();
+
+            // Thêm tài khoản
+            query = $"INSERT INTO TAIKHOAN (TENTK, MATKHAU, MANV) VALUES ('{taiKhoan}', '{matKhau}', {maNV})";
+            fn.setdata(query, "Tạo tài khoản thành công!");
+            Logger.Info("Tạo tài khoản thành công cho MANV=" + maNV);
+
+            clearAll();
+            getMaxID();
+        }
+        private void XuLyLoi(Exception ex)
+        {
+            Logger.Error("Lỗi khi đăng ký nhân viên: " + ex.Message);
+            Logger.Error("StackTrace: " + ex.StackTrace);
+
+            MessageBox.Show("Đã xảy ra lỗi khi Thêm nhân viên!",
+                            "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        private int LayMaNhanVienMoiNhat()
+        {
+            string getIdQuery = "SELECT MAX(MANV) FROM NHANVIEN";
+            DataSet ds = fn.getdata(getIdQuery);
+            return Convert.ToInt32(ds.Tables[0].Rows[0][0]);
         }
 
         private void txtPassword_TextChanged(object sender, EventArgs e)
@@ -579,29 +591,34 @@ namespace Quản_lí_khách_sạn.ksquanli
         {
 
         }
-        private bool checkEmail(string email)
+        private bool KiemTraEmail(string email)
         {
-            //Kiểm tra có chứa @ không?
             if (!email.Contains("@"))
             {
+                Logger.Error("Email sai: thiếu @");
+                MessageBox.Show("Email phải chứa '@'!", "Sai email", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
-            //Nếu không chứa ".com" -> Sai
-            if (!email.Contains(".com"))
+
+            if (!email.EndsWith(".com"))
             {
+                Logger.Error("Email sai: thiếu .com");
+                MessageBox.Show("Email phải kết thúc bằng '.com'!", "Sai email", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
-            //Tìm vị trí @ trong chuỗi email
+
             int index1 = email.IndexOf("@");
             int index2 = email.IndexOf(".com");
-            //Lấy ra tên miền nếu có của email
+
             string domain = email.Substring(index1 + 1, index2 - index1 - 1);
-            //Tại đây bạn có thể thêm miền nào muốn vào đây
-            //Nếu không nằm trong đây trả về false
+
             if (domain != "gmail" && domain != "hotmail")
             {
+                Logger.Error("Email sai: domain không phải gmail hoặc hotmail");
+                MessageBox.Show("Email phải là gmail hoặc hotmail!", "Sai email", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
+
             return true;
         }
 
