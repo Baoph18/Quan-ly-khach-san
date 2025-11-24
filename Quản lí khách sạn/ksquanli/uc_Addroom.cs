@@ -15,6 +15,7 @@ using log4net.Config;
 
 namespace Quản_lí_khách_sạn.ksquanli
 {
+    //ègdgdf
     public static class Logger
     {
         private static readonly string path = "log.txt";
