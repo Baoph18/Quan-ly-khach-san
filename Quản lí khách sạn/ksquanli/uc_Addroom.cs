@@ -66,7 +66,7 @@ namespace Quản_lí_khách_sạn.ksquanli
             //    MessageBox.Show("Vui lòng điền đầy đủ thông tin", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             //}
 
-            try
+            try // Thực thi logic thêm phòng
             {
                 
                 string sophong = txtSophong.Text.Trim();
@@ -86,17 +86,17 @@ namespace Quản_lí_khách_sạn.ksquanli
 
                 uc_Addroom_Load(this, null);
             }
-            catch (FormatException ex)
+            catch (FormatException ex)  // Bắt lỗi định dạng dữ liệu (nhập sai số, sai kiểu)
             {
                 MessageBox.Show("Lỗi định dạng dữ liệu: " + ex.Message,
                                 "Lỗi nhập liệu", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            catch (ApplicationException ex)
+            catch (ApplicationException ex)  // Bắt lỗi nghiệp vụ do mình tự ném (ví dụ: số phòng đã tồn tại)
             {
                 MessageBox.Show(ex.Message,
                                 "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-            catch (Exception ex)
+            catch (Exception ex) // Bắt tất cả các lỗi còn lại (lỗi hệ thống)
             {
                 MessageBox.Show("Lỗi hệ thống: " + ex.Message,
                                 "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -228,32 +228,30 @@ namespace Quản_lí_khách_sạn.ksquanli
             //{
             //    MessageBox.Show("Vui lòng nhập đầy đủ thông tin", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             //}
-            try
+            try // Logic chính: kiểm tra phòng, cập nhật DB, reset form
             {
                 if (!IsRoomSelected())
                     return;
-
-
 
                 UpdateRoom();
 
                 ResetForm();
             }
-            catch (FormatException ex)
+            catch (FormatException ex) // Bắt lỗi sai định dạng dữ liệu (nhập chữ thay vì số,...)
             {
                 MessageBox.Show($"Lỗi định dạng dữ liệu: {ex.Message}",
                                 "Lỗi nhập liệu",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Error);
             }
-            catch (SqlException ex)
+            catch (SqlException ex) // Bắt lỗi liên quan đến database (connection, câu lệnh SQL, khóa,...)
             {
                 MessageBox.Show($"Lỗi SQL: {ex.Message}",
                                 "Lỗi hệ thống",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Error);
             }
-            catch (Exception ex)
+            catch (Exception ex)  // Bắt các lỗi còn lại (lỗi không xác định)
             {
                 MessageBox.Show($"Lỗi không xác định: {ex.Message}",
                                 "Lỗi",
@@ -265,8 +263,6 @@ namespace Quản_lí_khách_sạn.ksquanli
                 // luôn chạy dù có lỗi hay không
                 Console.WriteLine("btnRepair_Click đã kết thúc.");
             }
-
-
         }
 
         private bool IsRoomSelected()
@@ -310,7 +306,7 @@ namespace Quản_lí_khách_sạn.ksquanli
             SqlConnection con = new SqlConnection("your_connection_string_here");
             SqlCommand cmd = null;
 
-            try
+            try  // Mở kết nối, tạo command, thêm parameters và thực thi query
             {
                 con.Open();
                 cmd = new SqlCommand(query, con);
@@ -329,15 +325,15 @@ namespace Quản_lí_khách_sạn.ksquanli
                                     MessageBoxIcon.Information);
                 }
             }
-            catch (SqlException ex)
+            catch (SqlException ex) // Bắt lỗi liên quan đến SQL: cú pháp, kết nối, trùng khóa,...
             {
                 throw new Exception("Lỗi truy vấn SQL: " + ex.Message);
             }
-            catch (Exception)
+            catch (Exception) // Bắt các lỗi còn lại và ném nguyên lỗi ra ngoài (giữ stacktrace)
             {
                 throw; // giữ nguyên lỗi
             }
-            finally
+            finally  // Luôn chạy: giải phóng SqlCommand và đóng SqlConnection
             {
                 if (cmd != null)
                     cmd.Dispose();
@@ -490,7 +486,7 @@ namespace Quản_lí_khách_sạn.ksquanli
                 return;
 
             Excel.Workbook workbook = excelApp.Workbooks.Add(Type.Missing);
-            Excel.Worksheet sheet = InitializeWorksheet(workbook, "DanhSachPhong");
+            Excel.Worksheet sheet = InitializeWorksheet(workbook, "DanhSachPhong"); 
 
             WriteHeader(sheet);
             WriteData(sheet);
@@ -603,19 +599,22 @@ namespace Quản_lí_khách_sạn.ksquanli
         private void txtSophong_TextChanged(object sender, EventArgs e)
         {
             try
-            {
+            {     // Lấy giá trị người dùng nhập
+                  // Nếu không đúng định dạng, tự tạo một lỗi để đưa xuống catch xử lý
                 string input = txtSophong.Text;
 
                 // Kiểm tra nếu nhập không phải là số nguyên
                 if (!System.Text.RegularExpressions.Regex.IsMatch(input, @"^\d*$"))
                 {
+                    // throw dùng để ném lỗi một cách chủ động
                     throw new Exception("Chỉ được nhập số, không cho phép chữ hoặc ký tự đặc biệt.");
                 }
             }
             catch (Exception ex)
             {
+                // catch sẽ bắt lỗi được ném từ throw hoặc lỗi hệ thống
                 MessageBox.Show(ex.Message, "Lỗi nhập liệu", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                txtSophong.Text = ""; // Xóa dữ liệu sai
+                txtSophong.Text = ""; // Sau khi báo lỗi, xóa dữ liệu sai để người dùng nhập lại
             }
         }
 

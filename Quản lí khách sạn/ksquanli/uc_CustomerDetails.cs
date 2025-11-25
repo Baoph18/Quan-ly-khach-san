@@ -342,13 +342,13 @@ namespace Quản_lí_khách_sạn.ksquanli
         {
             try
             {
-                // 0️⃣ Kiểm tra hàng được chọn
+                //  Kiểm tra hàng được chọn
                 if (dataGridView1.SelectedRows.Count == 0)
                 {
                     throw new ApplicationException("Vui lòng chọn khách hàng cần xóa!");
                 }
 
-                // 1️⃣ Hộp thoại xác nhận
+                // 1Hộp thoại xác nhận
                 DialogResult result = MessageBox.Show(
                     "Bạn có chắc chắn muốn xóa khách hàng này không?",
                     "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question
@@ -357,14 +357,14 @@ namespace Quản_lí_khách_sạn.ksquanli
                 if (result != DialogResult.Yes)
                     return;
 
-                // 2️⃣ Lấy MAKH và Số phòng
+                // Lấy MAKH và Số phòng
                 int makh = Convert.ToInt32(
                     dataGridView1.SelectedRows[0].Cells["Mã Khách Hàng"].Value.ToString()
                 );
 
                 string soPhong = dataGridView1.SelectedRows[0].Cells["Số Phòng"].Value.ToString();
 
-                // 3️⃣ Lấy MAPHONG
+                //  Lấy MAPHONG
                 string getMaphongQuery = $"SELECT MAPHONG FROM PHONG WHERE SOPHONG = '{soPhong}'";
                 DataSet dsPhong = fn.getdata(getMaphongQuery);
 
@@ -375,11 +375,11 @@ namespace Quản_lí_khách_sạn.ksquanli
 
                 int maPhong = Convert.ToInt32(dsPhong.Tables[0].Rows[0]["MAPHONG"]);
 
-                // 4️⃣ Giải phóng phòng
+                //  Giải phóng phòng
                 string updatePhong = $"UPDATE PHONG SET DATPHONG = 'NO' WHERE MAPHONG = {maPhong}";
                 fn.setdata(updatePhong, "Đã giải phóng phòng.");
 
-                // 5️⃣ Xóa khách hàng
+                //  Xóa khách hàng
                 string deleteQuery = $"DELETE FROM KHACHHANG WHERE MAKH = {makh}";
                 fn.setdata(deleteQuery, "Đã xóa khách hàng thành công!");
             }
@@ -396,7 +396,7 @@ namespace Quản_lí_khách_sạn.ksquanli
             }
             finally
             {
-                // 6️⃣ Load lại bảng dù lỗi hay không lỗi
+                //  Load lại bảng dù lỗi hay không lỗi
                 load();
             }
         }
