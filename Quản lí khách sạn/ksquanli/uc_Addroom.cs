@@ -78,7 +78,7 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         }
 
-        private void uc_Addroom_Leave(object sender, EventArgs e)
+        private void uc_Addroom_Leave(object sender, EventArgs e) 
         {
             clearAll();
         }
