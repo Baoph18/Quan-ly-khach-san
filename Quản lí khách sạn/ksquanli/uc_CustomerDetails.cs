@@ -37,46 +37,7 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            if (dataGridView1.SelectedRows.Count == 0)
-            {
-                MessageBox.Show("Vui lòng chọn khách hàng cần xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            DialogResult result = MessageBox.Show("Bạn có chắc chắn muốn xóa khách hàng này không?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (result != DialogResult.Yes) return;
-
-            try
-            {
-                // Lấy MAKH và MAPHONG từ dòng được chọn
-                int makh = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells["Mã Khách Hàng"].Value.ToString());
-                string soPhong = dataGridView1.SelectedRows[0].Cells["Số Phòng"].Value.ToString();
-
-                // Tìm MAPHONG từ SOPHONG
-                string getMaphongQuery = $"SELECT MAPHONG FROM PHONG WHERE SOPHONG = '{soPhong}'";
-                DataSet dsPhong = fn.getdata(getMaphongQuery);
-
-                if (dsPhong.Tables[0].Rows.Count > 0)
-                {
-                    int maPhong = Convert.ToInt32(dsPhong.Tables[0].Rows[0]["MAPHONG"]);
-
-                    // 1️⃣ Cập nhật lại trạng thái phòng
-                    string updatePhong = $"UPDATE PHONG SET DATPHONG = 'NO' WHERE MAPHONG = {maPhong}";
-                    fn.setdata(updatePhong, "Đã giải phóng phòng.");
-                }
-
-                // 2️⃣ Xóa khách hàng
-                string deleteQuery = $"DELETE FROM KHACHHANG WHERE MAKH = {makh}";
-                fn.setdata(deleteQuery, "Đã xóa khách hàng thành công!");
-                load();
-               
-
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Lỗi khi xóa khách hàng: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+           
         }
 
         private void dataGridView1_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -98,14 +59,51 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         private void btnRepair_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtMAKH.Text))
-            {
-                MessageBox.Show("Vui lòng chọn khách hàng để sửa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            //if (string.IsNullOrWhiteSpace(txtMAKH.Text))
+            //{
+            //    MessageBox.Show("Vui lòng chọn khách hàng để sửa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            //    return;
+            //}
+
+            //try
+            //{
+            //    int makh = Convert.ToInt32(txtMAKH.Text);
+            //    string ten = txtTENKH.Text;
+            //    string sdt = txtSDT.Text;
+            //    string quoctich = txtQUOCTICH.Text;
+            //    string gioitinh = cboGIOITINH.Text;
+            //    string madd = txtMADD.Text;
+            //    string diachi = txtDIACHI.Text;
+            //    string sodem = txtSoDem.Text;
+
+            //    string updateQuery = $"UPDATE KHACHHANG SET " +
+            //         $"TENKH = N'{ten}', " +
+            //         $"SDT = '{sdt}', " +
+            //         $"NUOC = N'{quoctich}', " +
+            //         $"GIOITINH = N'{gioitinh}', " +
+            //         $"MADD = N'{madd}', " +
+            //         $"DIACHI = N'{diachi}', " + // ✅ Đã thêm dấu ,
+            //         $"SODEM = '{sodem}' " +
+            //         $"WHERE MAKH = {makh}";
+
+            //    fn.setdata(updateQuery, "Thông tin khách hàng đã được cập nhật!");
+
+            //    // Cập nhật lại bảng
+            //    load();
+            //    ClearInputs();
+
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show("Lỗi khi cập nhật: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //}
 
             try
             {
+                //  Kiểm tra dữ liệu — hàm này sẽ throw nếu có lỗi
+                ValidateRepairInput();
+
+                //  Lấy dữ liệu
                 int makh = Convert.ToInt32(txtMAKH.Text);
                 string ten = txtTENKH.Text;
                 string sdt = txtSDT.Text;
@@ -115,28 +113,70 @@ namespace Quản_lí_khách_sạn.ksquanli
                 string diachi = txtDIACHI.Text;
                 string sodem = txtSoDem.Text;
 
-                string updateQuery = $"UPDATE KHACHHANG SET " +
-                     $"TENKH = N'{ten}', " +
-                     $"SDT = '{sdt}', " +
-                     $"NUOC = N'{quoctich}', " +
-                     $"GIOITINH = N'{gioitinh}', " +
-                     $"MADD = N'{madd}', " +
-                     $"DIACHI = N'{diachi}', " + // ✅ Đã thêm dấu ,
-                     $"SODEM = '{sodem}' " +
-                     $"WHERE MAKH = {makh}";
+                // Câu lệnh cập nhật
+                string updateQuery =
+                    $"UPDATE KHACHHANG SET " +
+                    $"TENKH = N'{ten}', " +
+                    $"SDT = '{sdt}', " +
+                    $"NUOC = N'{quoctich}', " +
+                    $"GIOITINH = N'{gioitinh}', " +
+                    $"MADD = N'{madd}', " +
+                    $"DIACHI = N'{diachi}', " +
+                    $"SODEM = '{sodem}' " +
+                    $"WHERE MAKH = {makh}";
 
                 fn.setdata(updateQuery, "Thông tin khách hàng đã được cập nhật!");
-
-                // Cập nhật lại bảng
-                load();
-                ClearInputs();
-
+            }
+            catch (ApplicationException ex)
+            {
+                // lỗi hợp lệ do người dùng nhập sai
+                MessageBox.Show(ex.Message, "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
+                // lỗi hệ thống
                 MessageBox.Show("Lỗi khi cập nhật: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                // Luôn chạy dù có lỗi hay không
+                load();
+                ClearInputs();
+            }
         }
+
+        private void ValidateRepairInput()
+        {
+            if (string.IsNullOrWhiteSpace(txtMAKH.Text))
+                throw new ApplicationException("Vui lòng chọn khách hàng để sửa!");
+
+            if (string.IsNullOrWhiteSpace(txtTENKH.Text))
+                throw new ApplicationException("Tên khách hàng không được để trống!");
+
+            if (string.IsNullOrWhiteSpace(txtSDT.Text))
+                throw new ApplicationException("Số điện thoại không được để trống!");
+
+            if (string.IsNullOrWhiteSpace(txtQUOCTICH.Text))
+                throw new ApplicationException("Quốc tịch không được để trống!");
+
+            if (string.IsNullOrWhiteSpace(txtDIACHI.Text))
+                throw new ApplicationException("Địa chỉ không được để trống!");
+
+            if (string.IsNullOrWhiteSpace(txtSoDem.Text))
+                throw new ApplicationException("Số đêm không được để trống!");
+        }
+
+
+        //private void ClearInputs()
+        //{
+        //    txtMAKH.Clear();
+        //    txtTENKH.Clear();
+        //    txtSDT.Clear();
+        //    txtQUOCTICH.Clear();
+        //    cboGIOITINH.SelectedIndex = -1;
+        //    txtMADD.Clear();
+        //    txtDIACHI.Clear();
+        //}
 
         private void ClearInputs()
         {
@@ -147,7 +187,9 @@ namespace Quản_lí_khách_sạn.ksquanli
             cboGIOITINH.SelectedIndex = -1;
             txtMADD.Clear();
             txtDIACHI.Clear();
+            txtSoDem.Clear();
         }
+
 
         private void txtTENKH_TextChanged(object sender, EventArgs e)
         {
@@ -295,7 +337,69 @@ namespace Quản_lí_khách_sạn.ksquanli
                 txtSDT.Text = ""; // Xóa dữ liệu sai
             }
         }
-      
+
+        private void btnDelete_Click_1(object sender, EventArgs e)
+        {
+            try
+            {
+                // 0️⃣ Kiểm tra hàng được chọn
+                if (dataGridView1.SelectedRows.Count == 0)
+                {
+                    throw new ApplicationException("Vui lòng chọn khách hàng cần xóa!");
+                }
+
+                // 1️⃣ Hộp thoại xác nhận
+                DialogResult result = MessageBox.Show(
+                    "Bạn có chắc chắn muốn xóa khách hàng này không?",
+                    "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question
+                );
+
+                if (result != DialogResult.Yes)
+                    return;
+
+                // 2️⃣ Lấy MAKH và Số phòng
+                int makh = Convert.ToInt32(
+                    dataGridView1.SelectedRows[0].Cells["Mã Khách Hàng"].Value.ToString()
+                );
+
+                string soPhong = dataGridView1.SelectedRows[0].Cells["Số Phòng"].Value.ToString();
+
+                // 3️⃣ Lấy MAPHONG
+                string getMaphongQuery = $"SELECT MAPHONG FROM PHONG WHERE SOPHONG = '{soPhong}'";
+                DataSet dsPhong = fn.getdata(getMaphongQuery);
+
+                if (dsPhong.Tables[0].Rows.Count == 0)
+                {
+                    throw new Exception("Không tìm thấy phòng tương ứng với số phòng đã chọn.");
+                }
+
+                int maPhong = Convert.ToInt32(dsPhong.Tables[0].Rows[0]["MAPHONG"]);
+
+                // 4️⃣ Giải phóng phòng
+                string updatePhong = $"UPDATE PHONG SET DATPHONG = 'NO' WHERE MAPHONG = {maPhong}";
+                fn.setdata(updatePhong, "Đã giải phóng phòng.");
+
+                // 5️⃣ Xóa khách hàng
+                string deleteQuery = $"DELETE FROM KHACHHANG WHERE MAKH = {makh}";
+                fn.setdata(deleteQuery, "Đã xóa khách hàng thành công!");
+            }
+            catch (ApplicationException ex)
+            {
+                // Lỗi hợp lệ do người dùng gây ra (thiếu chọn, thiếu dữ liệu…)
+                MessageBox.Show(ex.Message, "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (Exception ex)
+            {
+                // Lỗi hệ thống
+                MessageBox.Show("Lỗi khi xóa khách hàng: " + ex.Message,
+                                "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // 6️⃣ Load lại bảng dù lỗi hay không lỗi
+                load();
+            }
+        }
     }
   
 }

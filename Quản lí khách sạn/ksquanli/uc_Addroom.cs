@@ -108,16 +108,7 @@ namespace Quản_lí_khách_sạn.ksquanli
             }
         }
 
-//       private void ValidateInput()
-//{
-//    if (string.IsNullOrWhiteSpace(txtSophong.Text) ||
-//        string.IsNullOrWhiteSpace(txtLoaiphong.Text) ||
-//        string.IsNullOrWhiteSpace(txtLoaigiuong.Text) ||
-//        string.IsNullOrWhiteSpace(txtGiatien.Text))
-//    {
-//        throw new ApplicationException("Vui lòng điền đầy đủ thông tin.");
-//    }
-//}
+
 
         private long ParseGiaTien(string text)
         {
