@@ -28,6 +28,7 @@ namespace Quản_lí_khách_sạn.ksquanli
         {
             LoadEmployeeInfo();
         }
+        //su
         private void LoadEmployeeInfo()
         {
             try
