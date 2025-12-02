@@ -10,6 +10,7 @@ using System.Windows.Forms;
 
 namespace Quản_lí_khách_sạn.ksquanli
 {
+    //siu
     public partial class ThongTinCaNhan: UserControl
     {
         Function fn = new Function();
