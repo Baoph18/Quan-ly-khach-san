@@ -20,7 +20,7 @@ namespace Quản_lí_khách_sạn.ksquanli
         {
             InitializeComponent();
         }
-
+        //dương gay LGBT 
         private void uc_Addroom_Load(object sender, EventArgs e)
         {
             query = "select MAPHONG AS [Mã Phòng], SOPHONG AS [Số Phòng],LOAIPHONG AS [Loại Phòng], GIUONG AS [Giường], GIA AS [Gía], DATPHONG AS [Trạng thái đặt phòng] from PHONG";
