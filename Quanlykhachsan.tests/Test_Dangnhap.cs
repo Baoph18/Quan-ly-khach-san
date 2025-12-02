@@ -5,6 +5,31 @@ namespace Quản_lí_khách_sạn
     [TestClass]
     public class Test_Chucnang 
     {
+        private RoomService roomService;
+
+        [TestInitialize]
+        public void Setup()
+        {
+            roomService = new RoomService();
+            roomService.IsTesting = true;
+        }
+
+        [TestMethod]
+        public void Test_ThemPhong()
+        {
+            var room = new Room
+            {
+                SoPhong = "302",
+                LoaiPhong = "VIP",
+                Giuong = "Đôi",
+                Gia = 1000000,
+                TrangThai = "Trống"
+            };
+
+            bool result = roomService.AddRoom(room);
+
+            Assert.IsTrue(result, "Phòng hợp lệ phải được thêm thành công.");
+        }
         [TestMethod]
         public void Test_Dangnhap()
         {
