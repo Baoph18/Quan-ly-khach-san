@@ -23,30 +23,56 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         }
 
+        private readonly Function _function = new Function();
         private void ThongTinCaNhan_Load(object sender, EventArgs e)
         {
-            string query = $@"
-        SELECT nv.TENNV, nv.SDTNV, nv.GIOITINHNV, nv.EMAILNV,
-               tk.TENTK, tk.MATKHAU
-        FROM NHANVIEN nv
-        JOIN TAIKHOAN tk ON nv.MANV = tk.MANV
-        WHERE nv.MANV = {CurrentUser.Id}";
-            // thực hiện câu truy vấn trả về kq vào biến ds
-            DataSet ds = fn.getdata(query);
-
-            if (ds.Tables[0].Rows.Count > 0)
+            LoadEmployeeInfo();
+        }
+        private void LoadEmployeeInfo()
+        {
+            try
             {
-                // lấy dòng bảng đầu tiên gán vào biến row
-                DataRow row = ds.Tables[0].Rows[0];
+                if (CurrentUser.Id <= 0)
+                {
+                    MessageBox.Show("Không xác định được người dùng hiện tại.",
+                                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
 
-                txtName.Text = row["TENNV"].ToString();
-                txtMobile.Text = row["SDTNV"].ToString();
-                txtGender.Text = row["GIOITINHNV"].ToString();
-                txtEmail.Text = row["EMAILNV"].ToString();
-                txtUserName.Text = row["TENTK"].ToString();
-                txtPassword.Text = row["MATKHAU"].ToString();
+                string query = $@"
+            SELECT nv.TENNV, nv.SDTNV, nv.GIOITINHNV, nv.EMAILNV,
+                   tk.TENTK, tk.MATKHAU
+            FROM NHANVIEN nv
+            JOIN TAIKHOAN tk ON nv.MANV = tk.MANV
+            WHERE nv.MANV = {CurrentUser.Id}";
+
+                DataSet dataSet = _function.getdata(query);
+
+                if (dataSet.Tables.Count == 0 || dataSet.Tables[0].Rows.Count == 0)
+                {
+                    MessageBox.Show("Không tìm thấy thông tin nhân viên.",
+                                    "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                DisplayEmployeeInfo(dataSet.Tables[0].Rows[0]);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi tải thông tin: {ex.Message}",
+                                "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        private void DisplayEmployeeInfo(DataRow row)
+        {
+            txtName.Text = row["TENNV"]?.ToString();
+            txtMobile.Text = row["SDTNV"]?.ToString();
+            txtGender.Text = row["GIOITINHNV"]?.ToString();
+            txtEmail.Text = row["EMAILNV"]?.ToString();
+            txtUserName.Text = row["TENTK"]?.ToString();
+            txtPassword.Text = row["MATKHAU"]?.ToString();
+        }
+
 
         private void btnDangxuat_Click(object sender, EventArgs e)
         {
