@@ -21,9 +21,8 @@ namespace Quản_lí_khách_sạn
             return con;
             
         }
-        //fsfsd
-        //Duy is gay
-        //Duy Bao is gay
+
+
         // LẤY DATA 
         public DataSet getdata(string query)
         {

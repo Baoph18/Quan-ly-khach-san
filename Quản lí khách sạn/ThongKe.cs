@@ -109,10 +109,5 @@ namespace Quản_lí_khách_sạn
         {
 
         }
-
-        private void crystalReportViewer1_Load_3(object sender, EventArgs e)
-        {
-
-        }
     }
 }

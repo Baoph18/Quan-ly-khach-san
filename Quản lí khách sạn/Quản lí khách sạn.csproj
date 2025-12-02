@@ -165,11 +165,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-
-    <Compile Include="RoomServices.cs" />
-
     <Compile Include="RoomService.cs" />
-
     <Compile Include="ThongKe.cs">
       <SubType>Form</SubType>
     </Compile>

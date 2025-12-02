@@ -243,7 +243,6 @@
             this.Name = "ĐăngNhập";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ĐăngNhập";
-            this.Load += new System.EventHandler(this.ĐăngNhập_Load);
             this.guna2Panel2.ResumeLayout(false);
             this.guna2Panel2.PerformLayout();
             this.ResumeLayout(false);

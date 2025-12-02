@@ -50,7 +50,7 @@ namespace Quản_lí_khách_sạn.ksquanli
         {
             InitializeComponent();
         }
-        //dương gay LGBT 
+
         private void uc_Addroom_Load(object sender, EventArgs e)
         {
             query = "select MAPHONG AS [Mã Phòng], SOPHONG AS [Số Phòng],LOAIPHONG AS [Loại Phòng], GIUONG AS [Giường], GIA AS [Gía], DATPHONG AS [Trạng thái đặt phòng] from PHONG";
@@ -60,50 +60,42 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         }
 
-        private readonly Function _function = new Function();
         private void btnAddRoom_Click(object sender, EventArgs e)
         {
-            if (!IsRoomInputValid())
+
+
+            if ( txtSophong.Text != "" && txtLoaiphong.Text != "" && txtLoaigiuong.Text != "" && txtGiatien.Text != "")
+            {         
+                // gán vào biến sophong
+                String sophong = txtSophong.Text;
+                String loaiphong = txtLoaiphong.Text;
+                String loaigiuong = txtLoaigiuong.Text;
+                Int64 giatien = Int64.Parse(txtGiatien.Text);
+
+                // 🔍 Kiểm tra trùng số phòng
+                string checkQuery = $"SELECT COUNT(*) FROM PHONG WHERE SOPHONG = '{sophong}'";
+                DataSet dsCheck = fn.getdata(checkQuery);
+                int count = Convert.ToInt32(dsCheck.Tables[0].Rows[0][0]);
+
+                if (count > 0)
+                {
+                    MessageBox.Show("Số phòng đã tồn tại! Vui lòng nhập số phòng khác.", "Trùng dữ liệu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtSophong.Focus();
+                    return;
+                }
+                query = "insert into PHONG (SOPHONG, LOAIPHONG, GIUONG, GIA) values ('" + sophong + "', N'" + loaiphong + "', '" + loaigiuong + "', '" + giatien + "')";
+                fn.setdata(query, "Đã thêm phòng");
+
+                uc_Addroom_Load(this, null);
+                clearAll();
+
+            }
+            else
             {
-                MessageBox.Show("Vui lòng điền đầy đủ thông tin!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                MessageBox.Show("Vui lòng điền đầy đủ thông tin", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
-            string sophong = txtSophong.Text;
-            string loaiphong = txtLoaiphong.Text;
-            string loaigiuong = txtLoaigiuong.Text;
-            long giatien = long.Parse(txtGiatien.Text);
 
-            if (IsDuplicateRoomNumber(sophong))
-            {
-                MessageBox.Show("Số phòng đã tồn tại! Vui lòng nhập số khác.", "Trùng dữ liệu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtSophong.Focus();
-                return;
-            }
-
-            string insertQuery = $"INSERT INTO PHONG (SOPHONG, LOAIPHONG, GIUONG, GIA) " +
-                                 $"VALUES ('{sophong}', N'{loaiphong}', '{loaigiuong}', '{giatien}')";
-            _function.setdata(insertQuery, "Đã thêm phòng thành công!");
-
-            uc_Addroom_Load(this, null);
-            clearAll();
-
-        }
-
-        private bool IsRoomInputValid()
-        {
-            return !string.IsNullOrWhiteSpace(txtSophong.Text)
-                && !string.IsNullOrWhiteSpace(txtLoaiphong.Text)
-                && !string.IsNullOrWhiteSpace(txtLoaigiuong.Text)
-                && !string.IsNullOrWhiteSpace(txtGiatien.Text);
-        }
-
-        private bool IsDuplicateRoomNumber(string sophong)
-        {
-            string checkQuery = $"SELECT COUNT(*) FROM PHONG WHERE SOPHONG = '{sophong}'";
-            DataSet dsCheck = _function.getdata(checkQuery);
-            int count = Convert.ToInt32(dsCheck.Tables[0].Rows[0][0]);
-            return count > 0;
         }
 
         public void clearAll()

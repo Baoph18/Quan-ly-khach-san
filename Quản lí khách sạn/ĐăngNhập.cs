@@ -144,10 +144,5 @@ namespace Quản_lí_khách_sạn
             txtPassword.Clear();
 
         }
-
-        private void ĐăngNhập_Load(object sender, EventArgs e)
-        {
-
-        }
     }
 }
