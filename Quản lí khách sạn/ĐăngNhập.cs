@@ -139,5 +139,10 @@ namespace Quản_lí_khách_sạn
         {
             Application.Exit();
         }
+
+        private void ĐăngNhập_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
