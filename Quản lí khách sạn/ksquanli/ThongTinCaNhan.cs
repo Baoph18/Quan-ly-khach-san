@@ -76,6 +76,8 @@ namespace Quản_lí_khách_sạn.ksquanli
         }
 
 
+
+
         private void btnDangxuat_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show("Bạn muốn đăng xuất?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);

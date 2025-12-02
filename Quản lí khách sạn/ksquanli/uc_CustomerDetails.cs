@@ -8,11 +8,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using log4net;
+using log4net.Config;
+using System.IO;
 
 namespace Quản_lí_khách_sạn.ksquanli
 {
     public partial class uc_CustomerDetails: UserControl
     {
+        //// Khai báo một logger cho Program.cs 
+        private static readonly ILog log = LogManager.GetLogger(typeof(uc_CustomerDetails));
+
         Function fn = new Function();
         string query;
         public uc_CustomerDetails()
@@ -95,48 +101,188 @@ namespace Quản_lí_khách_sạn.ksquanli
                 txtSoDem.Text = row.Cells[7].Value.ToString(); // Số Đêm
             }
         }
+        /// <summary>
+        /// /////////////////////////////////////
+        /// </summary>
+        // TẠO CLASS THAM SỐ 
+        public class KhachHangUpdateInfo
+        {
+            public int MaKH { get; set; }
+            public string Ten { get; set; }
+            public string SDT { get; set; }
+            public string QuocTich { get; set; }
+            public string GioiTinh { get; set; }
+            public string MaDD { get; set; }
+            public string DiaChi { get; set; }
+            public string SoDem { get; set; }
+        }
 
-        private void btnRepair_Click(object sender, EventArgs e)
+        //TÁCH HÀM (Extract Method)
+        private bool XacNhanSuaKhachHang()
         {
             if (string.IsNullOrWhiteSpace(txtMAKH.Text))
             {
                 MessageBox.Show("Vui lòng chọn khách hàng để sửa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                return false;
             }
+
+            return true;
+        }
+
+        private KhachHangUpdateInfo LayThongTinKhachHang()
+        {
+            if (!int.TryParse(txtMAKH.Text, out int maKH))
+                throw new FormatException();
+
+            return new KhachHangUpdateInfo
+            {
+                MaKH = Convert.ToInt32(txtMAKH.Text),
+                Ten = txtTENKH.Text.Trim(),
+                SDT = txtSDT.Text.Trim(),
+                QuocTich = txtQUOCTICH.Text.Trim(),
+                GioiTinh = cboGIOITINH.Text.Trim(),
+                MaDD = txtMADD.Text.Trim(),
+                DiaChi = txtDIACHI.Text.Trim(),
+                SoDem = txtSoDem.Text.Trim()
+            };
+        }
+
+        private void CapNhatKhachHang(KhachHangUpdateInfo info)
+        {
+            try
+            {
+                string query = $@"
+                UPDATE KHACHHANG SET
+                    TENKH = N'{info.Ten}',
+                    SDT = '{info.SDT}',
+                    NUOC = N'{info.QuocTich}',
+                    GIOITINH = N'{info.GioiTinh}',
+                    MADD = N'{info.MaDD}',
+                    DIACHI = N'{info.DiaChi}',
+                    SODEM = '{info.SoDem}'
+                WHERE MAKH = {info.MaKH}
+            ";
+
+                fn.setdata(query, "Thông tin khách hàng đã được cập nhật!");
+
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        //    if (!XacNhanSuaKhachHang())
+        //        return;
+
+        //    try
+        //    {
+        //        KhachHangUpdateInfo info = LayThongTinKhachHang();
+        //        CapNhatKhachHang(info);
+
+        //        load();
+        //        ClearInputs();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show("Lỗi khi cập nhật: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //    }
+        private void btnRepair_Click(object sender, EventArgs e)
+        {
+            
+            if (!XacNhanSuaKhachHang())
+                return;
 
             try
             {
-                int makh = Convert.ToInt32(txtMAKH.Text);
-                string ten = txtTENKH.Text;
-                string sdt = txtSDT.Text;
-                string quoctich = txtQUOCTICH.Text;
-                string gioitinh = cboGIOITINH.Text;
-                string madd = txtMADD.Text;
-                string diachi = txtDIACHI.Text;
-                string sodem = txtSoDem.Text;
+                KhachHangUpdateInfo info = LayThongTinKhachHang();
+                CapNhatKhachHang(info);
+                // Yêu cầu Log4net đọc file config 
+                XmlConfigurator.Configure(new FileInfo("log4net.config"));
+                log.Info(
+                  $"Sua thong tin khach hang thanh cong: " +
+                  $"MaKH='{info.MaKH}', Ten='{info.Ten}', SDT='{info.SDT}', " +
+                  $"QuocTich='{info.QuocTich}', GioiTinh='{info.GioiTinh}', " +
+                  $"MaDD='{info.MaDD}', DiaChi='{info.DiaChi}', SoDem='{info.SoDem}'");
 
-                string updateQuery = $"UPDATE KHACHHANG SET " +
-                     $"TENKH = N'{ten}', " +
-                     $"SDT = '{sdt}', " +
-                     $"NUOC = N'{quoctich}', " +
-                     $"GIOITINH = N'{gioitinh}', " +
-                     $"MADD = N'{madd}', " +
-                     $"DIACHI = N'{diachi}', " + // ✅ Đã thêm dấu ,
-                     $"SODEM = '{sodem}' " +
-                     $"WHERE MAKH = {makh}";
-
-                fn.setdata(updateQuery, "Thông tin khách hàng đã được cập nhật!");
-
-                // Cập nhật lại bảng
                 load();
                 ClearInputs();
-
+            }
+            catch (NullReferenceException)
+            {
+                MessageBox.Show("Một đối tượng đang null. Có thể bạn chưa chọn khách hàng hoặc control chưa được khởi tạo.",
+                    "Null Reference", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show("Sai định dạng dữ liệu! Vui lòng kiểm tra lại các trường số (MAKH, Số đêm...).",
+                    "Format Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (ArgumentNullException)
+            {
+                MessageBox.Show("Dữ liệu truyền vào bị null. Kiểm tra lại các ô nhập liệu.",
+                    "Argument Null", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (InvalidOperationException)
+            {
+                MessageBox.Show("Thao tác không hợp lệ. Có thể kết nối CSDL đã bị đóng hoặc câu truy vấn sai.",
+                    "Invalid Operation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi cập nhật: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi không xác định: " + ex.Message,
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+
+
+
+
+        //private void btnRepair_Click(object sender, EventArgs e)
+        //{
+        //    if (string.IsNullOrWhiteSpace(txtMAKH.Text))
+        //    {
+        //        MessageBox.Show("Vui lòng chọn khách hàng để sửa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        //        return;
+        //    }
+
+        //    try
+        //    {
+        //        int makh = Convert.ToInt32(txtMAKH.Text);
+        //        string ten = txtTENKH.Text;
+        //        string sdt = txtSDT.Text;
+        //        string quoctich = txtQUOCTICH.Text;
+        //        string gioitinh = cboGIOITINH.Text;
+        //        string madd = txtMADD.Text;
+        //        string diachi = txtDIACHI.Text;
+        //        string sodem = txtSoDem.Text;
+
+        //        string updateQuery = $"UPDATE KHACHHANG SET " +
+        //             $"TENKH = N'{ten}', " +
+        //             $"SDT = '{sdt}', " +
+        //             $"NUOC = N'{quoctich}', " +
+        //             $"GIOITINH = N'{gioitinh}', " +
+        //             $"MADD = N'{madd}', " +
+        //             $"DIACHI = N'{diachi}', " + // ✅ Đã thêm dấu ,
+        //             $"SODEM = '{sodem}' " +
+        //             $"WHERE MAKH = {makh}";
+
+        //        fn.setdata(updateQuery, "Thông tin khách hàng đã được cập nhật!");
+
+        //        // Cập nhật lại bảng
+        //        load();
+        //        ClearInputs();
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show("Lỗi khi cập nhật: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //    }
+        //}
 
         private void ClearInputs()
         {
@@ -218,6 +364,12 @@ namespace Quản_lí_khách_sạn.ksquanli
                 // CHỈ cho nhập chữ cái (có dấu) và khoảng trắng
                 if (!char.IsLetter(c) && !char.IsWhiteSpace(c))
                 {
+                    // Yêu cầu Log4net đọc file config 
+                    XmlConfigurator.Configure(new FileInfo("log4net.config"));
+                    // GHI LOG WARN
+                    log.Warn($"Loi nhap lieu: Nguoi dung nhap quoc tich khong hop le: '{input}'. " +
+                               "Chi duoc phep nhap chu cai va khoang trang.");
+
                     MessageBox.Show("Chỉ được nhập chữ cái tiếng Việt và khoảng trắng. Không cho phép số hoặc ký tự đặc biệt.",
                                     "Lỗi nhập liệu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtQUOCTICH.Text = ""; // Xóa dữ liệu sai
