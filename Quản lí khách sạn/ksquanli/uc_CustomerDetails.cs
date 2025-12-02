@@ -175,23 +175,24 @@ namespace Quản_lí_khách_sạn.ksquanli
                 throw;
             }
         }
+        //    if (!XacNhanSuaKhachHang())
+        //        return;
+
+        //    try
+        //    {
+        //        KhachHangUpdateInfo info = LayThongTinKhachHang();
+        //        CapNhatKhachHang(info);
+
+        //        load();
+        //        ClearInputs();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show("Lỗi khi cập nhật: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //    }
         private void btnRepair_Click(object sender, EventArgs e)
         {
-            //    if (!XacNhanSuaKhachHang())
-            //        return;
-
-            //    try
-            //    {
-            //        KhachHangUpdateInfo info = LayThongTinKhachHang();
-            //        CapNhatKhachHang(info);
-
-            //        load();
-            //        ClearInputs();
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        MessageBox.Show("Lỗi khi cập nhật: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //    }
+            
             if (!XacNhanSuaKhachHang())
                 return;
 
@@ -365,8 +366,8 @@ namespace Quản_lí_khách_sạn.ksquanli
                 {
                     // Yêu cầu Log4net đọc file config 
                     XmlConfigurator.Configure(new FileInfo("log4net.config"));
-                    // GHI LOG ERROR
-                    log.Error($"Loi nhap lieu: Nguoi dung nhap quoc tich khong hop le: '{input}'. " +
+                    // GHI LOG WARN
+                    log.Warn($"Loi nhap lieu: Nguoi dung nhap quoc tich khong hop le: '{input}'. " +
                                "Chi duoc phep nhap chu cai va khoang trang.");
 
                     MessageBox.Show("Chỉ được nhập chữ cái tiếng Việt và khoảng trắng. Không cho phép số hoặc ký tự đặc biệt.",

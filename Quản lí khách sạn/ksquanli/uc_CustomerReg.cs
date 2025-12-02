@@ -385,8 +385,6 @@ namespace Quản_lí_khách_sạn.ksquanli
 
                     // Ghi lỗi ERROR
                     log.Error($"Loi nhap lieu ho ten: Gia tri '{input}' khong hop le. Chi duoc nhap chu cai va khoang trang.");
-
-
                     MessageBox.Show("Chỉ được nhập chữ cái và khoảng trắng. Không cho phép số hoặc ký tự đặc biệt.",
                                     "Lỗi nhập liệu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtName.Text = ""; // Xóa dữ liệu sai
@@ -394,6 +392,8 @@ namespace Quản_lí_khách_sạn.ksquanli
                 }
             }
         }
+
+      
 
         private void txtContact_TextChanged_1(object sender, EventArgs e)
         {
