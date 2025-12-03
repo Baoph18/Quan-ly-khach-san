@@ -6,24 +6,46 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using log4net;
+using log4net.Config;
+using System.IO;
+
 
 namespace Quản_lí_khách_sạn
 {
     class Function
     {
+        private static readonly ILog log = LogManager.GetLogger(typeof(Function));
+        public Function()
+        {
+           
+            // Yêu cầu Log4net đọc file config 
+            XmlConfigurator.Configure(new FileInfo("log4net.config"));
+        }
         // kết nối sql
         protected SqlConnection getconnection()
         {
             //Tạo một đối tượng kết nối đến SQL Server tên là con.
             SqlConnection con = new SqlConnection();
-            //Gán chuỗi kết nối (Connection String) cho đối tượng con.
-            con.ConnectionString = "Data Source=LAPTOP-B25HVS2V\\CSDL;Initial Catalog = QL_KS; Integrated Security = True"; 
+            try
+            {
+                con.ConnectionString = "Data Source=LAPTOP-GHEUHM8V\\SQLEXPRESS01;Initial Catalog=QL_KS;Integrated Security=True";
+                con.Open();   // kiểm tra kết nối
+                con.Close();
+            }
+            catch (Exception ex)
+            {
+                log.Fatal("Lỗi FATAL: Không thể kết nối đến SQL Server.",ex);
+            }
+
             return con;
+          
             
         }
-        //fsfsd
-        //Duy is gay
-        //Duy Bao is gay
+        ////Gán chuỗi kết nối (Connection String) cho đối tượng con.
+        //con.ConnectionString = "Data Source=LAPTOP-GHEUHM8V\\SQLEXPRESS01;Initial Catalog = QL_KS; Integrated Security = True"; 
+        //return con;
+      
         // LẤY DATA 
         public DataSet getdata(string query)
         {

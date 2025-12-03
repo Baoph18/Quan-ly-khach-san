@@ -31,6 +31,7 @@ namespace Quản_lí_khách_sạn
             Assert.IsTrue(result, "Phòng hợp lệ phải được thêm thành công.");
         }
         [TestMethod]
+
         public void Test_Dangnhap()
         {
             // Arrange
