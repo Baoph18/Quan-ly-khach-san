@@ -41,6 +41,11 @@ namespace Quản_lí_khách_sạn.ksquanli
         {
             Write("ERROR", message);
         }
+
+        public static void Debug(string message)
+        {
+            Write("DEBUG", message);
+        }
     }
     public partial class uc_Addroom : UserControl
     {
