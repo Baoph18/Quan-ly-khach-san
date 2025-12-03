@@ -24,12 +24,15 @@ namespace Quản_lí_khách_sạn.ksquanli
         public uc_CustomerDetails()
         {
             InitializeComponent();
+            // Yêu cầu Log4net đọc file config 
+            XmlConfigurator.Configure(new FileInfo("log4net.config"));
         }
 
        
         // gửi query lấy dữ liệu và gán dữ liệu lên datagridview 
         private void getrecord(String query)
         {
+           
             DataSet ds = fn.getdata(query);
             dataGridView1.DataSource = ds.Tables[0];
            
@@ -41,50 +44,7 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         }
 
-        private void btnDelete_Click(object sender, EventArgs e)
-        {
-            if (dataGridView1.SelectedRows.Count == 0)
-            {
-                MessageBox.Show("Vui lòng chọn khách hàng cần xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            DialogResult result = MessageBox.Show("Bạn có chắc chắn muốn xóa khách hàng này không?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (result != DialogResult.Yes) return;
-
-            try
-            {
-                // Lấy MAKH và MAPHONG từ dòng được chọn
-                int makh = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells["Mã Khách Hàng"].Value.ToString());
-                string soPhong = dataGridView1.SelectedRows[0].Cells["Số Phòng"].Value.ToString();
-
-                // Tìm MAPHONG từ SOPHONG
-                string getMaphongQuery = $"SELECT MAPHONG FROM PHONG WHERE SOPHONG = '{soPhong}'";
-                DataSet dsPhong = fn.getdata(getMaphongQuery);
-
-                if (dsPhong.Tables[0].Rows.Count > 0)
-                {
-                    int maPhong = Convert.ToInt32(dsPhong.Tables[0].Rows[0]["MAPHONG"]);
-
-                    // 1️⃣ Cập nhật lại trạng thái phòng
-                    string updatePhong = $"UPDATE PHONG SET DATPHONG = 'NO' WHERE MAPHONG = {maPhong}";
-                    fn.setdata(updatePhong, "Đã giải phóng phòng.");
-                }
-
-                // 2️⃣ Xóa khách hàng
-                string deleteQuery = $"DELETE FROM KHACHHANG WHERE MAKH = {makh}";
-                fn.setdata(deleteQuery, "Đã xóa khách hàng thành công!");
-                load();
-               
-
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Lỗi khi xóa khách hàng: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
+        
         private void dataGridView1_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
             if (e.RowIndex >= 0)
@@ -131,12 +91,13 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         private KhachHangUpdateInfo LayThongTinKhachHang()
         {
+
             if (!int.TryParse(txtMAKH.Text, out int maKH))
                 throw new FormatException();
 
-            return new KhachHangUpdateInfo
+            var info = new KhachHangUpdateInfo
             {
-                MaKH = Convert.ToInt32(txtMAKH.Text),
+                MaKH = maKH,
                 Ten = txtTENKH.Text.Trim(),
                 SDT = txtSDT.Text.Trim(),
                 QuocTich = txtQUOCTICH.Text.Trim(),
@@ -145,6 +106,13 @@ namespace Quản_lí_khách_sạn.ksquanli
                 DiaChi = txtDIACHI.Text.Trim(),
                 SoDem = txtSoDem.Text.Trim()
             };
+
+            log.Debug($"Lấy thông tin KH: MAKH={info.MaKH}, Ten={info.Ten}, SDT={info.SDT}, GioiTinh={info.GioiTinh}");
+
+            return info;
+
+
+
         }
 
         private void CapNhatKhachHang(KhachHangUpdateInfo info)
@@ -200,8 +168,8 @@ namespace Quản_lí_khách_sạn.ksquanli
             {
                 KhachHangUpdateInfo info = LayThongTinKhachHang();
                 CapNhatKhachHang(info);
-                // Yêu cầu Log4net đọc file config 
-                XmlConfigurator.Configure(new FileInfo("log4net.config"));
+                
+
                 log.Info(
                   $"Sua thong tin khach hang thanh cong: " +
                   $"MaKH='{info.MaKH}', Ten='{info.Ten}', SDT='{info.SDT}', " +
@@ -447,7 +415,50 @@ namespace Quản_lí_khách_sạn.ksquanli
                 txtSDT.Text = ""; // Xóa dữ liệu sai
             }
         }
-      
+
+        private void btnDelete_Click_1(object sender, EventArgs e)
+        {
+            if (dataGridView1.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Vui lòng chọn khách hàng cần xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DialogResult result = MessageBox.Show("Bạn có chắc chắn muốn xóa khách hàng này không?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result != DialogResult.Yes) return;
+
+            try
+            {
+                // Lấy MAKH và MAPHONG từ dòng được chọn
+                int makh = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells["Mã Khách Hàng"].Value.ToString());
+                string soPhong = dataGridView1.SelectedRows[0].Cells["Số Phòng"].Value.ToString();
+
+                // Tìm MAPHONG từ SOPHONG
+                string getMaphongQuery = $"SELECT MAPHONG FROM PHONG WHERE SOPHONG = '{soPhong}'";
+                DataSet dsPhong = fn.getdata(getMaphongQuery);
+
+                if (dsPhong.Tables[0].Rows.Count > 0)
+                {
+                    int maPhong = Convert.ToInt32(dsPhong.Tables[0].Rows[0]["MAPHONG"]);
+
+                    // Cập nhật lại trạng thái phòng
+                    string updatePhong = $"UPDATE PHONG SET DATPHONG = 'NO' WHERE MAPHONG = {maPhong}";
+                    fn.setdata(updatePhong, "Đã giải phóng phòng.");
+                }
+
+                //  Xóa khách hàng
+                string deleteQuery = $"DELETE FROM KHACHHANG WHERE MAKH = {makh}";
+                fn.setdata(deleteQuery, "Đã xóa khách hàng thành công!");
+                load();
+                //log debug
+                log.Debug($"Chuẩn bị xóa khách hàng: MAKH={makh}, SoPhong={soPhong}");
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi xóa khách hàng: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
     }
   
 }
