@@ -376,24 +376,24 @@ namespace Quản_lí_khách_sạn.ksquanli
         private void txtSophong_TextChanged(object sender, EventArgs e)
         {
             try
-            {
-
+            {     // Lấy giá trị người dùng nhập
+                  // Nếu không đúng định dạng, tự tạo một lỗi để đưa xuống catch xử lý
                 string input = txtSophong.Text;
 
                 // Kiểm tra nếu nhập không phải là số nguyên
                 if (!System.Text.RegularExpressions.Regex.IsMatch(input, @"^\d*$"))
                 {
-                    XmlConfigurator.Configure(new FileInfo("Log4net.config"));
-                    Logger.Warn("Sai định dạng.Yêu cầu nhập số,không được nhập chữ");
+                    // throw dùng để ném lỗi một cách chủ động
                     throw new Exception("Chỉ được nhập số, không cho phép chữ hoặc ký tự đặc biệt.");
-                    
                 }
             }
             catch (Exception ex)
             {
+                // catch sẽ bắt lỗi được ném từ throw hoặc lỗi hệ thống
                 MessageBox.Show(ex.Message, "Lỗi nhập liệu", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                txtSophong.Text = ""; // Xóa dữ liệu sai
+                txtSophong.Text = ""; // Sau khi báo lỗi, xóa dữ liệu sai để người dùng nhập lại
             }
+
         }
 
         private void txtGiatien_TextChanged(object sender, EventArgs e)
