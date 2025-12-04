@@ -71,14 +71,14 @@ namespace Quản_lí_khách_sạn
                 }
 
                 string query = $@"
-            SELECT 'HD' + RIGHT('000' + CAST(MAHD AS VARCHAR), 3) AS MAHD_HIEN,
-                    KH.TENKH, P.SOPHONG, NV.TENNV AS TENNHANVIEN,
-                   HD.NGAYTHANHTOAN, HD.TONGTIEN, HD.PHUONGTHUCTT
-            FROM HOADON HD
-            JOIN KHACHHANG KH ON HD.MAKH = KH.MAKH
-            JOIN PHONG P ON HD.MAPHONG = P.MAPHONG
-            JOIN NHANVIEN NV ON HD.MANV = NV.MANV
-            WHERE HD.NGAYTHANHTOAN BETWEEN '{fromDate:yyyy-MM-dd}' AND '{toDate:yyyy-MM-dd}'";
+                SELECT 'HD' + RIGHT('000' + CAST(MAHD AS VARCHAR), 3) AS MAHD_HIEN,
+                        KH.TENKH, P.SOPHONG, NV.TENNV AS TENNHANVIEN,
+                       HD.NGAYTHANHTOAN, HD.TONGTIEN, HD.PHUONGTHUCTT
+                FROM HOADON HD
+                JOIN KHACHHANG KH ON HD.MAKH = KH.MAKH
+                JOIN PHONG P ON HD.MAPHONG = P.MAPHONG
+                JOIN NHANVIEN NV ON HD.MANV = NV.MANV
+                WHERE HD.NGAYTHANHTOAN BETWEEN '{fromDate:yyyy-MM-dd}' AND '{toDate:yyyy-MM-dd}'";
 
                 DataSet ds = fn.getdata(query);
 
