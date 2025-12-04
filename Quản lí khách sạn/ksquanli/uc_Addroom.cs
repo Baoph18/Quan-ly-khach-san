@@ -54,8 +54,9 @@ namespace Quản_lí_khách_sạn.ksquanli
         public uc_Addroom()
         {
             InitializeComponent();
+            XmlConfigurator.Configure(new FileInfo("Log4net.config"));
         }
-        //dương gay LGBT 
+        
         private void uc_Addroom_Load(object sender, EventArgs e)
         {
             query = "select MAPHONG AS [Mã Phòng], SOPHONG AS [Số Phòng],LOAIPHONG AS [Loại Phòng], GIUONG AS [Giường], GIA AS [Gía], DATPHONG AS [Trạng thái đặt phòng] from PHONG";
@@ -68,31 +69,53 @@ namespace Quản_lí_khách_sạn.ksquanli
         private readonly Function _function = new Function();
         private void btnAddRoom_Click(object sender, EventArgs e)
         {
-            if (!IsRoomInputValid())
+            try
             {
-                MessageBox.Show("Vui lòng điền đầy đủ thông tin!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                if (!IsRoomInputValid())
+                {
+                    MessageBox.Show("Vui lòng điền đầy đủ thông tin!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                string sophong = txtSophong.Text.Trim();
+                string loaiphong = txtLoaiphong.Text.Trim();
+                string loaigiuong = txtLoaigiuong.Text.Trim();
+
+                // chuyển giá tiền → có thể gây FormatException
+                long giatien = long.Parse(txtGiatien.Text.Trim());
+
+                // kiểm tra trùng phòng → lỗi nghiệp vụ
+                if (IsDuplicateRoomNumber(sophong))
+                {
+                    throw new ApplicationException("Số phòng đã tồn tại! Vui lòng nhập số khác.");
+                }
+
+                string insertQuery = $"INSERT INTO PHONG (SOPHONG, LOAIPHONG, GIUONG, GIA) " +
+                                     $"VALUES ('{sophong}', N'{loaiphong}', '{loaigiuong}', '{giatien}')";
+
+                _function.setdata(insertQuery, "Đã thêm phòng thành công!");
+
+                uc_Addroom_Load(this, null);
             }
-
-            string sophong = txtSophong.Text;
-            string loaiphong = txtLoaiphong.Text;
-            string loaigiuong = txtLoaigiuong.Text;
-            long giatien = long.Parse(txtGiatien.Text);
-
-            if (IsDuplicateRoomNumber(sophong))
+            catch (FormatException ex)  // nhập sai kiểu số
             {
-                MessageBox.Show("Số phòng đã tồn tại! Vui lòng nhập số khác.", "Trùng dữ liệu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtSophong.Focus();
-                return;
+                MessageBox.Show("Lỗi định dạng dữ liệu: " + ex.Message,
+                                "Lỗi nhập liệu", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-            string insertQuery = $"INSERT INTO PHONG (SOPHONG, LOAIPHONG, GIUONG, GIA) " +
-                                 $"VALUES ('{sophong}', N'{loaiphong}', '{loaigiuong}', '{giatien}')";
-            _function.setdata(insertQuery, "Đã thêm phòng thành công!");
-
-            uc_Addroom_Load(this, null);
-            clearAll();
-
+            catch (ApplicationException ex)  // lỗi nghiệp vụ do mình throw
+            {
+                MessageBox.Show(ex.Message,
+                                "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (Exception ex)  // lỗi hệ thống
+            {
+                MessageBox.Show("Lỗi hệ thống: " + ex.Message,
+                                "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                clearAll(); // luôn chạy
+            }
         }
 
         private bool IsRoomInputValid()
@@ -159,18 +182,38 @@ namespace Quản_lí_khách_sạn.ksquanli
         {
             try
             {
-                
-                XmlConfigurator.Configure(new FileInfo("Log4net.config"));
+                if (!KiemTraDaChonPhong())
+                    throw new ApplicationException("Chưa chọn phòng để sửa.");
 
-                if (!KiemTraDaChonPhong()) return;
-                if (!KiemTraDuLieuNhap()) return;
+                if (!KiemTraDuLieuNhap())
+                    throw new ApplicationException("Dữ liệu nhập không hợp lệ.");
 
                 CapNhatPhong();
                 LamMoiSauKhiSua();
             }
-            catch (Exception ex)
+            catch (FormatException ex)   // Lỗi định dạng số (giá tiền)
             {
-                XuLyLoi(ex);
+                Logger.Error("Lỗi định dạng dữ liệu khi sửa phòng: " + ex.Message);
+                MessageBox.Show("Lỗi định dạng số: " + ex.Message,
+                                "Lỗi nhập liệu", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (ApplicationException ex)  // lỗi nghiệp vụ
+            {
+                Logger.Warn("Lỗi nghiệp vụ: " + ex.Message);
+                MessageBox.Show(ex.Message,
+                                "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (Exception ex)  // lỗi hệ thống khác
+            {
+                Logger.Error("Lỗi hệ thống khi sửa phòng: " + ex.ToString());
+                MessageBox.Show("Lỗi hệ thống: " + ex.Message,
+                                "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // luôn chạy dù có lỗi hay không
+                clearAll();
+                selectedRoomId = -1;
             }
         }
 
