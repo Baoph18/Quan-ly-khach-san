@@ -5,97 +5,57 @@ namespace Quản_lí_khách_sạn
     [TestClass]
     public class Test_Chucnang 
     {
-        private RoomService roomService;
+        private AccountService service;
 
         [TestInitialize]
-        public void Setup()
+        public void KhoiTao()
         {
-            roomService = new RoomService();
-            roomService.IsTesting = true;
+            service = new AccountService();
         }
 
+        // 1️⃣ Đăng nhập thành công
         [TestMethod]
-        public void Test_ThemPhong()
+        public void DangNhap_HopLe_TraVeThanhCong()
         {
-            var room = new Room
-            {
-                SoPhong = "302",
-                LoaiPhong = "VIP",
-                Giuong = "Đôi",
-                Gia = 1000000,
-                TrangThai = "Trống"
-            };
+            var ketQua = service.DangNhap("admin", "123456");
 
-            bool result = roomService.AddRoom(room);
-
-            Assert.IsTrue(result, "Phòng hợp lệ phải được thêm thành công.");
-        }
-        [TestMethod]
-
-        public void Test_Dangnhap()
-        {
-            // Arrange
-            var service = new AccountService();
-            string username = "b";
-            string password = "123";
-
-            // Act
-            bool result = service.Login(username, password);
-
-            // Assert
-            Assert.IsTrue(result,"đăng nhập thành công");
+            Assert.AreEqual("Thành công", ketQua);
         }
 
+        // 2️⃣ Sai mật khẩu
         [TestMethod]
-        public void Test_Suaphong()
+        public void DangNhap_SaiMatKhau_TraVeSaiMatKhau()
         {
-            // Arrange
-            var roomService = new RoomService();
-            int maPhong = 1; 
-            string soPhongMoi = "101";
-            string loaiPhongMoi = "VIP";
-            string giuongMoi = "Giường đôi";
-            long giaMoi = 800000;
+            var ketQua = service.DangNhap("admin", "abc");
 
-            // Act
-            bool result = roomService.SuaPhong(maPhong, soPhongMoi, loaiPhongMoi, giuongMoi, giaMoi);
-
-            // Assert
-            Assert.IsTrue(result, "Sửa phòng thành công");
+            Assert.AreEqual("Sai mật khẩu", ketQua);
         }
 
+        // 3️⃣ Tài khoản không tồn tại
         [TestMethod]
-        public void Test_Thanhtoan()
+        public void DangNhap_TaiKhoanKhongTonTai_TraVeLoi()
         {
-            // Arrange
-            var payment = new PaymentService();
-            int maHoaDon = 1;
-            decimal tongTien = 500000;
-            string phuongThuc = "Tiền mặt";
+            var ketQua = service.DangNhap("abcxyz", "123456");
 
-            // Act
-            bool result = payment.ThanhToan(maHoaDon, tongTien, phuongThuc);
-
-            // Assert
-            Assert.IsTrue(result, "Thanh toán hợp lệ → thành công");
+            Assert.AreEqual("Tài khoản không tồn tại", ketQua);
         }
 
+        // 4️⃣ Thiếu tên đăng nhập
         [TestMethod]
-        public void Test_Datphong()
+        public void DangNhap_ThieuTenDangNhap_TraVeLoi()
         {
-            // Arrange
-            var booking = new BookingService();
-            int maPhong = 1;
-            int maKhach = 5;
-            int soDem = 3;
-            string ngayNhan = "2025-11-10";
-            string ngayTra = "2025-11-13";
+            var ketQua = service.DangNhap("", "123456");
 
-            // Act
-            bool result = booking.DatPhong(maPhong, maKhach, soDem, ngayNhan, ngayTra);
+            Assert.AreEqual("Thiếu thông tin", ketQua);
+        }
 
-            // Assert
-            Assert.IsTrue(result, "Đặt phòng hợp lệ → thành công");
+        // 5️⃣ Thiếu mật khẩu
+        [TestMethod]
+        public void DangNhap_ThieuMatKhau_TraVeLoi()
+        {
+            var ketQua = service.DangNhap("admin", "");
+
+            Assert.AreEqual("Thiếu thông tin", ketQua);
         }
     }
 }

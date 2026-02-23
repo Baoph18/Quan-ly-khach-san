@@ -9,29 +9,27 @@ namespace Quản_lí_khách_sạn
 {
     public class AccountService
     {
-        private Function fn = new Function(); // class Function bạn đã có sẵn
+        // Giả lập dữ liệu có sẵn
+        private Dictionary<string, string> danhSachTaiKhoan =
+            new Dictionary<string, string>()
+            {
+            { "admin", "123456" },
+            { "nhanvien", "111111" }
+            };
 
-        public bool Login(string username, string password)
+        public string DangNhap(string tenDangNhap, string matKhau)
         {
-            // Không nhập gì
-            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
-                return false;
+            if (string.IsNullOrWhiteSpace(tenDangNhap) ||
+                string.IsNullOrWhiteSpace(matKhau))
+                return "Thiếu thông tin";
 
-            // Truy vấn tài khoản trong CSDL
-            string query = $@"
-                SELECT * FROM TAIKHOAN tk
-                JOIN NHANVIEN nv ON tk.MANV = nv.MANV
-                WHERE tk.TENTK = '{username}' AND tk.MATKHAU = '{password}'";
+            if (!danhSachTaiKhoan.ContainsKey(tenDangNhap))
+                return "Tài khoản không tồn tại";
 
-            DataSet ds = fn.getdata(query);
-            if (ds.Tables[0].Rows.Count > 0)
-                return true;
+            if (danhSachTaiKhoan[tenDangNhap] != matKhau)
+                return "Sai mật khẩu";
 
-            // Tài khoản admin mặc định
-            if (username.ToLower() == "b" && password == "123")
-                return true;
-
-            return false;
+            return "Thành công";
         }
     }
 }

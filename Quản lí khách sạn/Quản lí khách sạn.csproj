@@ -157,6 +157,8 @@
     <Compile Include="ksquanli\uc_Employee.Designer.cs">
       <DependentUpon>uc_Employee.cs</DependentUpon>
     </Compile>
+    <Compile Include="NhanVien.cs" />
+    <Compile Include="NhanVienServices.cs" />
     <Compile Include="PaymentService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -165,11 +167,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-
-    <Compile Include="RoomServices.cs" />
-
     <Compile Include="RoomService.cs" />
-
     <Compile Include="ThongKe.cs">
       <SubType>Form</SubType>
     </Compile>
