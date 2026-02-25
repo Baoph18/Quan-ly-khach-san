@@ -10,10 +10,10 @@ using System.Threading;
 namespace Quanlykhachsan.tests
 {
     /// <summary>
-    /// Summary description for TestDangNhapWinappdriver
+    /// Summary description for TestDangXuatWinappdriver
     /// </summary>
     [TestClass]
-    public class TestDangNhapWinappdriver
+    public class TestDangXuatWinappdriver
     {
         private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
 
@@ -36,7 +36,6 @@ namespace Quanlykhachsan.tests
             Assert.IsNotNull(session);
             Thread.Sleep(3000); // đợi app load
         }
-        [TestMethod]
         public void Test_DangNhap_Va_MoFormDangXuat()
         {
             session.FindElementByAccessibilityId("txtUserName").SendKeys("b");
@@ -48,12 +47,43 @@ namespace Quanlykhachsan.tests
             var handles = session.WindowHandles;
             session.SwitchTo().Window(handles.Last());
 
-            
+            session.FindElementByAccessibilityId("btnInformation").Click();
 
             Thread.Sleep(2000);
 
             handles = session.WindowHandles;
             session.SwitchTo().Window(handles.Last());
+        }
+
+        [TestMethod]
+        public void DangXuat_ThanhCong()
+        {
+            Test_DangNhap_Va_MoFormDangXuat();
+            
+
+            // Bấm đăng ký
+            session.FindElementByAccessibilityId("btnDangxuat").Click();
+
+            // Đợi dialog hiện
+            Thread.Sleep(1500);
+
+            // Lấy tất cả window handle
+            var handles = session.WindowHandles;
+
+            // Switch sang window mới nhất (dialog)
+            session.SwitchTo().Window(handles.Last());
+
+            // Switch sang cửa sổ dialog
+            foreach (var handle in session.WindowHandles)
+            {
+                session.SwitchTo().Window(handle);
+
+                if (session.Title.Contains("Xác nhận"))
+                    break;
+            }
+
+            // Click nút Yes
+            session.FindElementByName("Yes").Click();
         }
 
         [TestCleanup]

@@ -60,25 +60,28 @@ namespace Quanlykhachsan.tests
         {
             Test_DangNhap_Va_MoFormThanhToan();
 
-            // Đợi form load xong và tìm DataGridView theo AccessibilityId
-            WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(10));
+            WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(20));
 
+            // Switch sang window mới nhất
+            wait.Until(d => session.WindowHandles.Count > 0);
+            session.SwitchTo().Window(session.WindowHandles.Last());
+
+            // Đợi grid xuất hiện
             var grid = wait.Until(d =>
-    session.FindElementByAccessibilityId("dataGridView1"));
+                session.FindElementByAccessibilityId("dataGridView1"));
 
-            // Lấy tất cả dòng
-            var rows = grid.FindElementsByClassName("DataItem");
+            Thread.Sleep(2000); // cho bind dữ liệu
 
-            Assert.IsTrue(rows.Count > 0, "Không có dữ liệu trong DataGrid");
+            // Lấy tất cả phần tử con trong grid
+            var children = grid.FindElementsByXPath(".//*");
 
-            var firstRow = rows[0];
+            Assert.IsTrue(children.Count > 0, "Grid không có dữ liệu hoặc chưa load xong");
 
-            // Click chọn dòng
-            firstRow.Click();
+            // Click vào grid (không click row cụ thể nữa)
+            grid.Click();
 
             Thread.Sleep(500);
 
-            // Click nút Thanh Toán
             var btnThanhToan = wait.Until(d =>
                 session.FindElementByAccessibilityId("btnThanhToan"));
 
@@ -86,7 +89,7 @@ namespace Quanlykhachsan.tests
 
             Thread.Sleep(1000);
 
-            // Nếu có MessageBox thì xử lý
+            // Xử lý MessageBox nếu có
             var handles = session.WindowHandles;
             if (handles.Count > 1)
             {

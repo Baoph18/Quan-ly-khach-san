@@ -10,10 +10,10 @@ using System.Threading;
 namespace Quanlykhachsan.tests
 {
     /// <summary>
-    /// Summary description for TestDangNhapWinappdriver
+    /// Summary description for TestXuatHoaDonWinappdriver
     /// </summary>
     [TestClass]
-    public class TestDangNhapWinappdriver
+    public class TestXuatHoaDonWinappdriver
     {
         private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
 
@@ -36,7 +36,6 @@ namespace Quanlykhachsan.tests
             Assert.IsNotNull(session);
             Thread.Sleep(3000); // đợi app load
         }
-        [TestMethod]
         public void Test_DangNhap_Va_MoFormDangXuat()
         {
             session.FindElementByAccessibilityId("txtUserName").SendKeys("b");
@@ -48,12 +47,34 @@ namespace Quanlykhachsan.tests
             var handles = session.WindowHandles;
             session.SwitchTo().Window(handles.Last());
 
-            
+            session.FindElementByAccessibilityId("btnHoaDon").Click();
 
             Thread.Sleep(2000);
 
             handles = session.WindowHandles;
             session.SwitchTo().Window(handles.Last());
+        }
+
+        [TestMethod]
+        public void DangXuat_ThanhCong()
+        {
+            Test_DangNhap_Va_MoFormDangXuat();
+
+
+            // Bấm đăng ký
+            session.FindElementByAccessibilityId("guna2Button2").Click();
+
+            // Đợi dialog hiện
+            Thread.Sleep(1500);
+
+            // Lấy tất cả window handle
+            var handles = session.WindowHandles;
+
+            // Switch sang window mới nhất (dialog)
+            session.SwitchTo().Window(handles.Last());
+
+            
+            Thread.Sleep(1500);
         }
 
         [TestCleanup]
