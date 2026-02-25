@@ -200,23 +200,7 @@ namespace Quản_lí_khách_sạn.ksquanli
             clearAll();
         }
 
-        private void dataGridView1_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
-        {
-            if (e.RowIndex >= 0 && dataGridView1.Rows[e.RowIndex].Cells[0].Value != null)
-            {
-                id = int.Parse(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString());
-                txtName.Text = dataGridView1.Rows[e.RowIndex].Cells[1].Value.ToString();
-                txtRoomNo.Text = dataGridView1.Rows[e.RowIndex].Cells[9].Value.ToString();
-
-                int soDem = int.Parse(dataGridView1.Rows[e.RowIndex].Cells[11].Value.ToString());
-                decimal gia = decimal.Parse(dataGridView1.Rows[e.RowIndex].Cells[13].Value.ToString());
-
-                txtSoDem.Text = soDem.ToString();
-                decimal tongTien = soDem * gia;
-                txtTongSoTien.Text = tongTien.ToString("N0") + " VNĐ"; // định dạng tiền Việt
-
-            }
-        }
+        
 
         private void txtCheckout_ValueChanged(object sender, EventArgs e)
         {
@@ -286,7 +270,31 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-
+            
         }
+
+        private void dataGridView1_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dataGridView1.CurrentRow != null
+        && dataGridView1.CurrentRow.Index >= 0
+        && dataGridView1.CurrentRow.Cells[0].Value != null)
+            {
+                var row = dataGridView1.CurrentRow;
+
+                id = int.Parse(row.Cells[0].Value.ToString());
+                txtName.Text = row.Cells[1].Value.ToString();
+                txtRoomNo.Text = row.Cells[9].Value.ToString();
+
+                int soDem = int.Parse(row.Cells[11].Value.ToString());
+                decimal gia = decimal.Parse(row.Cells[13].Value.ToString());
+
+                txtSoDem.Text = soDem.ToString();
+
+                decimal tongTien = soDem * gia;
+                txtTongSoTien.Text = tongTien.ToString("N0") + " VNĐ";
+            }
+        }
+
+        
     }
 }

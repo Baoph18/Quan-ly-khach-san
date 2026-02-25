@@ -5,11 +5,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A9910035-8F39-4DE9-B932-47FBEB5E5191}</ProjectGuid>
+    <ProjectGuid>{C5A8658A-CFF5-4156-AD9F-75BBAC8F89E9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Quanlykhachsan.tests</RootNamespace>
-    <AssemblyName>Quanlykhachsan.tests</AssemblyName>
+    <RootNamespace>UnitTestProject1</RootNamespace>
+    <AssemblyName>UnitTestProject1</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -69,23 +69,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TestDangNhapWinappdriver.cs" />
-    <Compile Include="TestDKKhachHangWinappdriver.cs" />
-    <Compile Include="TestSuaTTKhachHangWinappdriver.cs" />
-    <Compile Include="TestSuaTTNhanVien.cs" />
-    <Compile Include="TestSuaTTNhanVienWinappdriver.cs" />
-    <Compile Include="TestSuaTTPhongWinappdriver.cs" />
-    <Compile Include="TestThanhToanWinappdriver.cs" />
-    <Compile Include="TestThemNhanVienWinappdriver.cs" />
-    <Compile Include="TestThemPhongWinappdriver.cs" />
-    <Compile Include="TestXoaKhachHangWinappdriver.cs" />
-    <Compile Include="TestXoaNhanVienWinappdriver.cs" />
     <Compile Include="Test_DangKyKhachHang.cs" />
-    <Compile Include="Test_Dangnhap.cs" />
+    <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Test_ThanhToan.cs" />
-    <Compile Include="Test_ThemNhanVien.cs" />
-    <Compile Include="Test_XoaNhanVien.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

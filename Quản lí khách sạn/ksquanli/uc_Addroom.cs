@@ -16,37 +16,7 @@ using log4net.Config;
 namespace Quản_lí_khách_sạn.ksquanli
 {
     //ègdgdf
-    public static class Logger
-    {
-        private static readonly string path = "log.txt";
-
-        private static void Write(string level, string message)
-        {
-            string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            string log = $"{time} [{level}] {message}";
-            File.AppendAllText(path, log + Environment.NewLine);
-        }
-
-        public static void Info(string message)
-        {
-            Write("INFO", message);
-        }
-
-        public static void Warn(string message)
-        {
-            Write("WARN", message);
-        }
-
-        public static void Error(string message)
-        {
-            Write("ERROR", message);
-        }
-
-        public static void Debug(string message)
-        {
-            Write("DEBUG", message);
-        }
-    }
+    
     public partial class uc_Addroom : UserControl
     {
         Function fn = new Function();
@@ -193,19 +163,19 @@ namespace Quản_lí_khách_sạn.ksquanli
             }
             catch (FormatException ex)   // Lỗi định dạng số (giá tiền)
             {
-                Logger.Error("Lỗi định dạng dữ liệu khi sửa phòng: " + ex.Message);
+                
                 MessageBox.Show("Lỗi định dạng số: " + ex.Message,
                                 "Lỗi nhập liệu", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (ApplicationException ex)  // lỗi nghiệp vụ
             {
-                Logger.Warn("Lỗi nghiệp vụ: " + ex.Message);
+                
                 MessageBox.Show(ex.Message,
                                 "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)  // lỗi hệ thống khác
             {
-                Logger.Error("Lỗi hệ thống khi sửa phòng: " + ex.ToString());
+                
                 MessageBox.Show("Lỗi hệ thống: " + ex.Message,
                                 "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -221,7 +191,7 @@ namespace Quản_lí_khách_sạn.ksquanli
         {
             if (selectedRoomId == -1)
             {
-                Logger.Error("Người dùng nhấn sửa nhưng chưa chọn phòng.");
+                
                 MessageBox.Show("Vui lòng chọn phòng cần chỉnh sửa.",
                                 "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
@@ -234,7 +204,7 @@ namespace Quản_lí_khách_sạn.ksquanli
             if (txtSophong.Text == "" || txtLoaiphong.Text == "" ||
                 txtLoaigiuong.Text == "" || txtGiatien.Text == "")
             {
-                Logger.Warn("Người dùng nhập thiếu dữ liệu khi sửa phòng.");
+               
                 MessageBox.Show("Vui lòng nhập đầy đủ thông tin.",
                                 "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
@@ -249,12 +219,10 @@ namespace Quản_lí_khách_sạn.ksquanli
             string loaigiuong = txtLoaigiuong.Text;
             long gia = long.Parse(txtGiatien.Text);
 
-            Logger.Info($"Dữ liệu nhập: SOPHONG={sophong}, LOAIPHONG={loaiphong}, LOAIGIUONG={loaigiuong}, GIA={gia}");
 
             string query =
                 $"UPDATE PHONG SET SOPHONG='{sophong}', LOAIPHONG='{loaiphong}', GIUONG='{loaigiuong}', GIA={gia} WHERE MAPHONG={selectedRoomId}";
 
-            Logger.Info("Sửa thông tin phòng thành công: " + query);
 
             fn.setdata(query, "Cập nhật thông tin phòng thành công!");
         }
@@ -270,8 +238,6 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         private void XuLyLoi(Exception ex)
         {
-            Logger.Error("Lỗi khi sửa phòng: " + ex.Message);
-            Logger.Error("StackTrace: " + ex.StackTrace);
 
             MessageBox.Show("Đã xảy ra lỗi khi cập nhật phòng!",
                             "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -424,6 +390,20 @@ namespace Quản_lí_khách_sạn.ksquanli
         private void btnDelete_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void Datagridview_SelectionChanged(object sender, EventArgs e)
+        {
+            if (Datagridview.CurrentRow != null)
+            {
+                DataGridViewRow row = Datagridview.CurrentRow;
+
+                selectedRoomId = Convert.ToInt32(row.Cells[0].Value);
+                txtSophong.Text = row.Cells[1].Value?.ToString();
+                txtLoaiphong.Text = row.Cells[2].Value?.ToString();
+                txtLoaigiuong.Text = row.Cells[3].Value?.ToString();
+                txtGiatien.Text = row.Cells[4].Value?.ToString();
+            }
         }
     }
 }

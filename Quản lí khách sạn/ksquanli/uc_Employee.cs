@@ -454,7 +454,6 @@ namespace Quản_lí_khách_sạn.ksquanli
 
             if (!NhapDuLieuDayDu())
             {
-                Logger.Warn("Thiếu dữ liệu đăng ký.");
                 MessageBox.Show("Vui lòng nhập đầy đủ thông tin!", "Thiếu dữ liệu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -494,13 +493,11 @@ namespace Quản_lí_khách_sạn.ksquanli
             string matKhau = txtPassword.Text.Trim().Replace("'", "''");
             string chucVu = "nhanvien";
 
-            Logger.Info($"Dữ liệu nhập: TENNV={ten}, SDTNV={sdt}, GIOITINHNV={gioiTinh}, EMAILNV={email}, TENTK={taiKhoan}");
 
             // Thêm nhân viên mới
             string query = $"INSERT INTO NHANVIEN (TENNV, SDTNV, GIOITINHNV, EMAILNV, CHUCVU) " +
                            $"VALUES (N'{ten}', '{sdt}', N'{gioiTinh}', '{email}', '{chucVu}')";
             fn.setdata(query, "Đăng ký nhân viên thành công!");
-            Logger.Info("Đăng ký nhân viên thành công: " + ten);
 
             // Lấy MANV mới nhất
             int maNV = LayMaNhanVienMoiNhat();
@@ -508,15 +505,12 @@ namespace Quản_lí_khách_sạn.ksquanli
             // Thêm tài khoản
             query = $"INSERT INTO TAIKHOAN (TENTK, MATKHAU, MANV) VALUES ('{taiKhoan}', '{matKhau}', {maNV})";
             fn.setdata(query, "Tạo tài khoản thành công!");
-            Logger.Info("Tạo tài khoản thành công cho MANV=" + maNV);
 
             clearAll();
             getMaxID();
         }
         private void XuLyLoi(Exception ex)
         {
-            Logger.Error("Lỗi khi đăng ký nhân viên: " + ex.Message);
-            Logger.Error("StackTrace: " + ex.StackTrace);
 
             MessageBox.Show("Đã xảy ra lỗi khi Thêm nhân viên!",
                             "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -595,14 +589,12 @@ namespace Quản_lí_khách_sạn.ksquanli
         {
             if (!email.Contains("@"))
             {
-                Logger.Error("Email sai: thiếu @");
                 MessageBox.Show("Email phải chứa '@'!", "Sai email", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
             if (!email.EndsWith(".com"))
             {
-                Logger.Error("Email sai: thiếu .com");
                 MessageBox.Show("Email phải kết thúc bằng '.com'!", "Sai email", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
@@ -614,7 +606,6 @@ namespace Quản_lí_khách_sạn.ksquanli
 
             if (domain != "gmail" && domain != "hotmail")
             {
-                Logger.Error("Email sai: domain không phải gmail hoặc hotmail");
                 MessageBox.Show("Email phải là gmail hoặc hotmail!", "Sai email", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
@@ -681,6 +672,20 @@ namespace Quản_lí_khách_sạn.ksquanli
             {
                 MessageBox.Show(ex.Message, "Lỗi nhập liệu", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 txtMobile.Text = ""; // Xóa dữ liệu sai
+            }
+        }
+
+        private void dataGridView1_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dataGridView1.CurrentRow != null)
+            {
+                DataGridViewRow row = dataGridView1.CurrentRow;
+
+                txtIDNV.Text = row.Cells[0].Value?.ToString() ?? "";
+                txtTenNV.Text = row.Cells[1].Value?.ToString() ?? "";
+                txtSDTNV.Text = row.Cells[2].Value?.ToString() ?? "";
+                cboGioiTinh.Text = row.Cells[3].Value?.ToString() ?? "";
+                txtEmailr.Text = row.Cells[4].Value?.ToString() ?? "";
             }
         }
     }

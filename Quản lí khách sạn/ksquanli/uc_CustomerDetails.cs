@@ -472,6 +472,23 @@ namespace Quản_lí_khách_sạn.ksquanli
                 ClearInputs();
             }
         }
+
+        private void dataGridView1_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dataGridView1.CurrentRow != null)
+            {
+                DataGridViewRow row = dataGridView1.CurrentRow;
+
+                txtMAKH.Text = row.Cells[0].Value?.ToString();
+                txtTENKH.Text = row.Cells[1].Value?.ToString();
+                txtSDT.Text = row.Cells[2].Value?.ToString();
+                txtQUOCTICH.Text = row.Cells[3].Value?.ToString();
+                cboGIOITINH.Text = row.Cells[4].Value?.ToString();
+                txtMADD.Text = row.Cells[5].Value?.ToString();
+                txtDIACHI.Text = row.Cells[6].Value?.ToString();
+                txtSoDem.Text = row.Cells[7].Value?.ToString();
+            }
+        }
     }
   
 }
