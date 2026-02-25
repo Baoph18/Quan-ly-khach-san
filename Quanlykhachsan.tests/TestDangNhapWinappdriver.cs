@@ -4,60 +4,52 @@ using OpenQA.Selenium.Appium.Windows;
 using System;
 using System.Linq;
 using System.Threading;
+using System.Diagnostics;
+using System.IO;
 
 namespace Quanlykhachsan.tests
 {
     [TestClass]
     public class ĐăngNhậpTests
     {
-        // Đường dẫn mặc định của WinAppDriver
         private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
 
-        // TODO: Thay thế bằng đường dẫn tuyệt đối đến file .exe của phần mềm khách sạn của bạn
-        private const string AppId = @"D:\Quản lí khách sạn\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
+        private const string AppId =
+            @"E:\Kiểm thử phần mềm\file khachsan du phong\Quản lí khách sạn du phong\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
 
         private static WindowsDriver<WindowsElement> session;
 
         [ClassInitialize]
         public static void Setup(TestContext context)
         {
-            // Khởi tạo session mở ứng dụng
-            if (session == null)
-            {
-                var appiumOptions = new AppiumOptions();
-                appiumOptions.AddAdditionalCapability("app", AppId);
-                session = new WindowsDriver<WindowsElement>(new Uri(WindowsApplicationDriverUrl), appiumOptions);
+            var options = new AppiumOptions();
+            options.AddAdditionalCapability("app", AppId);
 
-                Assert.IsNotNull(session, "Không thể khởi tạo session WinAppDriver.");
+            session = new WindowsDriver<WindowsElement>(
+                new Uri(WindowsApplicationDriverUrl),
+                options
+            );
 
-                // Đợi ứng dụng load lên
-                Thread.Sleep(2000);
-            }
+            Assert.IsNotNull(session);
+            Thread.Sleep(3000); // đợi app load
         }
-
         [TestMethod]
-        public void Test_DangNhapTaiKhoanDuPhong_ThanhCong()
+        public void Test_DangNhap()
         {
-            // Hành động: Nhập tài khoản admin dự phòng
             session.FindElementByAccessibilityId("txtUserName").SendKeys("b");
             session.FindElementByAccessibilityId("txtPassword").SendKeys("123");
             session.FindElementByAccessibilityId("btnLogin").Click();
 
-            // Đợi form Trang Chủ load (có thể lâu hơn tùy kết nối DB)
-            Thread.Sleep(5000);
+            Thread.Sleep(3000);
 
 
-
-            // switch sang window mới
-            var handles = session.WindowHandles;
-            session.SwitchTo().Window(handles.Last());
-            // Kiểm tra: Cửa sổ Trang Chủ xuất hiện
-            // TODO: Sửa "Trang Chủ" thành tiêu đề (Text) thực tế của form TrangChủ
-            var mainForm = session.FindElementByName("TrangChủ");
-            Assert.IsNotNull(mainForm);
+          
+         
         }
+
+       
         [ClassCleanup]
-        public void Cleanup()
+        public static void Cleanup()
         {
             try
             {

@@ -19,7 +19,7 @@ namespace Quanlykhachsan.tests
         private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
 
         private const string AppId =
-            @"D:\Quản lí khách sạn\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
+            @"E:\Kiểm thử phần mềm\file khachsan du phong\Quản lí khách sạn du phong\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
 
         private static WindowsDriver<WindowsElement> session;
 
