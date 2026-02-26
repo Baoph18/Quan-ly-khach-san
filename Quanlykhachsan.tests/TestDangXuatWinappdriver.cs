@@ -156,6 +156,39 @@ namespace Quanlykhachsan.tests
           
         }
 
+        [TestMethod]
+        public void DangNhap_BoTrongUserVaPass_ThatBai()
+        {
+            // Không nhập gì cả
+
+            // Click nút đăng nhập
+            session.FindElementByAccessibilityId("btnLogin").Click();
+
+            Thread.Sleep(1500);
+
+            // ===== BẮT MESSAGEBOX LỖI =====
+            var handles = session.WindowHandles;
+
+            if (handles.Count > 1)
+            {
+                session.SwitchTo().Window(handles.Last());
+
+                string msg = session.PageSource;
+
+                // Kiểm tra thông báo lỗi bắt buộc nhập
+                Assert.IsTrue(
+                    msg.Contains("bắt buộc") ||
+                    msg.Contains("required") ||
+                    msg.Contains("nhập"),
+                    "Không xuất hiện thông báo lỗi khi bỏ trống tài khoản"
+                );
+
+                // Click OK
+                session.FindElementByName("OK").Click();
+            }
+           
+        }
+
         [TestCleanup]
         public void Cleanup()
         {
