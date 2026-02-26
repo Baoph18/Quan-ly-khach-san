@@ -105,6 +105,74 @@ namespace Quanlykhachsan.tests
             session.FindElementByName("OK").Click();
         }
 
+        [TestMethod]
+        public void DangKy_KhachBoTrongTen_KhongThanhCong()
+        {
+            Test_DangNhap_Va_MoFormDangKy();
+
+            // ===== NHẬP DATA =====
+
+            // bỏ trống tên khách
+            session.FindElementByAccessibilityId("txtName").Clear();
+
+            session.FindElementByAccessibilityId("txtContact")
+                   .SendKeys("0912345678");
+
+            session.FindElementByAccessibilityId("txtQuocTich")
+                   .SendKeys("Viet Nam");
+
+            session.FindElementByAccessibilityId("txtGioiTinh")
+                   .SendKeys("Nam");
+
+            session.FindElementByAccessibilityId("txtMaID")
+                   .SendKeys("123456789012");
+
+            session.FindElementByAccessibilityId("txtAddress")
+                   .SendKeys("Ha Noi");
+
+            session.FindElementByAccessibilityId("txtRoomNo")
+                   .SendKeys("101");
+
+            session.FindElementByAccessibilityId("txtSoDem")
+                   .SendKeys("2");
+
+            session.FindElementByAccessibilityId("txtBed_Type")
+                   .SendKeys("Đơn");
+
+            session.FindElementByAccessibilityId("txtRoom_type")
+                   .SendKeys("Vip");
+
+
+
+            // ===== CLICK ĐĂNG KÝ =====
+            session.FindElementByAccessibilityId("btnAdd_Khachhang").Click();
+
+            Thread.Sleep(1500);
+
+
+
+            // ===== VERIFY KHÔNG THÀNH CÔNG =====
+
+            // nếu hệ thống báo lỗi dạng popup
+            var dialog = session.WindowHandles;
+
+            if (dialog.Count > 1)
+            {
+                session.SwitchTo().Window(dialog.Last());
+
+                var msg = session.FindElementByName("Vui lòng nhập tên khách hàng");
+                Assert.IsNotNull(msg);
+
+                session.FindElementByName("OK").Click();
+            }
+
+
+
+            // kiểm tra form vẫn còn mở (chưa đóng → chưa lưu)
+            var txtName = session.FindElementByAccessibilityId("txtName");
+            Assert.IsTrue(txtName.Displayed);
+        }
+
         [TestCleanup]
         public void Cleanup()
         {

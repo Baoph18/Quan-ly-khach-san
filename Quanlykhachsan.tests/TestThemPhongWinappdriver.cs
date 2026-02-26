@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Windows;
+using OpenQA.Selenium.Support.UI;
 using System;
 using System.Linq;
 using System.Threading;
@@ -35,6 +36,7 @@ namespace Quanlykhachsan.tests
             Thread.Sleep(3000); // đợi app load
         }
 
+      
         public void Test_DangNhap_Va_MoForm()
         {
             session.FindElementByAccessibilityId("txtUserName").SendKeys("b");
@@ -54,7 +56,7 @@ namespace Quanlykhachsan.tests
         }
 
         [TestMethod]
-        public void DangKy_KhachHopLe_ThanhCong()
+        public void ThêmPhòng_ThanhCong()
         {
             Test_DangNhap_Va_MoForm();
             // Nhập thông tin khách
@@ -88,6 +90,58 @@ namespace Quanlykhachsan.tests
             session.FindElementByName("OK").Click();
         }
 
+
+        [TestMethod]
+        public void ThemPhong_KhongHopLe_ThatBai()
+        {
+            Test_DangNhap_Va_MoForm();
+
+            // ===== NHẬP DỮ LIỆU SAI =====
+
+            // Số phòng hợp lệ
+            session.FindElementByAccessibilityId("txtSophong")
+                   .SendKeys("100");
+
+            // Bỏ trống loại phòng
+            var loaiphong = session.FindElementByAccessibilityId("txtLoaiphong");
+            loaiphong.Clear();
+
+            // Loại giường hợp lệ
+            session.FindElementByAccessibilityId("txtLoaigiuong")
+                   .SendKeys("Đơn");
+
+            // Giá âm → sai dữ liệu
+            session.FindElementByAccessibilityId("txtGiatien")
+                   .SendKeys("-500");
+
+            // ===== CLICK THÊM =====
+            session.FindElementByAccessibilityId("btnAddRoom").Click();
+            session.FindElementByAccessibilityId("btnAddRoom").Click();
+
+            Thread.Sleep(1500);
+
+            // ===== BẮT MESSAGEBOX LỖI =====
+            var handles = session.WindowHandles;
+
+            if (handles.Count > 1)
+            {
+                session.SwitchTo().Window(handles.Last());
+
+                string msg = session.PageSource;
+
+                // Kiểm tra có thông báo lỗi
+                Assert.IsTrue(
+                    msg.Contains("lỗi") ||
+                    msg.Contains("không hợp lệ") ||
+                    msg.Contains("vui lòng"),
+                    "Không xuất hiện thông báo lỗi khi nhập dữ liệu sai"
+                );
+
+                // Click OK
+                session.FindElementByName("OK").Click();
+            }
+           
+        }
         [TestCleanup]
         public void Cleanup()
         {

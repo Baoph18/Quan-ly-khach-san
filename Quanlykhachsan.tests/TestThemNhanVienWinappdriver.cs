@@ -92,6 +92,59 @@ namespace Quanlykhachsan.tests
             }
         }
 
+        [TestMethod]
+        public void UI_AddNhanVien_KhongHopLe_ThatBai()
+        {
+            Test_DangNhap_Va_MoFormNhanVien();
+
+            // ===== NHẬP DỮ LIỆU SAI =====
+
+            // Bỏ trống tên
+            var txtName = session.FindElementByAccessibilityId("txtName");
+            txtName.Clear();
+
+            // SĐT nhập chữ → sai định dạng
+            var txtMobile = session.FindElementByAccessibilityId("txtMobile");
+            txtMobile.Clear();
+            txtMobile.SendKeys("ABCXYZ");
+
+            session.FindElementByAccessibilityId("txtEmail").SendKeys("saiemail");
+
+            session.FindElementByAccessibilityId("txtUserName").SendKeys("userfail");
+            session.FindElementByAccessibilityId("txtPassword").SendKeys("123");
+
+            var cbo = session.FindElementByAccessibilityId("txtGender");
+            cbo.Click();
+            cbo.SendKeys("Nam");
+            cbo.SendKeys(OpenQA.Selenium.Keys.Enter);
+
+            // ===== CLICK THÊM =====
+            session.FindElementByAccessibilityId("btnDangKy").Click();
+
+            Thread.Sleep(1500);
+
+            // ===== KIỂM TRA MESSAGEBOX LỖI =====
+            var handles = session.WindowHandles;
+
+            if (handles.Count > 1)
+            {
+                session.SwitchTo().Window(handles.Last());
+
+                string message = session.PageSource;
+
+                // Kiểm tra có thông báo lỗi
+                Assert.IsTrue(
+                    message.Contains("lỗi") ||
+                    message.Contains("không hợp lệ") ||
+                    message.Contains("vui lòng"),
+                    "Không xuất hiện thông báo lỗi khi nhập sai dữ liệu"
+                );
+
+                session.FindElementByName("OK").Click();
+            }
+        
+        }
+
         [TestCleanup]
         public void Cleanup()
         {

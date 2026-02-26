@@ -149,5 +149,10 @@ namespace Quản_lí_khách_sạn
         {
 
         }
+
+        private void txtPassword_TextChanged_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }

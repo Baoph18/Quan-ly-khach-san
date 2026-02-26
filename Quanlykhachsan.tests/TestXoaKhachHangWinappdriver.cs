@@ -67,7 +67,7 @@ namespace Quanlykhachsan.tests
         }
 
         [TestMethod]
-        public void ThemPhong_ThanhCong()
+        public void XoaKhachHang_ThanhCong()
         {
             Test_DangNhap_Va_MoForm();
 
@@ -120,6 +120,46 @@ namespace Quanlykhachsan.tests
 
             okButton1.Click();
 
+        }
+
+        [TestMethod]
+        public void XoaKhachHang_KhongChonDong_ThatBai()
+        {
+            Test_DangNhap_Va_MoForm();
+
+            WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(15));
+
+            // Chờ DataGrid load
+            var grid = wait.Until(d =>
+                session.FindElementByAccessibilityId("dataGridView1"));
+
+            // KHÔNG click grid → không chọn khách
+
+            // Click nút Xóa luôn
+            session.FindElementByAccessibilityId("btnDelete").Click();
+
+            Thread.Sleep(1500);
+
+            // ===== BẮT MESSAGEBOX LỖI =====
+            var handles = session.WindowHandles;
+
+            if (handles.Count > 1)
+            {
+                session.SwitchTo().Window(handles.Last());
+
+                string msg = session.PageSource;
+
+                // Kiểm tra thông báo yêu cầu chọn khách
+                Assert.IsTrue(
+                    msg.Contains("chọn") ||
+                    msg.Contains("Select") ||
+                    msg.Contains("vui lòng"),
+                    "Không xuất hiện cảnh báo khi chưa chọn khách"
+                );
+
+                session.FindElementByName("OK").Click();
+            }
+          
         }
 
         [TestCleanup]

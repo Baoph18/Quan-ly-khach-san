@@ -67,7 +67,7 @@
             this.guna2Panel2.Controls.Add(this.label1);
             this.guna2Panel2.CustomBorderThickness = new System.Windows.Forms.Padding(100, 0, 0, 0);
             this.guna2Panel2.Location = new System.Drawing.Point(0, -2);
-            this.guna2Panel2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.guna2Panel2.Margin = new System.Windows.Forms.Padding(4);
             this.guna2Panel2.Name = "guna2Panel2";
             this.guna2Panel2.Size = new System.Drawing.Size(652, 228);
             this.guna2Panel2.TabIndex = 24;
@@ -88,7 +88,7 @@
             this.guna2CircleButton1.ImageOffset = new System.Drawing.Point(3, 0);
             this.guna2CircleButton1.ImageSize = new System.Drawing.Size(50, 50);
             this.guna2CircleButton1.Location = new System.Drawing.Point(261, 9);
-            this.guna2CircleButton1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.guna2CircleButton1.Margin = new System.Windows.Forms.Padding(4);
             this.guna2CircleButton1.Name = "guna2CircleButton1";
             this.guna2CircleButton1.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
             this.guna2CircleButton1.Size = new System.Drawing.Size(132, 119);
@@ -106,7 +106,7 @@
             this.bntExit.ForeColor = System.Drawing.Color.White;
             this.bntExit.Image = ((System.Drawing.Image)(resources.GetObject("bntExit.Image")));
             this.bntExit.Location = new System.Drawing.Point(597, 0);
-            this.bntExit.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.bntExit.Margin = new System.Windows.Forms.Padding(4);
             this.bntExit.Name = "bntExit";
             this.bntExit.Size = new System.Drawing.Size(55, 49);
             this.bntExit.TabIndex = 1;
@@ -149,7 +149,7 @@
             this.btnLogin.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold);
             this.btnLogin.ForeColor = System.Drawing.Color.White;
             this.btnLogin.Location = new System.Drawing.Point(37, 570);
-            this.btnLogin.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnLogin.Margin = new System.Windows.Forms.Padding(4);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Size = new System.Drawing.Size(569, 66);
             this.btnLogin.TabIndex = 23;
@@ -181,6 +181,7 @@
             this.txtPassword.SelectedText = "";
             this.txtPassword.Size = new System.Drawing.Size(569, 68);
             this.txtPassword.TabIndex = 28;
+            this.txtPassword.TextChanged += new System.EventHandler(this.txtPassword_TextChanged_1);
             // 
             // label3
             // 

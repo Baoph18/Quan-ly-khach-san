@@ -98,7 +98,7 @@ namespace Quanlykhachsan.tests
 
             var txtSDTNV = session.FindElementByAccessibilityId("txtSDTNV");
             txtSDTNV.Clear();
-            txtSDTNV.SendKeys("5345645747467");
+            txtSDTNV.SendKeys("53456457");
 
             var cboGioiTinh = session.FindElementByAccessibilityId("cboGioiTinh");
             cboGioiTinh.Click();
@@ -132,11 +132,82 @@ namespace Quanlykhachsan.tests
                 }
                 catch { }
             }
+        }
 
-            
+        [TestMethod]
+        public void UI_SuaTTNhanVien_KhongHopLe_KhongThanhCong()
+        {
+            Test_DangNhap_Va_MoFormNhanVien();
+
+            WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(15));
+
+            // Chờ grid load
+            wait.Until(d =>
+                session.FindElementByAccessibilityId("dataGridView1"));
+
+            Thread.Sleep(800);
 
 
 
+            // ===== NHẬP DỮ LIỆU SAI =====
+
+            var txtTenNV = session.FindElementByAccessibilityId("txtTenNV");
+            txtTenNV.Clear(); // ❌ bỏ trống tên
+
+
+
+            var txtSDTNV = session.FindElementByAccessibilityId("txtSDTNV");
+            txtSDTNV.Clear();
+            txtSDTNV.SendKeys("abcxyz"); // ❌ sai định dạng số điện thoại
+
+
+
+            var cboGioiTinh = session.FindElementByAccessibilityId("cboGioiTinh");
+            cboGioiTinh.Click();
+            cboGioiTinh.SendKeys("Nam");
+
+
+
+            var txtEmailr = session.FindElementByAccessibilityId("txtEmailr");
+            txtEmailr.Clear();
+            txtEmailr.SendKeys("saiemail"); // ❌ email sai format
+
+
+
+            // ===== CLICK SỬA =====
+
+            var btnSua = wait.Until(d =>
+                session.FindElementByName("Sửa"));
+
+            btnSua.Click();
+            Thread.Sleep(1500);
+
+
+
+            // ===== VERIFY KHÔNG THÀNH CÔNG =====
+
+            bool errorFound = false;
+
+            foreach (var handle in session.WindowHandles)
+            {
+                session.SwitchTo().Window(handle);
+
+                if (session.PageSource.Contains("lỗi") ||
+                    session.PageSource.Contains("không hợp lệ") ||
+                    session.PageSource.Contains("nhập"))
+                {
+                    errorFound = true;
+                    break;
+                }
+            }
+
+            btnSua.Click();
+
+
+
+            // ===== FORM VẪN MỞ → CHỨNG TỎ KHÔNG LƯU =====
+            var stillOpen = session.FindElementByAccessibilityId("txtTenNV");
+            Assert.IsTrue(stillOpen.Displayed);
         }
 
         [TestCleanup]

@@ -67,7 +67,7 @@ namespace Quanlykhachsan.tests
 
         [TestMethod]
         
-        public void ThemPhong_ThanhCong()
+        public void SuaPhong_ThanhCong()
         {
             Test_DangNhap_Va_MoForm();
 
@@ -115,6 +115,66 @@ namespace Quanlykhachsan.tests
             }
 
             session.FindElementByName("OK").Click();
+        }
+
+
+        [TestMethod]
+        public void SuaPhong_KhongThanhCong()
+        {
+            Test_DangNhap_Va_MoForm();
+
+            WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(15));
+
+            // Chờ DataGrid xuất hiện
+            var grid = wait.Until(d =>
+                session.FindElementByAccessibilityId("dataGridView1"));
+
+            grid.Click();
+            Thread.Sleep(500);
+
+            // Nhập dữ liệu sai (giá âm + bỏ trống loại phòng)
+            var txtSoPhong = session.FindElementByAccessibilityId("txtSophong");
+            txtSoPhong.Clear();
+            txtSoPhong.SendKeys("1");
+
+            var txtLoaiPhong = session.FindElementByAccessibilityId("txtLoaiphong");
+            txtLoaiPhong.Clear(); // bỏ trống -> lỗi validate
+
+            var txtLoaiGiuong = session.FindElementByAccessibilityId("txtLoaigiuong");
+            txtLoaiGiuong.Clear();
+            txtLoaiGiuong.SendKeys("Đơn");
+
+            var txtGiaTien = session.FindElementByAccessibilityId("txtGiatien");
+            txtGiaTien.Clear();
+            txtGiaTien.SendKeys("-100"); // giá âm -> sai dữ liệu
+
+            // Nhấn nút sửa
+            session.FindElementByAccessibilityId("btnRepair").Click();
+            Thread.Sleep(1500);
+
+            // Kiểm tra dialog báo lỗi xuất hiện
+            bool errorFound = false;
+
+            foreach (var handle in session.WindowHandles)
+            {
+                session.SwitchTo().Window(handle);
+
+                if (session.PageSource.Contains("lỗi") ||
+                    session.PageSource.Contains("không hợp lệ") ||
+                    session.PageSource.Contains("Error"))
+                {
+                    errorFound = true;
+                    break;
+                }
+            }
+
+
+            // Đóng thông báo lỗi nếu có nút OK
+            try
+            {
+                session.FindElementByName("OK").Click();
+            }
+            catch { }
         }
 
         [TestCleanup]

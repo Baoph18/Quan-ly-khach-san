@@ -149,6 +149,49 @@ namespace Quanlykhachsan.tests
             
         }
 
+        [TestMethod]
+        public void UI_XoaNhanVien_KhongChon_ThatBai()
+        {
+            Test_DangNhap_Va_MoFormNhanVien();
+
+            var handles = session.WindowHandles;
+            session.SwitchTo().Window(handles.Last());
+
+            // Chờ grid load
+            var grid = session.FindElementByAccessibilityId("dataGridView2");
+
+            Assert.IsNotNull(grid, "Không tìm thấy bảng nhân viên");
+
+            // ===== KHÔNG CHỌN DÒNG =====
+
+            // Click nút Xóa luôn
+            session.FindElementByAccessibilityId("btnDelete").Click();
+            session.FindElementByAccessibilityId("btnDelete").Click();
+
+            Thread.Sleep(1500);
+
+            // ===== BẮT MESSAGEBOX CẢNH BÁO =====
+            var windows = session.WindowHandles;
+
+            if (windows.Count > 1)
+            {
+                session.SwitchTo().Window(windows.Last());
+
+                string msg = session.PageSource;
+
+                // Kiểm tra có cảnh báo yêu cầu chọn nhân viên
+                Assert.IsTrue(
+                    msg.Contains("chọn") ||
+                    msg.Contains("Select") ||
+                    msg.Contains("vui lòng"),
+                    "Không xuất hiện cảnh báo khi chưa chọn nhân viên"
+                );
+
+                session.FindElementByName("OK").Click();
+            }
+           
+        }
+
         [TestCleanup]
         public void Cleanup()
         {
