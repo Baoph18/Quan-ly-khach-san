@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TestDangNhapWinappdriver.cs" />
+    <Compile Include="TestDangXuatWinappdriver.cs" />
     <Compile Include="TestDKKhachHangWinappdriver.cs" />
     <Compile Include="TestSuaTTKhachHangWinappdriver.cs" />
     <Compile Include="TestSuaTTNhanVien.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="TestThemPhongWinappdriver.cs" />
     <Compile Include="TestXoaKhachHangWinappdriver.cs" />
     <Compile Include="TestXoaNhanVienWinappdriver.cs" />
+    <Compile Include="TestXuatHoaDonWinappdriver.cs" />
     <Compile Include="Test_DangKyKhachHang.cs" />
     <Compile Include="Test_Dangnhap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
