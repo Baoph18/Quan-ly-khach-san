@@ -54,42 +54,72 @@ namespace Quanlykhachsan.tests
             handles = session.WindowHandles;
             session.SwitchTo().Window(handles.Last());
         }
+
+        public TestContext TestContext { get; set; }
         [TestMethod]
         public void UI_AddNhanVien_HopLe_ThanhCong()
         {
-            Test_DangNhap_Va_MoFormNhanVien();   // nếu có login
+            Test_DangNhap_Va_MoFormNhanVien();
 
-
-
-            // Nhập dữ liệu
-
-            session.FindElementByAccessibilityId("txtName").SendKeys("Nguyen Van B");
+            // ===== NHẬP DỮ LIỆU =====
+            session.FindElementByAccessibilityId("txtName").SendKeys("Nguyen Van u");
             session.FindElementByAccessibilityId("txtMobile").SendKeys("0909999999");
-            session.FindElementByAccessibilityId("txtEmail").SendKeys("danguyen@gmail.com");
-            session.FindElementByAccessibilityId("txtUserName").SendKeys("ad");
-            session.FindElementByAccessibilityId("txtPassword").SendKeys("5232532");
+            session.FindElementByAccessibilityId("txtEmail").SendKeys("te@gmail.com");
+            session.FindElementByAccessibilityId("txtUserName").SendKeys("ua");
+            session.FindElementByAccessibilityId("txtPassword").SendKeys("12346");
+
             var cbo = session.FindElementByAccessibilityId("txtGender");
             cbo.Click();
             cbo.SendKeys("Nam");
             cbo.SendKeys(OpenQA.Selenium.Keys.Enter);
 
-            session.FindElementByAccessibilityId("txtEmail").SendKeys("test2@gmail.com");
-
-            // Bấm Thêm
+            // ===== CLICK ĐĂNG KÝ =====
             session.FindElementByAccessibilityId("btnDangKy").Click();
 
-            Thread.Sleep(1000);
 
-            // Nếu có MessageBox
-            var handles = session.WindowHandles;
-            if (handles.Count > 1)
+            // ===== TẠO DESKTOP SESSION ĐỂ BẮT POPUP =====
+            var options = new AppiumOptions();
+            options.AddAdditionalCapability("app", "Root");
+
+            var desktopSession = new WindowsDriver<WindowsElement>(
+                new Uri("http://127.0.0.1:4723"),
+                options
+            );
+
+
+            // ===== CHỜ POPUP XUẤT HIỆN =====
+            WindowsElement popup = null;
+
+            for (int i = 0; i < 10; i++)
             {
-                session.SwitchTo().Window(handles.Last());
-                var message = session.PageSource;
-                session.FindElementByName("OK").Click();
+                try
+                {
+                    popup = desktopSession.FindElementByXPath("//*[contains(@Name,'thành công')]");
+                    if (popup != null)
+                        break;
+                }
+                catch { }
 
-                Assert.IsTrue(message.Contains("Thành công"));
+                Thread.Sleep(500);
             }
+
+
+            // ===== VERIFY POPUP =====
+            Assert.IsNotNull(popup, "Không xuất hiện popup thành công");
+
+
+
+            // ===== CLICK OK =====
+            try
+            {
+                desktopSession.FindElementByName("OK").Click();
+            }
+            catch { }
+
+
+
+            // ===== LOG PASS =====
+            Console.WriteLine("✔ PASS: Thêm nhân viên thành công");
         }
 
         [TestMethod]
@@ -143,6 +173,52 @@ namespace Quanlykhachsan.tests
                 session.FindElementByName("OK").Click();
             }
         
+        }
+
+        [TestMethod]
+        public void UI_AddNhanVien_BoTrongBatBuoc_HienThongBaoDungNoiDung()
+        {
+            // 1. Login & mở form nhân viên
+            Test_DangNhap_Va_MoFormNhanVien();
+
+            // 2. Nhập dữ liệu sai/bỏ trống
+            session.FindElementByAccessibilityId("txtName").Clear(); // bỏ trống tên
+            session.FindElementByAccessibilityId("txtMobile").SendKeys("4354675863"); // chữ -> sai
+            session.FindElementByAccessibilityId("txtEmail").SendKeys("abc@gmail.com");
+            session.FindElementByAccessibilityId("txtUserName").SendKeys("utt");
+            session.FindElementByAccessibilityId("txtPassword").SendKeys("123");
+
+            // chọn giới tính
+            var cbo = session.FindElementByAccessibilityId("txtGender");
+            cbo.Click();
+            cbo.SendKeys("Nam");
+            cbo.SendKeys(OpenQA.Selenium.Keys.Enter);
+
+            // 3. Click Thêm
+            session.FindElementByAccessibilityId("btnDangKy").Click();
+
+            Thread.Sleep(1500); // chờ popup hiện
+
+            // ===== VERIFY KHÔNG THÀNH CÔNG =====
+
+            // nếu hệ thống báo lỗi dạng popup
+            var dialog = session.WindowHandles;
+
+            if (dialog.Count > 1)
+            {
+                session.SwitchTo().Window(dialog.Last());
+
+                var msg = session.FindElementByName("Vui lòng nhập tên nhân viên ");
+                Assert.IsNotNull(msg);
+
+                session.FindElementByName("OK").Click();
+            }
+
+
+
+            // kiểm tra form vẫn còn mở (chưa đóng → chưa lưu)
+            var txtName = session.FindElementByAccessibilityId("txtName");
+            Assert.IsTrue(txtName.Displayed);
         }
 
         [TestCleanup]

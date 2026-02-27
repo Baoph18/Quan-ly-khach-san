@@ -1,6 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Windows;
+using OpenQA.Selenium.Support.UI;
 using System;
 using System.Linq;
 using System.Threading;
@@ -172,7 +174,129 @@ namespace Quanlykhachsan.tests
             var txtName = session.FindElementByAccessibilityId("txtName");
             Assert.IsTrue(txtName.Displayed);
         }
+        public TestContext TestContext { get; set; }
+        [TestMethod]
+        public void DangKy_NhapSoVaoTen_KhongThanhCong()
+        {
+            Test_DangNhap_Va_MoFormDangKy();
 
+            session.FindElementByAccessibilityId("txtName").SendKeys("12345");
+            session.FindElementByAccessibilityId("txtContact").SendKeys("0912345678");
+            session.FindElementByAccessibilityId("btnAdd_Khachhang").Click();
+
+            bool popupFound = false;
+            string msg = "";
+
+            for (int i = 0; i < 5; i++)
+            {
+                var handles = session.WindowHandles;
+
+                if (handles.Count > 1)
+                {
+                    session.SwitchTo().Window(handles.Last());
+
+                    msg = session.PageSource;
+                    popupFound = true;
+                    break;
+                }
+
+                Thread.Sleep(1000);
+            }
+
+            // ===== ASSERT popup xuất hiện =====
+            Assert.IsTrue(popupFound, "BUG: Hệ thống không chặn tên chứa số");
+
+            TestContext.WriteLine("Popup text = " + msg);
+
+            // ===== Đóng popup =====
+            try
+            {
+                session.FindElementByName("OK").Click();
+            }
+            catch { }
+
+            // ===== verify form chưa submit =====
+            Assert.IsTrue(
+                session.FindElementByAccessibilityId("txtName").Displayed,
+                "BUG: Dữ liệu sai vẫn được lưu"
+            );
+        }
+
+        [TestMethod]
+        public void DangKy_NhapChuVaoSDT_KhongThanhCong()
+        {
+            Test_DangNhap_Va_MoFormDangKy();
+
+            // ===== NHẬP DATA =====
+            session.FindElementByAccessibilityId("txtName").SendKeys("Nguyen Van A");
+            session.FindElementByAccessibilityId("txtContact").SendKeys("ABCXYZ"); // sai SĐT
+            session.FindElementByAccessibilityId("txtQuocTich").SendKeys("Viet Nam");
+            session.FindElementByAccessibilityId("txtGioiTinh").SendKeys("Nam");
+            session.FindElementByAccessibilityId("txtMaID").SendKeys("123456789012");
+            session.FindElementByAccessibilityId("txtAddress").SendKeys("Ha Noi");
+            session.FindElementByAccessibilityId("txtRoomNo").SendKeys("101");
+            session.FindElementByAccessibilityId("txtSoDem").SendKeys("2");
+            session.FindElementByAccessibilityId("txtBed_Type").SendKeys("Đơn");
+            session.FindElementByAccessibilityId("txtRoom_type").SendKeys("Vip");
+
+            // ===== CLICK ADD =====
+            session.FindElementByAccessibilityId("btnAdd_Khachhang").Click();
+
+
+            // ===== TẠO ROOT SESSION =====
+            var options = new AppiumOptions();
+            options.AddAdditionalCapability("app", "Root");
+
+            var desktop = new WindowsDriver<WindowsElement>(
+                new Uri("http://127.0.0.1:4723"),
+                options
+            );
+
+
+            // ===== CHỜ POPUP =====
+            WindowsElement popup = null;
+
+            for (int i = 0; i < 5; i++)
+            {
+                try
+                {
+                    popup = desktop.FindElementByClassName("#32770");
+                    if (popup != null)
+                        break;
+                }
+                catch { }
+
+                Thread.Sleep(1000);
+            }
+
+
+            // ===== ASSERT POPUP PHẢI CÓ =====
+            Assert.IsNotNull(popup, "BUG: Không xuất hiện popup lỗi SĐT");
+
+
+            // ===== LẤY TEXT POPUP =====
+            string msg = popup.Text.ToLower();
+
+
+            // ===== ASSERT NỘI DUNG =====
+            Assert.IsFalse(string.IsNullOrWhiteSpace(msg),
+     "Popup xuất hiện nhưng không có nội dung");
+
+
+            // ===== CLICK OK =====
+            try
+            {
+                popup.FindElement(By.Name("OK")).Click();
+            }
+            catch { }
+
+
+            // ===== FORM PHẢI CÒN =====
+            Assert.IsTrue(
+                session.FindElementByAccessibilityId("txtName").Displayed,
+                "BUG: Form đã đóng → dữ liệu sai vẫn lưu"
+            );
+        }
         [TestCleanup]
         public void Cleanup()
         {

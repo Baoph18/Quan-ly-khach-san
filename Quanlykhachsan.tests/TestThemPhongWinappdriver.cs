@@ -142,6 +142,57 @@ namespace Quanlykhachsan.tests
             }
            
         }
+
+        [TestMethod]
+        public void ThemPhong_NhapChuVaoSoPhong_ThatBai()
+        {
+            Test_DangNhap_Va_MoForm();
+
+            // ===== NHẬP DỮ LIỆU =====
+
+            // Số phòng nhập chữ → sai
+            session.FindElementByAccessibilityId("txtSophong")
+                   .SendKeys("ABC");
+
+            // Loại phòng hợp lệ
+            session.FindElementByAccessibilityId("txtLoaiphong")
+                   .SendKeys("VIP");
+
+            // Loại giường hợp lệ
+            session.FindElementByAccessibilityId("txtLoaigiuong")
+                   .SendKeys("Đơn");
+
+            // Giá hợp lệ
+            session.FindElementByAccessibilityId("txtGiatien")
+                   .SendKeys("500");
+
+            // ===== CLICK THÊM =====
+            session.FindElementByAccessibilityId("btnAddRoom").Click();
+
+            Thread.Sleep(1500);
+
+            // ===== BẮT MESSAGEBOX =====
+            var handles = session.WindowHandles;
+
+            if (handles.Count > 1)
+            {
+                session.SwitchTo().Window(handles.Last());
+
+                string msg = session.PageSource;
+
+                Assert.IsTrue(
+                    msg.Contains("số") ||
+                    msg.Contains("không hợp lệ") ||
+                    msg.Contains("chỉ được nhập số"),
+                    "Không xuất hiện lỗi khi nhập chữ vào số phòng"
+                );
+
+                session.FindElementByName("OK").Click();
+            }
+        }
+
+       
+
         [TestCleanup]
         public void Cleanup()
         {

@@ -128,9 +128,12 @@ namespace Quanlykhachsan.tests
 
             Assert.IsNotNull(errorMessage);
             Assert.IsTrue(errorMessage.Displayed);
+            var handles = session.WindowHandles;
+            // 5. Kiểm tra nội dung thông báo (nếu cần)
+            Assert.AreEqual(
+"Bạn đăng nhập không đúng hoặc mật khẩu sai",
+errorMessage.Text.Trim());
 
-            //// 5. Kiểm tra nội dung thông báo (nếu cần)
-            //Assert.AreEqual("Sai tên đăng nhập hoặc mật khẩu", errorMessage.Text);
         }
 
         [TestMethod]
@@ -144,16 +147,19 @@ namespace Quanlykhachsan.tests
             session.FindElementByAccessibilityId("txtPassword").Clear();
 
             // click login
+            var handles = session.WindowHandles;
             var btnLogin = session.FindElementByAccessibilityId("btnLogin");
+
             btnLogin.Click();
 
             // đợi UI cập nhật text
             Thread.Sleep(1500);
-
+           
             // kiểm tra text của button đổi thành thông báo lỗi
             string buttonText = btnLogin.Text;
 
-          
+            btnLogin.Click(); 
+
         }
 
         [TestMethod]
@@ -165,6 +171,7 @@ namespace Quanlykhachsan.tests
             session.FindElementByAccessibilityId("btnLogin").Click();
 
             Thread.Sleep(1500);
+
 
             // ===== BẮT MESSAGEBOX LỖI =====
             var handles = session.WindowHandles;
@@ -183,8 +190,10 @@ namespace Quanlykhachsan.tests
                     "Không xuất hiện thông báo lỗi khi bỏ trống tài khoản"
                 );
 
-                // Click OK
-                session.FindElementByName("OK").Click();
+                //Click OK
+
+
+               session.FindElementByName("OK").Click();
             }
            
         }

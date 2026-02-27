@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Windows;
 using OpenQA.Selenium.Support.UI;
@@ -177,6 +178,43 @@ namespace Quanlykhachsan.tests
             catch { }
         }
 
+
+        [TestMethod]
+        public void SuaPhong_BoTrongDuLieu_ThatBai()
+        {
+            Test_DangNhap_Va_MoForm();
+
+            WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(15));
+
+            var grid = wait.Until(d =>
+                session.FindElementByAccessibilityId("dataGridView1"));
+
+            grid.Click();
+
+            // Xóa dữ liệu
+            session.FindElementByAccessibilityId("txtSophong").Clear();
+            session.FindElementByAccessibilityId("txtLoaiphong").Clear();
+            session.FindElementByAccessibilityId("txtLoaigiuong").Clear();
+            session.FindElementByAccessibilityId("txtGiatien").Clear();
+
+            // Click sửa
+            session.FindElementByAccessibilityId("btnRepair").Click();
+
+            // ===== BẮT MESSAGEBOX =====
+            WebDriverWait waitMsg = new WebDriverWait(session, TimeSpan.FromSeconds(5));
+
+            var dialog = waitMsg.Until(d =>
+            {
+                var all = session.FindElementsByClassName("#32770");
+                return all.Count > 0 ? all[0] : null;
+            });
+
+            string msg = dialog.Text;
+
+            Assert.IsTrue(msg.Length > 0, "Không tìm thấy nội dung thông báo lỗi");
+
+            dialog.FindElement(By.Name("OK")).Click();
+        }
         [TestCleanup]
         public void Cleanup()
         {
