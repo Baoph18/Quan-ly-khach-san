@@ -75,7 +75,7 @@ namespace Quanlykhachsan.tests
             }
         }
         [TestMethod]
-        public void XuatHoaDon_ThanhCong()
+        public void ThongKe_ThanhCong()
         {
             var logSteps = new List<string>();
             Test_DangNhap_Va_MoFormDangXuat();
