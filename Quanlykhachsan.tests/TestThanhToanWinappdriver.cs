@@ -1,9 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Windows;
 using OpenQA.Selenium.Support.UI;
 using Quản_lí_khách_sạn;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -18,7 +21,7 @@ namespace Quanlykhachsan.tests
         private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
 
         private const string AppId =
-            @"E:\Kiểm thử phần mềm\file khachsan du phong\Quản lí khách sạn du phong\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
+            @"D:\QLKS\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
 
         private static WindowsDriver<WindowsElement> session;
 
@@ -35,6 +38,25 @@ namespace Quanlykhachsan.tests
 
             Assert.IsNotNull(session);
             Thread.Sleep(3000); // đợi app load
+        }
+
+        private void WriteLogBlock(string testName, List<string> steps, string result)
+        {
+            string path = @"D:\ThanhToan_test.txt";
+
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+            using (StreamWriter sw = new StreamWriter(path, true))
+            {
+                sw.WriteLine($"===== LOG {testName.ToUpper()} =====");
+                sw.WriteLine($"Thời gian: {DateTime.Now}");
+                foreach (var step in steps)
+                {
+                    sw.WriteLine(step);
+                }
+                sw.WriteLine($"KẾT QUẢ: {result}");
+                sw.WriteLine(); // dòng trống phân cách
+            }
         }
         public void Test_DangNhap_Va_MoFormThanhToan()
         {
@@ -58,8 +80,10 @@ namespace Quanlykhachsan.tests
         [TestMethod]
         public void UI_ThanhToan_HopLe_ThanhCong()
         {
+            var logSteps = new List<string>();
             Test_DangNhap_Va_MoFormThanhToan();
-
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Thanh Toán");
             WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(20));
 
             // Switch sang window mới nhất
@@ -80,23 +104,33 @@ namespace Quanlykhachsan.tests
 
             // Click vào grid (không click row cụ thể nữa)
             grid.Click();
-
+            logSteps.Add("Chọn đơn cần thanh toán");
             Thread.Sleep(500);
 
             var btnThanhToan = wait.Until(d =>
                 session.FindElementByAccessibilityId("btnThanhToan"));
 
             btnThanhToan.Click();
-
+            logSteps.Add("Nhấn nút thanh toán");
             Thread.Sleep(1000);
 
-            // Xử lý MessageBox nếu có
-            var handles = session.WindowHandles;
-            if (handles.Count > 1)
-            {
-                session.SwitchTo().Window(handles.Last());
-                session.FindElementByName("OK").Click();
-            }
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
+
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiển thị thông báo:Bạn có chắc muốn thanh toán");
+            btnOK1.Click();
+            logSteps.Add("Nhấn ok");
+            // ===== POPUP 1 =====
+            var btnOK2 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiển thị thông báo:Thanh toán và cập nhật thông tin thành công");
+            btnOK2.Click();
+            logSteps.Add("Nhấn ok");
+            WriteLogBlock("TEST THANH TOÁN THÀNH CÔNG", logSteps, "PASS");
         }
 
         [TestCleanup]

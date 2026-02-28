@@ -1,8 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Windows;
 using OpenQA.Selenium.Support.UI;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -17,7 +20,7 @@ namespace Quanlykhachsan.tests
         private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
 
         private const string AppId =
-            @"E:\Kiểm thử phần mềm\file khachsan du phong\Quản lí khách sạn du phong\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
+            @"D:\QLKS\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
 
         private static WindowsDriver<WindowsElement> session;
 
@@ -36,7 +39,24 @@ namespace Quanlykhachsan.tests
             Thread.Sleep(3000); // đợi app load
         }
 
-      
+        private void WriteLogBlock(string testName, List<string> steps, string result)
+        {
+            string path = @"D:\ThemPhong_test.txt";
+
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+            using (StreamWriter sw = new StreamWriter(path, true))
+            {
+                sw.WriteLine($"===== LOG {testName.ToUpper()} =====");
+                sw.WriteLine($"Thời gian: {DateTime.Now}");
+                foreach (var step in steps)
+                {
+                    sw.WriteLine(step);
+                }
+                sw.WriteLine($"KẾT QUẢ: {result}");
+                sw.WriteLine(); // dòng trống phân cách
+            }
+        }
         public void Test_DangNhap_Va_MoForm()
         {
             session.FindElementByAccessibilityId("txtUserName").SendKeys("b");
@@ -58,7 +78,10 @@ namespace Quanlykhachsan.tests
         [TestMethod]
         public void ThêmPhòng_ThanhCong()
         {
+            var logSteps = new List<string>();
             Test_DangNhap_Va_MoForm();
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Thêm phòng");
             // Nhập thông tin khách
             session.FindElementByAccessibilityId("txtSophong")
                    .SendKeys("99");
@@ -71,30 +94,75 @@ namespace Quanlykhachsan.tests
 
             session.FindElementByAccessibilityId("txtGiatien")
                    .SendKeys("260000");
+            logSteps.Add("Nhập thông tin phòng");
 
-            
 
             // Bấm đăng ký
             session.FindElementByAccessibilityId("btnAddRoom").Click();
             session.FindElementByAccessibilityId("btnAddRoom").Click();
-            // Đợi dialog hiện
-            Thread.Sleep(1500);
+            logSteps.Add("Nhấn nút Thêm phòng");
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
-            // Lấy tất cả window handle
-            var handles = session.WindowHandles;
-
-            // Switch sang window mới nhất (dialog)
-            session.SwitchTo().Window(handles.Last());
-
-            // Click OK
-            session.FindElementByName("OK").Click();
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiển thị thông báo:Đã thêm phòng thành công");
+            btnOK1.Click();
+            logSteps.Add("Nhấn ok");
+            WriteLogBlock("TEST THÊM PHÒNG THÀNH CÔNG", logSteps, "PASS");
         }
 
 
         [TestMethod]
         public void ThemPhong_KhongHopLe_ThatBai()
         {
+            var logSteps = new List<string>();
             Test_DangNhap_Va_MoForm();
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Thêm phòng");
+
+            // ===== NHẬP DỮ LIỆU SAI =====
+
+            // Số phòng hợp lệ
+            session.FindElementByAccessibilityId("txtSophong")
+                   .SendKeys("100");
+
+            
+            session.FindElementByAccessibilityId("txtLoaiphong")
+                   .SendKeys("Vip");
+
+            // Loại giường hợp lệ
+            session.FindElementByAccessibilityId("txtLoaigiuong")
+                   .SendKeys("Đơn");
+
+            // Giá âm → sai dữ liệu
+            session.FindElementByAccessibilityId("txtGiatien")
+                   .SendKeys("-500");
+
+            logSteps.Add("Nhập thông tin phòng(giá tiền âm");
+            
+
+
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
+
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiển thị thông báo:Chỉ được số. Không cho phép chữ hoặc ký tự đặc biệt");
+            btnOK1.Click();
+            logSteps.Add("Nhấn ok");
+            WriteLogBlock("TEST THÊM PHÒNG NHẬP TIỀN ÂM", logSteps, "PASS");
+        }
+
+        [TestMethod]
+        public void ThemPhong_BoTrong_ThatBai()
+        {
+            var logSteps = new List<string>();
+            Test_DangNhap_Va_MoForm();
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Thêm phòng");
 
             // ===== NHẬP DỮ LIỆU SAI =====
 
@@ -112,41 +180,34 @@ namespace Quanlykhachsan.tests
 
             // Giá âm → sai dữ liệu
             session.FindElementByAccessibilityId("txtGiatien")
-                   .SendKeys("-500");
-
+                   .SendKeys("500");
+            logSteps.Add("Nhập thông tin phòng(bỏ trống loại phòng");
             // ===== CLICK THÊM =====
             session.FindElementByAccessibilityId("btnAddRoom").Click();
             session.FindElementByAccessibilityId("btnAddRoom").Click();
+            logSteps.Add("Nhấn nút thêm phòng");
 
-            Thread.Sleep(1500);
 
-            // ===== BẮT MESSAGEBOX LỖI =====
-            var handles = session.WindowHandles;
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
-            if (handles.Count > 1)
-            {
-                session.SwitchTo().Window(handles.Last());
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiển thị thông báo:Vui lòng nhập đầy đủ thông tin");
+            btnOK1.Click();
+            logSteps.Add("Nhấn ok");
+            WriteLogBlock("TEST THÊM PHÒNG BỎ TRỐNG DỮ LIỆU", logSteps, "PASS");
 
-                string msg = session.PageSource;
-
-                // Kiểm tra có thông báo lỗi
-                Assert.IsTrue(
-                    msg.Contains("lỗi") ||
-                    msg.Contains("không hợp lệ") ||
-                    msg.Contains("vui lòng"),
-                    "Không xuất hiện thông báo lỗi khi nhập dữ liệu sai"
-                );
-
-                // Click OK
-                session.FindElementByName("OK").Click();
-            }
-           
         }
 
         [TestMethod]
         public void ThemPhong_NhapChuVaoSoPhong_ThatBai()
         {
+            var logSteps = new List<string>();
             Test_DangNhap_Va_MoForm();
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Thêm phòng");
 
             // ===== NHẬP DỮ LIỆU =====
 
@@ -154,41 +215,22 @@ namespace Quanlykhachsan.tests
             session.FindElementByAccessibilityId("txtSophong")
                    .SendKeys("ABC");
 
-            // Loại phòng hợp lệ
-            session.FindElementByAccessibilityId("txtLoaiphong")
-                   .SendKeys("VIP");
 
-            // Loại giường hợp lệ
-            session.FindElementByAccessibilityId("txtLoaigiuong")
-                   .SendKeys("Đơn");
+            logSteps.Add("Nhập thông tin phòng(nhập chữ vào số phòng");
 
-            // Giá hợp lệ
-            session.FindElementByAccessibilityId("txtGiatien")
-                   .SendKeys("500");
-
-            // ===== CLICK THÊM =====
-            session.FindElementByAccessibilityId("btnAddRoom").Click();
 
             Thread.Sleep(1500);
 
-            // ===== BẮT MESSAGEBOX =====
-            var handles = session.WindowHandles;
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
-            if (handles.Count > 1)
-            {
-                session.SwitchTo().Window(handles.Last());
-
-                string msg = session.PageSource;
-
-                Assert.IsTrue(
-                    msg.Contains("số") ||
-                    msg.Contains("không hợp lệ") ||
-                    msg.Contains("chỉ được nhập số"),
-                    "Không xuất hiện lỗi khi nhập chữ vào số phòng"
-                );
-
-                session.FindElementByName("OK").Click();
-            }
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiển thị thông báo:Chỉ được số. Không cho phép chữ hoặc ký tự đặc biệt");
+            btnOK1.Click();
+            logSteps.Add("Nhấn ok");
+            WriteLogBlock("TEST THÊM PHÒNG NHẬP CHỮ VÀO SỐ PHÒNG", logSteps, "PASS");
         }
 
        

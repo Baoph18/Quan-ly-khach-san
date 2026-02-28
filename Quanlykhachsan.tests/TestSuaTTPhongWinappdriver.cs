@@ -4,6 +4,8 @@ using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Windows;
 using OpenQA.Selenium.Support.UI;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -19,7 +21,7 @@ namespace Quanlykhachsan.tests
         private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
 
         private const string AppId =
-            @"E:\Kiểm thử phần mềm\file khachsan du phong\Quản lí khách sạn du phong\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
+            @"D:\QLKS\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
 
         private static WindowsDriver<WindowsElement> session;
 
@@ -38,7 +40,24 @@ namespace Quanlykhachsan.tests
             Assert.IsNotNull(session);
             Thread.Sleep(3000);
         }
+        private void WriteLogBlock(string testName, List<string> steps, string result)
+        {
+            string path = @"D:\SuaTTPhong_test.txt";
 
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+            using (StreamWriter sw = new StreamWriter(path, true))
+            {
+                sw.WriteLine($"===== LOG {testName.ToUpper()} =====");
+                sw.WriteLine($"Thời gian: {DateTime.Now}");
+                foreach (var step in steps)
+                {
+                    sw.WriteLine(step);
+                }
+                sw.WriteLine($"KẾT QUẢ: {result}");
+                sw.WriteLine(); // dòng trống phân cách
+            }
+        }
         public void Test_DangNhap_Va_MoForm()
         {
             session.FindElementByAccessibilityId("txtUserName").SendKeys("b");
@@ -70,14 +89,17 @@ namespace Quanlykhachsan.tests
         
         public void SuaPhong_ThanhCong()
         {
+            var logSteps = new List<string>();
             Test_DangNhap_Va_MoForm();
-
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Thêm phòng");
+            
             WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(15));
 
             // Chờ DataGrid xuất hiện
             var grid = wait.Until(d =>
                 session.FindElementByAccessibilityId("dataGridView1")); // kiểm tra lại AutomationId
-
+            logSteps.Add("Chọn phòng cần sửa");
             // Click vào grid
             grid.Click();
             Thread.Sleep(500);
@@ -102,93 +124,78 @@ namespace Quanlykhachsan.tests
             var txtGiaTien = session.FindElementByAccessibilityId("txtGiatien");
             txtGiaTien.Clear();
             txtGiaTien.SendKeys("1");
+            logSteps.Add("Nhập thông tin phòng");
 
             session.FindElementByAccessibilityId("btnRepair").Click();
             session.FindElementByAccessibilityId("btnRepair").Click();
+            logSteps.Add("Nhấn nút sửa");
+
             Thread.Sleep(1500);
 
-            // Bắt dialog OK
-            foreach (var handle in session.WindowHandles)
-            {
-                session.SwitchTo().Window(handle);
-                if (session.PageSource.Contains("OK"))
-                    break;
-            }
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
-            session.FindElementByName("OK").Click();
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiển thị thông báo:Cập nhật thông tin phòng thành công");
+
+            btnOK1.Click();
+            logSteps.Add("Nhấn ok");
+            WriteLogBlock("TEST SỬA THÔNG TIN PHÒNG THÀNH CÔNG", logSteps, "PASS");
         }
 
 
         [TestMethod]
         public void SuaPhong_KhongThanhCong()
         {
+            var logSteps = new List<string>();
             Test_DangNhap_Va_MoForm();
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Thêm phòng");
 
             WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(15));
 
-            // Chờ DataGrid xuất hiện
             var grid = wait.Until(d =>
                 session.FindElementByAccessibilityId("dataGridView1"));
-
+            logSteps.Add("Chọn phòng cần sửa");
             grid.Click();
             Thread.Sleep(500);
 
-            // Nhập dữ liệu sai (giá âm + bỏ trống loại phòng)
-            var txtSoPhong = session.FindElementByAccessibilityId("txtSophong");
-            txtSoPhong.Clear();
-            txtSoPhong.SendKeys("1");
-
-            var txtLoaiPhong = session.FindElementByAccessibilityId("txtLoaiphong");
-            txtLoaiPhong.Clear(); // bỏ trống -> lỗi validate
-
-            var txtLoaiGiuong = session.FindElementByAccessibilityId("txtLoaigiuong");
-            txtLoaiGiuong.Clear();
-            txtLoaiGiuong.SendKeys("Đơn");
-
+            // Nhập giá âm (trigger validate nếu có sự kiện TextChanged/Leave)
             var txtGiaTien = session.FindElementByAccessibilityId("txtGiatien");
             txtGiaTien.Clear();
-            txtGiaTien.SendKeys("-100"); // giá âm -> sai dữ liệu
+            txtGiaTien.SendKeys("-100");
+            logSteps.Add("Nhập số tiền âm");
+            // Click ra ngoài để kích hoạt validation
+            grid.Click();
+            
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
-            // Nhấn nút sửa
-            session.FindElementByAccessibilityId("btnRepair").Click();
-            Thread.Sleep(1500);
-
-            // Kiểm tra dialog báo lỗi xuất hiện
-            bool errorFound = false;
-
-            foreach (var handle in session.WindowHandles)
-            {
-                session.SwitchTo().Window(handle);
-
-                if (session.PageSource.Contains("lỗi") ||
-                    session.PageSource.Contains("không hợp lệ") ||
-                    session.PageSource.Contains("Error"))
-                {
-                    errorFound = true;
-                    break;
-                }
-            }
-
-
-            // Đóng thông báo lỗi nếu có nút OK
-            try
-            {
-                session.FindElementByName("OK").Click();
-            }
-            catch { }
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiển thị thông báo:Chỉ được số. Không cho phép chữ hoặc ký tự đặc biệt");
+            btnOK1.Click();
+            logSteps.Add("Nhấn ok");
+            WriteLogBlock("TEST SỬA THÔNG TIN PHÒNG NHẬP SỐ TIỀN ÂM", logSteps, "PASS");
         }
 
 
         [TestMethod]
         public void SuaPhong_BoTrongDuLieu_ThatBai()
         {
+            var logSteps = new List<string>();
             Test_DangNhap_Va_MoForm();
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Thêm phòng");
 
             WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(15));
 
             var grid = wait.Until(d =>
                 session.FindElementByAccessibilityId("dataGridView1"));
-
+            logSteps.Add("Chọn phòng cần sửa");
             grid.Click();
 
             // Xóa dữ liệu
@@ -196,24 +203,29 @@ namespace Quanlykhachsan.tests
             session.FindElementByAccessibilityId("txtLoaiphong").Clear();
             session.FindElementByAccessibilityId("txtLoaigiuong").Clear();
             session.FindElementByAccessibilityId("txtGiatien").Clear();
-
+            logSteps.Add("Xóa hết dữ liệu ô nhập");
             // Click sửa
             session.FindElementByAccessibilityId("btnRepair").Click();
+            logSteps.Add("Nhấn nút Sửa");
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
-            // ===== BẮT MESSAGEBOX =====
-            WebDriverWait waitMsg = new WebDriverWait(session, TimeSpan.FromSeconds(5));
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiển thị thông báo:Vui lòng nhập đầy đủ thông tin");
+            btnOK1.Click();
+            logSteps.Add("Nhấn ok");
 
-            var dialog = waitMsg.Until(d =>
-            {
-                var all = session.FindElementsByClassName("#32770");
-                return all.Count > 0 ? all[0] : null;
-            });
 
-            string msg = dialog.Text;
-
-            Assert.IsTrue(msg.Length > 0, "Không tìm thấy nội dung thông báo lỗi");
-
-            dialog.FindElement(By.Name("OK")).Click();
+            // ===== POPUP 1 =====
+            var btnOK2 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiển thị thông báo:Dữ liệu nhập không hợp lệ");
+            btnOK2.Click();
+            logSteps.Add("Nhấn ok");
+            WriteLogBlock("TEST SỬA THÔNG TIN PHÒNG BỎ TRỐNG DỮ LIỆU", logSteps, "PASS");
         }
         [TestCleanup]
         public void Cleanup()

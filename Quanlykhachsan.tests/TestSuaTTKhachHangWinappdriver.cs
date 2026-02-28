@@ -1,9 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Windows;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading;
 
@@ -18,7 +20,7 @@ namespace Quanlykhachsan.tests
         private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
 
         private const string AppId =
-            @"E:\Kiểm thử phần mềm\file khachsan du phong\Quản lí khách sạn du phong\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
+            @"D:\QLKS\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
 
         private static WindowsDriver<WindowsElement> session;
 
@@ -38,6 +40,24 @@ namespace Quanlykhachsan.tests
             Thread.Sleep(3000);
         }
 
+        private void WriteLogBlock(string testName, List<string> steps, string result)
+        {
+            string path = @"D:\SuaTTKhachHang_test.txt";
+
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+            using (StreamWriter sw = new StreamWriter(path, true))
+            {
+                sw.WriteLine($"===== LOG {testName.ToUpper()} =====");
+                sw.WriteLine($"Thời gian: {DateTime.Now}");
+                foreach (var step in steps)
+                {
+                    sw.WriteLine(step);
+                }
+                sw.WriteLine($"KẾT QUẢ: {result}");
+                sw.WriteLine(); // dòng trống phân cách
+            }
+        }
         public void Test_DangNhap_Va_MoForm()
         {
             session.FindElementByAccessibilityId("txtUserName").SendKeys("b");
@@ -68,16 +88,19 @@ namespace Quanlykhachsan.tests
         [TestMethod]
         public void SuaTTKhachHang_ThanhCong()
         {
+            var logSteps = new List<string>();
             Test_DangNhap_Va_MoForm();
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Thông tin khách hàng");
 
             WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(15));
-
-            // Chờ DataGrid xuất hiện
+            // Chờ DataGrid xuất hiện  WebDriverWait wait = new WebDriv
             var grid = wait.Until(d =>
                 session.FindElementByAccessibilityId("dataGridView1")); // kiểm tra lại AutomationId
 
             // Click vào grid
             grid.Click();
+            logSteps.Add("Chọn khách hàng cần sửa");
             Thread.Sleep(500);
 
             
@@ -113,26 +136,31 @@ namespace Quanlykhachsan.tests
             var txtSoDem = session.FindElementByAccessibilityId("txtSoDem");
             txtSoDem.Clear();
             txtSoDem.SendKeys("3");
-
+            logSteps.Add("Nhập thông tin khách hàng");
             session.FindElementByAccessibilityId("btnRepair").Click();
             session.FindElementByAccessibilityId("btnRepair").Click();
+            logSteps.Add("Nhấn nút sửa");
             Thread.Sleep(1500);
 
-            // Bắt dialog OK
-            foreach (var handle in session.WindowHandles)
-            {
-                session.SwitchTo().Window(handle);
-                if (session.PageSource.Contains("OK"))
-                    break;
-            }
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
-            session.FindElementByName("OK").Click();
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiển thị thông báo:Thông tin khách hàng đã được cập nhật");
+            btnOK1.Click();
+            logSteps.Add("Nhấn Ok");
+            WriteLogBlock("TEST SỬA THÔNG TIN KHÁCH HÀNG THÀNH CÔNG", logSteps, "PASS");
         }
 
         [TestMethod]
         public void SuaTTKhachHang_KhongThanhCong()
         {
+            var logSteps = new List<string>();
             Test_DangNhap_Va_MoForm();
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Thông tin khách hàng");
 
             WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(15));
 
@@ -141,6 +169,7 @@ namespace Quanlykhachsan.tests
                 session.FindElementByAccessibilityId("dataGridView1"));
 
             grid.Click();
+            logSteps.Add("Chọn khách hàng cần sửa");
             Thread.Sleep(500);
 
 
@@ -174,10 +203,13 @@ namespace Quanlykhachsan.tests
             var txtSoDem = session.FindElementByAccessibilityId("txtSoDem");
             txtSoDem.Clear();
             txtSoDem.SendKeys("2");
+            logSteps.Add("Nhập thông tin khách hàng(Nhập chữ vào sdt)");
 
 
-
-
+            // ===== CLICK SỬA =====
+            session.FindElementByAccessibilityId("btnRepair").Click();
+            Thread.Sleep(1500);
+            logSteps.Add("Nhấn nút sửa");
 
 
             // ===== VERIFY KHÔNG THÀNH CÔNG =====
@@ -196,13 +228,16 @@ namespace Quanlykhachsan.tests
                     break;
                 }
             }
+            logSteps.Add("Hiển thị thông báo:Chỉ được số. Không cho phép chữ hoặc ký tự đặc biệt");
 
-
+            logSteps.Add("Nhấn ok");
 
 
             // Form vẫn còn mở → chứng tỏ chưa lưu
             var stillOpen = session.FindElementByAccessibilityId("txtTENKH");
             Assert.IsTrue(stillOpen.Displayed);
+
+            WriteLogBlock("TEST SỬA THÔNG TIN KHÁCH HÀNG NHẬP CHỮ VÀO SDT", logSteps, "PASS");
         }
 
         [TestCleanup]

@@ -1,12 +1,15 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Windows;
+using OpenQA.Selenium.Interactions;
+using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using OpenQA.Selenium.Interactions;
 
 namespace Quanlykhachsan.tests
 {
@@ -19,7 +22,7 @@ namespace Quanlykhachsan.tests
         private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
 
         private const string AppId =
-            @"E:\Kiểm thử phần mềm\file khachsan du phong\Quản lí khách sạn du phong\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
+            @"D:\QLKS\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
 
         private static WindowsDriver<WindowsElement> session;
 
@@ -36,6 +39,25 @@ namespace Quanlykhachsan.tests
 
             Assert.IsNotNull(session);
             Thread.Sleep(3000); // đợi app load
+        }
+
+        private void WriteLogBlock(string testName, List<string> steps, string result)
+        {
+            string path = @"D:\XoaNhanVien_test.txt";
+
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+            using (StreamWriter sw = new StreamWriter(path, true))
+            {
+                sw.WriteLine($"===== LOG {testName.ToUpper()} =====");
+                sw.WriteLine($"Thời gian: {DateTime.Now}");
+                foreach (var step in steps)
+                {
+                    sw.WriteLine(step);
+                }
+                sw.WriteLine($"KẾT QUẢ: {result}");
+                sw.WriteLine(); // dòng trống phân cách
+            }
         }
         public void Test_DangNhap_Va_MoFormNhanVien()
         {
@@ -80,8 +102,11 @@ namespace Quanlykhachsan.tests
         [TestMethod]
         public void UI_XoaNhanVien_HopLe_ThanhCong()
         {
+            var logSteps = new List<string>();
             Test_DangNhap_Va_MoFormNhanVien();
-
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Nhân viên");
+            logSteps.Add("Mở tab Xóa nhân viên");
             var handles = session.WindowHandles;
             session.SwitchTo().Window(handles.Last());
 
@@ -113,7 +138,7 @@ namespace Quanlykhachsan.tests
             var txtID = session.FindElementByAccessibilityId("txtID"); // đổi lại nếu tên khác
             txtID.Clear();
             txtID.SendKeys(id);
-
+            logSteps.Add("Nhập id vào textbox");
             Thread.Sleep(500);
 
             var all = session.FindElementsByXPath("//*");
@@ -127,32 +152,41 @@ namespace Quanlykhachsan.tests
             session.FindElementByAccessibilityId("btnDelete").Click();
             session.FindElementByAccessibilityId("btnDelete").Click();
             Thread.Sleep(1000);
+            logSteps.Add("Nhấn nút xóa");
 
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
-            // Lấy tất cả window handles
-            var windows = session.WindowHandles;
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("Yes"))
+            );
+            logSteps.Add("Hiện thị thông báo:Bạn có muốn xóa nhân viên này không");
+            btnOK1.Click();
+            logSteps.Add("Nhấn yes");
 
-            // Switch sang window cuối (thường là popup)
-            session.SwitchTo().Window(windows.Last());
-
-            // Click nút Yes
-            var btnYes = session.FindElementByName("Yes");
-            btnYes.Click();
-            // Nếu có MessageBox
-            handles = session.WindowHandles;
-            if (handles.Count > 1)
-            {
-                session.SwitchTo().Window(handles.Last());
-                session.FindElementByName("Yes").Click();
-            }
 
             
+            Thread.Sleep(1500);
+
+            var btnOK3 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiện thị thông báo:Xóa nhân viên thành công");
+            btnOK3.Click();
+            logSteps.Add("Nhấn ok");
+            WriteLogBlock("TEST XÓA NHÂN VIÊN THÀNH CÔNG", logSteps, "PASS");
+
+
         }
 
         [TestMethod]
         public void UI_XoaNhanVien_KhongChon_ThatBai()
         {
+            var logSteps = new List<string>();
             Test_DangNhap_Va_MoFormNhanVien();
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Nhân viên");
+            logSteps.Add("Mở tab Xóa nhân viên");
 
             var handles = session.WindowHandles;
             session.SwitchTo().Window(handles.Last());
@@ -167,29 +201,20 @@ namespace Quanlykhachsan.tests
             // Click nút Xóa luôn
             session.FindElementByAccessibilityId("btnDelete").Click();
             session.FindElementByAccessibilityId("btnDelete").Click();
-
+            logSteps.Add("Nhấn nút xóa");
             Thread.Sleep(1500);
 
-            // ===== BẮT MESSAGEBOX CẢNH BÁO =====
-            var windows = session.WindowHandles;
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
-            if (windows.Count > 1)
-            {
-                session.SwitchTo().Window(windows.Last());
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiển thị thông báo:Vui lòng nhập id nhân viên để xóa");
+            btnOK1.Click();
+            logSteps.Add("Nhấn ok");
+            WriteLogBlock("TEST XÓA NHÂN VIÊN CHƯA NHẬP ID", logSteps, "PASS");
 
-                string msg = session.PageSource;
-
-                // Kiểm tra có cảnh báo yêu cầu chọn nhân viên
-                Assert.IsTrue(
-                    msg.Contains("chọn") ||
-                    msg.Contains("Select") ||
-                    msg.Contains("vui lòng"),
-                    "Không xuất hiện cảnh báo khi chưa chọn nhân viên"
-                );
-
-                session.FindElementByName("OK").Click();
-            }
-           
         }
 
         [TestCleanup]

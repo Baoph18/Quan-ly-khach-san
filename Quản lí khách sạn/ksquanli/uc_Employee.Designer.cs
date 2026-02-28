@@ -539,6 +539,7 @@
             this.txtSDTNV.Size = new System.Drawing.Size(231, 55);
             this.txtSDTNV.TabIndex = 4;
             this.txtSDTNV.TextChanged += new System.EventHandler(this.txtSDTNV_TextChanged);
+            this.txtSDTNV.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtSDTNV_KeyPress);
             // 
             // txtTenNV
             // 

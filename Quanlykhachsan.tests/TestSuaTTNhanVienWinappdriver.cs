@@ -1,9 +1,12 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Castle.Core.Internal;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Windows;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -19,7 +22,7 @@ namespace Quanlykhachsan.tests
         private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
 
         private const string AppId =
-            @"E:\Kiểm thử phần mềm\file khachsan du phong\Quản lí khách sạn du phong\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
+            @"D:\QLKS\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
 
         private static WindowsDriver<WindowsElement> session;
 
@@ -36,6 +39,25 @@ namespace Quanlykhachsan.tests
 
             Assert.IsNotNull(session);
             Thread.Sleep(3000); // đợi app load
+        }
+
+        private void WriteLogBlock(string testName, List<string> steps, string result)
+        {
+            string path = @"D:\SuaTTNhanVien_test.txt";
+
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+            using (StreamWriter sw = new StreamWriter(path, true))
+            {
+                sw.WriteLine($"===== LOG {testName.ToUpper()} =====");
+                sw.WriteLine($"Thời gian: {DateTime.Now}");
+                foreach (var step in steps)
+                {
+                    sw.WriteLine(step);
+                }
+                sw.WriteLine($"KẾT QUẢ: {result}");
+                sw.WriteLine(); // dòng trống phân cách
+            }
         }
         public void Test_DangNhap_Va_MoFormNhanVien()
         {
@@ -80,14 +102,19 @@ namespace Quanlykhachsan.tests
         [TestMethod]
         public void UI_SuaTTNhanVien_HopLe_ThanhCong()
         {
+            var logSteps = new List<string>();
             Test_DangNhap_Va_MoFormNhanVien();
-
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Nhân viên");
+            logSteps.Add("Mở tab Thông tin nhân viên");
+            
             WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(15));
 
             // Chờ grid xuất hiện
             wait.Until(d =>
                 session.FindElementByAccessibilityId("dataGridView1"));
 
+            logSteps.Add("Chọn nhân viên cần sửa");
             Thread.Sleep(800);
 
             // ---- SỬA DỮ LIỆU ----
@@ -107,7 +134,7 @@ namespace Quanlykhachsan.tests
             var txtEmailr = session.FindElementByAccessibilityId("txtEmailr");
             txtEmailr.Clear();
             txtEmailr.SendKeys("duytan@gmail.com");
-
+            logSteps.Add("Nhập lại thông tin nhân viên");
             // ---- CLICK NÚT SỬA ----
 
             var btnSua = wait.Until(d =>
@@ -117,99 +144,127 @@ namespace Quanlykhachsan.tests
 
             btnSua.Click();
             btnSua.Click();
+            logSteps.Add("Nhấn nút sửa");
             Thread.Sleep(1000);
 
-            // ---- BẮT MESSAGEBOX SUCCESS ----
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
-            foreach (var handle in session.WindowHandles)
-            {
-                session.SwitchTo().Window(handle);
-                try
-                {
-                    var okBtn = session.FindElementByName("OK");
-                    okBtn.Click();
-                    break;
-                }
-                catch { }
-            }
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiển thị thông báo:Cập nhật thông tin nhân viên thành công");
+            btnOK1.Click();
+            logSteps.Add("Nhấn ok");
+            WriteLogBlock("TEST SỬA THÔNG TIN NHÂN VIÊN THÀNH CÔNG", logSteps, "PASS");
         }
 
         [TestMethod]
-        public void UI_SuaTTNhanVien_KhongHopLe_KhongThanhCong()
+        public void UI_SuaTTNhanVien_BotrongTen_KhongThanhCong()
         {
+            var logSteps = new List<string>();
             Test_DangNhap_Va_MoFormNhanVien();
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Nhân viên");
+            logSteps.Add("Mở tab Thông tin nhân viên");
 
             WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(15));
 
             // Chờ grid load
-            wait.Until(d =>
-                session.FindElementByAccessibilityId("dataGridView1"));
-
+            wait.Until(d => session.FindElementByAccessibilityId("dataGridView1"));
             Thread.Sleep(800);
-
-
-
+            logSteps.Add("Chọn nhân viên cần sửa");
             // ===== NHẬP DỮ LIỆU SAI =====
 
             var txtTenNV = session.FindElementByAccessibilityId("txtTenNV");
-            txtTenNV.Clear(); // ❌ bỏ trống tên
-
-
+            txtTenNV.Clear(); // bỏ trống tên
 
             var txtSDTNV = session.FindElementByAccessibilityId("txtSDTNV");
             txtSDTNV.Clear();
-            txtSDTNV.SendKeys("abcxyz"); // ❌ sai định dạng số điện thoại
-
-
+            txtSDTNV.SendKeys("0338982058"); // sai định dạng
 
             var cboGioiTinh = session.FindElementByAccessibilityId("cboGioiTinh");
             cboGioiTinh.Click();
             cboGioiTinh.SendKeys("Nam");
 
+            var txtEmailr = session.FindElementByAccessibilityId("txtEmailr");
+            txtEmailr.Clear();
+            txtEmailr.SendKeys("duynguyen@gmail.com"); // sai format
+            logSteps.Add("Nhập lại thông tin nhân viên(bỏ trống tên)");
+            // ===== CLICK SỬA =====
+            var btnSua = wait.Until(d => session.FindElementByName("Sửa"));
+            
+            btnSua.Click();
+            logSteps.Add("Nhấn nút sửa");
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("HIển thị thông báo:Vui lòng nhập đầy đủ thông tin");
+            btnOK1.Click();
+            logSteps.Add("Nhấn ok");
+            WriteLogBlock("TEST SỬA THÔNG TIN NHÂN VIÊN BỎ TRỐNG TÊN", logSteps, "PASS");
+        }
+
+        [TestMethod]
+        public void UI_SuaTTNhanVien_VietSaiEmail_KhongThanhCong()
+        {
+            var logSteps = new List<string>();
+            Test_DangNhap_Va_MoFormNhanVien();
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Nhân viên");
+            logSteps.Add("Mở tab Thông tin nhân viên");
+
+            WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(15));
+
+            // Chờ grid load
+            wait.Until(d => session.FindElementByAccessibilityId("dataGridView1"));
+            Thread.Sleep(800);
+            logSteps.Add("Chọn nhân viên cần sửa");
+            // ===== NHẬP DỮ LIỆU SAI =====
+
+            var txtTenNV = session.FindElementByAccessibilityId("txtTenNV");
+            txtTenNV.Clear(); // bỏ trống tên
+            txtTenNV.SendKeys("duy");
+
+            var txtSDTNV = session.FindElementByAccessibilityId("txtSDTNV");
+            txtSDTNV.Clear();
+            txtSDTNV.SendKeys("0338982058"); // sai định dạng
+
+            var cboGioiTinh = session.FindElementByAccessibilityId("cboGioiTinh");
+            cboGioiTinh.Click();
+            cboGioiTinh.SendKeys("Nam");
 
             var txtEmailr = session.FindElementByAccessibilityId("txtEmailr");
             txtEmailr.Clear();
-            txtEmailr.SendKeys("saiemail"); // ❌ email sai format
-
-
-
+            txtEmailr.SendKeys("duynguyen"); // sai format
+            logSteps.Add("Nhập lại thông tin nhân viên(bỏ trống tên)");
             // ===== CLICK SỬA =====
-
-            var btnSua = wait.Until(d =>
-                session.FindElementByName("Sửa"));
+            var btnSua = wait.Until(d => session.FindElementByName("Sửa"));
 
             btnSua.Click();
-            Thread.Sleep(1500);
-
-
-
-            // ===== VERIFY KHÔNG THÀNH CÔNG =====
-
-            bool errorFound = false;
-
-            foreach (var handle in session.WindowHandles)
-            {
-                session.SwitchTo().Window(handle);
-
-                if (session.PageSource.Contains("lỗi") ||
-                    session.PageSource.Contains("không hợp lệ") ||
-                    session.PageSource.Contains("nhập"))
-                {
-                    errorFound = true;
-                    break;
-                }
-            }
-
             btnSua.Click();
+            logSteps.Add("Nhấn nút sửa");
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiển thị thông bảo:Email phải chứa '@");
+            btnOK1.Click();
+            logSteps.Add("Nhấn ok");
 
-
-            // ===== FORM VẪN MỞ → CHỨNG TỎ KHÔNG LƯU =====
-            var stillOpen = session.FindElementByAccessibilityId("txtTenNV");
-            Assert.IsTrue(stillOpen.Displayed);
+            var btnOK2 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Email vừa nhập không hợp lệ");
+            btnOK2.Click();
+            logSteps.Add("Nhấn ok");
+            WriteLogBlock("TEST SỬA THÔNG TIN NHÂN VIÊN NHẬP SAI EMAIL", logSteps, "PASS");
         }
-
         [TestCleanup]
         public void Cleanup()
         {

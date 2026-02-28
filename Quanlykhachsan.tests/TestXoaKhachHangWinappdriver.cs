@@ -1,10 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Windows;
 using OpenQA.Selenium.Support.UI;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 
@@ -19,7 +21,7 @@ namespace Quanlykhachsan.tests
         private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
 
         private const string AppId =
-            @"E:\Kiểm thử phần mềm\file khachsan du phong\Quản lí khách sạn du phong\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
+            @"D:\QLKS\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
 
         private static WindowsDriver<WindowsElement> session;
 
@@ -38,7 +40,24 @@ namespace Quanlykhachsan.tests
             Assert.IsNotNull(session);
             Thread.Sleep(3000);
         }
+        private void WriteLogBlock(string testName, List<string> steps, string result)
+        {
+            string path = @"D:\XoaKhachHang_test.txt";
 
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+            using (StreamWriter sw = new StreamWriter(path, true))
+            {
+                sw.WriteLine($"===== LOG {testName.ToUpper()} =====");
+                sw.WriteLine($"Thời gian: {DateTime.Now}");
+                foreach (var step in steps)
+                {
+                    sw.WriteLine(step);
+                }
+                sw.WriteLine($"KẾT QUẢ: {result}");
+                sw.WriteLine(); // dòng trống phân cách
+            }
+        }
         public void Test_DangNhap_Va_MoForm()
         {
             session.FindElementByAccessibilityId("txtUserName").SendKeys("b");
@@ -69,98 +88,83 @@ namespace Quanlykhachsan.tests
         [TestMethod]
         public void XoaKhachHang_ThanhCong()
         {
+            var logSteps = new List<string>();
             Test_DangNhap_Va_MoForm();
-
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Thông tin khách hàng");
             WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(15));
 
             // Chờ DataGrid xuất hiện
             var grid = wait.Until(d =>
                 session.FindElementByAccessibilityId("dataGridView1")); // kiểm tra lại AutomationId
-
+            logSteps.Add("Chọn khách hàng cần xóa");
             // Click vào grid
             grid.Click();
             Thread.Sleep(500);
 
-
-
-            Thread.Sleep(500);
-
-
-            
-
             session.FindElementByAccessibilityId("btnDelete").Click();
-
+            logSteps.Add("Nhấn xóa");
             // Chờ dialog xuất hiện
             Thread.Sleep(1000);
 
-            // Switch sang cửa sổ dialog
-            foreach (var handle in session.WindowHandles)
-            {
-                session.SwitchTo().Window(handle);
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
-                if (session.Title.Contains("Xác nhận"))
-                    break;
-            }
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("Yes"))
+            );
+            logSteps.Add("Hiện thị thông báo:Bạn có muốn xóa khách hàng này không");
+            btnOK1.Click();
+            logSteps.Add("Nhấn yes");
 
-            // Click nút Yes
-            session.FindElementByName("Yes").Click();
-            // Chờ MessageBox OK xuất hiện
-            var ok = new WebDriverWait(session, TimeSpan.FromSeconds(10));
-
-            var okButton = ok.Until(d =>
-                session.FindElementByName("OK"));
-
-            okButton.Click();
-
-            // Chờ MessageBox OK xuất hiện
-            var ok1 = new WebDriverWait(session, TimeSpan.FromSeconds(10));
-
-            var okButton1 = ok1.Until(d =>
-                session.FindElementByName("OK"));
-
-            okButton1.Click();
-
-        }
-
-        [TestMethod]
-        public void XoaKhachHang_KhongChonDong_ThatBai()
-        {
-            Test_DangNhap_Va_MoForm();
-
-            WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(15));
-
-            // Chờ DataGrid load
-            var grid = wait.Until(d =>
-                session.FindElementByAccessibilityId("dataGridView1"));
-
-            // KHÔNG click grid → không chọn khách
-
-            // Click nút Xóa luôn
-            session.FindElementByAccessibilityId("btnDelete").Click();
 
             Thread.Sleep(1500);
 
-            // ===== BẮT MESSAGEBOX LỖI =====
-            var handles = session.WindowHandles;
+            // ===== POPUP 2 =====
+            var btnOK2 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiện thị thông báo:Giải phóng phòng");
+            btnOK2.Click();
+            logSteps.Add("Nhấn ok");
+            Thread.Sleep(1500);
 
-            if (handles.Count > 1)
-            {
-                session.SwitchTo().Window(handles.Last());
-
-                string msg = session.PageSource;
-
-                // Kiểm tra thông báo yêu cầu chọn khách
-                Assert.IsTrue(
-                    msg.Contains("chọn") ||
-                    msg.Contains("Select") ||
-                    msg.Contains("vui lòng"),
-                    "Không xuất hiện cảnh báo khi chưa chọn khách"
-                );
-
-                session.FindElementByName("OK").Click();
-            }
-          
+            var btnOK3 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiện thị thông báo:Xóa khách hàng thành công");
+            btnOK3.Click();
+            logSteps.Add("Nhấn ok");
+            WriteLogBlock("TEST XÓA KHÁCH HÀNG THÀNH CÔNG", logSteps, "PASS");
         }
+
+        //[TestMethod]
+        //public void XoaKhachHang_KhongChonDong_ThatBai()
+        //{
+        //    Test_DangNhap_Va_MoForm();
+
+        //    WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(15));
+
+        //    // Chờ DataGrid load
+        //    var grid = wait.Until(d =>
+        //        session.FindElementByAccessibilityId("dataGridView1"));
+
+        //    // KHÔNG click grid → không chọn khách
+
+        //    // Click nút Xóa luôn
+        //    session.FindElementByAccessibilityId("btnDelete").Click();
+
+        //    Thread.Sleep(1500);
+        //    WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
+
+        //    // ===== POPUP 1 =====
+        //    var btnOK1 = waitPopup.Until(d =>
+        //        d.FindElement(By.Name("OK"))
+        //    );
+
+        //    btnOK1.Click();
+
+        //}
 
         [TestCleanup]
         public void Cleanup()

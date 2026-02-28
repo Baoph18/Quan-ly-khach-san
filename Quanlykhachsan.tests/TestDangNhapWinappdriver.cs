@@ -1,11 +1,14 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Windows;
+using OpenQA.Selenium.Support.UI;
 using System;
-using System.Linq;
-using System.Threading;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Threading;
 
 namespace Quanlykhachsan.tests
 {
@@ -15,7 +18,7 @@ namespace Quanlykhachsan.tests
         private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
 
         private const string AppId =
-            @"E:\Kiểm thử phần mềm\file khachsan du phong\Quản lí khách sạn du phong\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
+               @"D:\QLKS\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
 
         private static WindowsDriver<WindowsElement> session;
 
@@ -33,23 +36,152 @@ namespace Quanlykhachsan.tests
             Assert.IsNotNull(session);
             Thread.Sleep(3000); // đợi app load
         }
-        [TestMethod]
-        public void Test_DangNhap()
+
+        private void WriteLogBlock(string testName, List<string> steps, string result)
         {
+            string path = @"D:\DangNhap_test.txt";
+
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+            using (StreamWriter sw = new StreamWriter(path, true))
+            {
+                sw.WriteLine($"===== LOG {testName.ToUpper()} =====");
+                sw.WriteLine($"Thời gian: {DateTime.Now}");
+                foreach (var step in steps)
+                {
+                    sw.WriteLine(step);
+                }
+                sw.WriteLine($"KẾT QUẢ: {result}");
+                sw.WriteLine(); // dòng trống phân cách
+            }
+        }
+        
+
+        
+
+        [TestMethod]
+        public void Test_DangNhap_ThanhCong()
+        {
+            var logSteps = new List<string>();
+
+            logSteps.Add("Mở form đăng nhập");
             session.FindElementByAccessibilityId("txtUserName").SendKeys("b");
             session.FindElementByAccessibilityId("txtPassword").SendKeys("123");
-            session.FindElementByAccessibilityId("btnLogin").Click();
+            logSteps.Add("Nhập username(b) và password(123)");
 
+            session.FindElementByAccessibilityId("btnLogin").Click();
+            logSteps.Add("Nhấn nút đăng nhập");
+            // Đợi form Trang Chủ load (có thể lâu hơn tùy kết nối DB)
             Thread.Sleep(3000);
 
-
-          
-         
+            // switch sang window mới
+            var handles = session.WindowHandles;
+            session.SwitchTo().Window(handles.Last());
+            // Kiểm tra: Cửa sổ Trang Chủ xuất hiện
+            // TODO: Sửa "Trang Chủ" thành tiêu đề (Text) thực tế của form TrangChủ
+            logSteps.Add("Nhấn nút đăng nhập vô trang chủ");
+            var mainForm = session.FindElementByName("TrangChủ");
+            WriteLogBlock("TEST ĐĂNG NHẬP THÀNH CÔNG", logSteps, "PASS");
+            Assert.IsNotNull(mainForm);
         }
 
-       
-        [ClassCleanup]
-        public static void Cleanup()
+
+        [TestMethod]
+        public void Test_DangNhapSaiThongTin_HienThongBaoLoi()
+        {
+            var logSteps = new List<string>();
+
+            logSteps.Add("Mở form đăng nhập");
+            session.FindElementByAccessibilityId("txtUserName").Clear();
+            session.FindElementByAccessibilityId("txtUserName").SendKeys("saiuser");
+
+            session.FindElementByAccessibilityId("txtPassword").Clear();
+            session.FindElementByAccessibilityId("txtPassword").SendKeys("saimatkhau");
+            logSteps.Add("Nhập username(saiuser) và password(saimatkhau)");
+
+            session.FindElementByAccessibilityId("btnLogin").Click();
+            logSteps.Add("Nhấn nút đăng nhập");
+
+            WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(10));
+
+            var errorMessage = wait.Until(d =>
+    session.FindElementByAccessibilityId("LabelError")
+);
+            logSteps.Add("Hiển thị lỗi:Bạn đăng nhập không đúng hoặc mật khẩu sai");
+            Assert.IsTrue(errorMessage.Displayed);
+
+            Assert.AreEqual(
+                "Bạn đăng nhập không đúng hoặc mật khẩu sai",
+                errorMessage.Text.Trim()
+            );
+            
+            WriteLogBlock("TEST ĐĂNG NHẬP SAI THÔNG TIN", logSteps, "PASS");
+
+        }
+
+        [TestMethod]
+        public void Test_DangNhap_KhongNhapMatKhau_HienThongBaoTrenButton()
+        {
+            var logSteps = new List<string>();
+
+            logSteps.Add("Mở form đăng nhập");
+            // nhập username
+            session.FindElementByAccessibilityId("txtUserName").Clear();
+            session.FindElementByAccessibilityId("txtUserName").SendKeys("b");
+
+            // không nhập password
+            session.FindElementByAccessibilityId("txtPassword").Clear();
+            logSteps.Add("Nhập username(b) và password()");
+
+            session.FindElementByAccessibilityId("btnLogin").Click();
+            session.FindElementByAccessibilityId("btnLogin").Click();
+            logSteps.Add("Nhấn nút đăng nhập");
+
+            // đợi UI cập nhật text
+            Thread.Sleep(1500);
+
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiện thông báo lỗi:Vui lòng nhập đầy đủ thông tin");
+            logSteps.Add("Nhấn Ok");
+            btnOK1.Click();
+            WriteLogBlock("TEST ĐĂNG NHẬP KHÔNG NHẬP MẬT KHẨU", logSteps, "PASS");
+        }
+
+        [TestMethod]
+        public void DangNhap_BoTrongUserVaPass_ThatBai()
+        {
+            var logSteps = new List<string>();
+
+            logSteps.Add("Mở form đăng nhập");
+            // Không nhập gì cả
+            logSteps.Add("Không nhập username và password");
+            // Click nút đăng nhập
+            session.FindElementByAccessibilityId("btnLogin").Click();
+            logSteps.Add("Nhấn nút đăng nhập");
+            Thread.Sleep(1500);
+
+
+            
+
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
+
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+
+            btnOK1.Click();
+            logSteps.Add("Hiện thông báo lỗi:Vui lòng nhập đầy đủ thông tin");
+            logSteps.Add("Nhấn Ok");
+            WriteLogBlock("TEST ĐĂNG NHẬP KHÔNG NHẬP USER VÀ PASS", logSteps, "PASS");
+        }
+
+        [TestCleanup]
+        public void Cleanup()
         {
             try
             {

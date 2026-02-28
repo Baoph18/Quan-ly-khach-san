@@ -349,7 +349,11 @@ namespace Quản_lí_khách_sạn.ksquanli
         GIOITINHNV = N'{info.GioiTinh}', 
         EMAILNV = N'{info.Email}' 
         WHERE MANV = {info.MaNV};"; // Sử dụng info.MaNV
-
+            if(info.Ten == "" || info.SDT == "" || info.GioiTinh == "" || info.Email == "")
+            {
+                MessageBox.Show("Vui lòng nhập đầy đủ thông tin!", "Thiếu dữ liệu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             fn.setdata(query, "Cập nhật thông tin nhân viên thành công!");
         }
         
@@ -686,6 +690,15 @@ namespace Quản_lí_khách_sạn.ksquanli
                 txtSDTNV.Text = row.Cells[2].Value?.ToString() ?? "";
                 cboGioiTinh.Text = row.Cells[3].Value?.ToString() ?? "";
                 txtEmailr.Text = row.Cells[4].Value?.ToString() ?? "";
+            }
+        }
+
+        private void txtSDTNV_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // Cho phép số và phím Backspace
+            if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
+            {
+                e.Handled = true; // Chặn ký tự không hợp lệ
             }
         }
     }

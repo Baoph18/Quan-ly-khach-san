@@ -3,8 +3,9 @@ using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Windows;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 
 namespace Quanlykhachsan.tests
@@ -18,7 +19,7 @@ namespace Quanlykhachsan.tests
         private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
 
         private const string AppId =
-               @"E:\Kiểm thử phần mềm\file khachsan du phong\Quản lí khách sạn du phong\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
+               @"D:\QLKS\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
 
         private static WindowsDriver<WindowsElement> session;
 
@@ -55,15 +56,36 @@ namespace Quanlykhachsan.tests
             session.SwitchTo().Window(handles.Last());
         }
 
+        private void WriteLogBlock(string testName, List<string> steps, string result)
+        {
+            string path = @"D:\XuatHoaDon_test.txt";
+
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+            using (StreamWriter sw = new StreamWriter(path, true))
+            {
+                sw.WriteLine($"===== LOG {testName.ToUpper()} =====");
+                sw.WriteLine($"Thời gian: {DateTime.Now}");
+                foreach (var step in steps)
+                {
+                    sw.WriteLine(step);
+                }
+                sw.WriteLine($"KẾT QUẢ: {result}");
+                sw.WriteLine(); // dòng trống phân cách
+            }
+        }
         [TestMethod]
         public void XuatHoaDon_ThanhCong()
         {
+            var logSteps = new List<string>();
             Test_DangNhap_Va_MoFormDangXuat();
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Hóa Đơn");
 
-
-            // Bấm đăng ký
+            
             session.FindElementByAccessibilityId("guna2Button2").Click();
-
+            logSteps.Add("Nhấn nút xuất hóa đơn");
+            
             // Đợi dialog hiện
             Thread.Sleep(1500);
 
@@ -72,9 +94,11 @@ namespace Quanlykhachsan.tests
 
             // Switch sang window mới nhất (dialog)
             session.SwitchTo().Window(handles.Last());
-
+            logSteps.Add("Hiện form crystal report");
             
+
             Thread.Sleep(1500);
+            WriteLogBlock("TEST XUẤT HÓA ĐƠN THÀNH CÔNG", logSteps, "PASS");
         }
 
         [TestCleanup]

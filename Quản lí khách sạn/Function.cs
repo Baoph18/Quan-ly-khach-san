@@ -29,7 +29,7 @@ namespace Quản_lí_khách_sạn
             SqlConnection con = new SqlConnection();
             try
             {
-                con.ConnectionString = "Data Source=LAPTOP-GHEUHM8V\\SQLEXPRESS01;Initial Catalog = QL_KS;Integrated Security=True";
+                con.ConnectionString = "Data Source=.\\SQLEXPRESS01;Initial Catalog = QL_KS2;Integrated Security=True";
                 con.Open();   // kiểm tra kết nối
                 con.Close();
             }

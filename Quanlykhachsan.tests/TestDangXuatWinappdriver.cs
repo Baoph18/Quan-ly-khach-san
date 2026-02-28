@@ -1,10 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Windows;
+using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 
 namespace Quanlykhachsan.tests
@@ -18,7 +21,7 @@ namespace Quanlykhachsan.tests
         private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
 
         private const string AppId =
-               @"E:\Kiểm thử phần mềm\file khachsan du phong\Quản lí khách sạn du phong\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
+               @"D:\QLKS\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
 
         private static WindowsDriver<WindowsElement> session;
 
@@ -36,19 +39,42 @@ namespace Quanlykhachsan.tests
             Assert.IsNotNull(session);
             Thread.Sleep(3000); // đợi app load
         }
+
+
+        private void WriteLogBlock(string testName, List<string> steps, string result)
+        {
+            string path = @"D:\DangXuat_test.txt";
+
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+            using (StreamWriter sw = new StreamWriter(path, true))
+            {
+                sw.WriteLine($"===== LOG {testName.ToUpper()} =====");
+                sw.WriteLine($"Thời gian: {DateTime.Now}");
+                foreach (var step in steps)
+                {
+                    sw.WriteLine(step);
+                }
+                sw.WriteLine($"KẾT QUẢ: {result}");
+                sw.WriteLine(); // dòng trống phân cách
+            }
+        }
         public void Test_DangNhap_Va_MoFormDangXuat()
         {
+            
             session.FindElementByAccessibilityId("txtUserName").SendKeys("b");
             session.FindElementByAccessibilityId("txtPassword").SendKeys("123");
             session.FindElementByAccessibilityId("btnLogin").Click();
+            
 
+            
             Thread.Sleep(3000);
 
             var handles = session.WindowHandles;
             session.SwitchTo().Window(handles.Last());
 
             session.FindElementByAccessibilityId("btnInformation").Click();
-
+            
             Thread.Sleep(2000);
 
             handles = session.WindowHandles;
@@ -58,145 +84,27 @@ namespace Quanlykhachsan.tests
         [TestMethod]
         public void DangXuat_ThanhCong()
         {
+            var logSteps = new List<string>();
             Test_DangNhap_Va_MoFormDangXuat();
-            
-
-            // Bấm đăng ký
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Thông tin cá nhân");
+            // Click nút đăng xuất
             session.FindElementByAccessibilityId("btnDangxuat").Click();
+            logSteps.Add("Nhấn nút đăng xuất");
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
-            // Đợi dialog hiện
-            Thread.Sleep(1500);
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("Yes"))
+            );
 
-            // Lấy tất cả window handle
-            var handles = session.WindowHandles;
-
-            // Switch sang window mới nhất (dialog)
-            session.SwitchTo().Window(handles.Last());
-
-            // Switch sang cửa sổ dialog
-            foreach (var handle in session.WindowHandles)
-            {
-                session.SwitchTo().Window(handle);
-
-                if (session.Title.Contains("Xác nhận"))
-                    break;
-            }
-
-            // Click nút Yes
-            session.FindElementByName("Yes").Click();
+            btnOK1.Click();
+            logSteps.Add("Hiển thị thông báo:Bạn có muốn đăng xuất không");
+            logSteps.Add("Nhấn Yes");
+            WriteLogBlock("TEST ĐĂNG XUẤT THÀNH CÔNG", logSteps, "PASS");
         }
 
-        [TestMethod]
-        public void Test_DangNhap_ThanhCong()
-        {
-            session.FindElementByAccessibilityId("txtUserName").SendKeys("b");
-            session.FindElementByAccessibilityId("txtPassword").SendKeys("123");
-            session.FindElementByAccessibilityId("btnLogin").Click();
-
-            // Đợi form Trang Chủ load (có thể lâu hơn tùy kết nối DB)
-            Thread.Sleep(3000);
-
-            // switch sang window mới
-            var handles = session.WindowHandles;
-            session.SwitchTo().Window(handles.Last());
-            // Kiểm tra: Cửa sổ Trang Chủ xuất hiện
-            // TODO: Sửa "Trang Chủ" thành tiêu đề (Text) thực tế của form TrangChủ
-            var mainForm = session.FindElementByName("TrangChủ");
-            Assert.IsNotNull(mainForm);
-        }
-
-
-        [TestMethod]
-        public void Test_DangNhapSaiThongTin_HienThongBaoLoi()
-        {
-            // 1. Nhập username hoặc password sai
-            session.FindElementByAccessibilityId("txtUserName").Clear();
-            session.FindElementByAccessibilityId("txtUserName").SendKeys("saiuser");
-
-            session.FindElementByAccessibilityId("txtPassword").Clear();
-            session.FindElementByAccessibilityId("txtPassword").SendKeys("saimatkhau");
-
-            // 2. Nhấn nút đăng nhập
-            session.FindElementByAccessibilityId("btnLogin").Click();
-
-            // 3. Chờ hệ thống phản hồi
-            Thread.Sleep(2000);
-
-            // 4. Kiểm tra thông báo lỗi hiển thị
-            var errorMessage = session.FindElementByAccessibilityId("LabelError");
-            // sửa lại AccessibilityId nếu label thông báo của bạn tên khác
-
-            Assert.IsNotNull(errorMessage);
-            Assert.IsTrue(errorMessage.Displayed);
-            var handles = session.WindowHandles;
-            // 5. Kiểm tra nội dung thông báo (nếu cần)
-            Assert.AreEqual(
-"Bạn đăng nhập không đúng hoặc mật khẩu sai",
-errorMessage.Text.Trim());
-
-        }
-
-        [TestMethod]
-        public void Test_DangNhap_KhongNhapMatKhau_HienThongBaoTrenButton()
-        {
-            // nhập username
-            session.FindElementByAccessibilityId("txtUserName").Clear();
-            session.FindElementByAccessibilityId("txtUserName").SendKeys("admin");
-
-            // không nhập password
-            session.FindElementByAccessibilityId("txtPassword").Clear();
-
-            // click login
-            var handles = session.WindowHandles;
-            var btnLogin = session.FindElementByAccessibilityId("btnLogin");
-
-            btnLogin.Click();
-
-            // đợi UI cập nhật text
-            Thread.Sleep(1500);
-           
-            // kiểm tra text của button đổi thành thông báo lỗi
-            string buttonText = btnLogin.Text;
-
-            btnLogin.Click(); 
-
-        }
-
-        [TestMethod]
-        public void DangNhap_BoTrongUserVaPass_ThatBai()
-        {
-            // Không nhập gì cả
-
-            // Click nút đăng nhập
-            session.FindElementByAccessibilityId("btnLogin").Click();
-
-            Thread.Sleep(1500);
-
-
-            // ===== BẮT MESSAGEBOX LỖI =====
-            var handles = session.WindowHandles;
-
-            if (handles.Count > 1)
-            {
-                session.SwitchTo().Window(handles.Last());
-
-                string msg = session.PageSource;
-
-                // Kiểm tra thông báo lỗi bắt buộc nhập
-                Assert.IsTrue(
-                    msg.Contains("bắt buộc") ||
-                    msg.Contains("required") ||
-                    msg.Contains("nhập"),
-                    "Không xuất hiện thông báo lỗi khi bỏ trống tài khoản"
-                );
-
-                //Click OK
-
-
-               session.FindElementByName("OK").Click();
-            }
-           
-        }
+        
 
         [TestCleanup]
         public void Cleanup()
