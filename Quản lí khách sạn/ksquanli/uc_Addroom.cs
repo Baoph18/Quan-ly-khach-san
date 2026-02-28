@@ -310,13 +310,12 @@ namespace Quản_lí_khách_sạn.ksquanli
             worksheet.Cells[1, 4] = "Giá tiền";
 
             // Xuất dữ liệu từ DataGridView vào Excel
-            for (int i = 0; i < Datagridview.Rows.Count; i++)
+            for (int i = 0; i < Datagridview.Rows.Count - 1; i++)
             {
-                worksheet.Cells[i + 2, 1] = Datagridview.Rows[i].Cells["MAPHONG"].Value?.ToString();
-                worksheet.Cells[i + 2, 2] = Datagridview.Rows[i].Cells["LOAIPHONG"].Value?.ToString();
-                
-                worksheet.Cells[i + 2, 4] = Datagridview.Rows[i].Cells["GIUONG"].Value?.ToString();
-                worksheet.Cells[i + 2, 5] = Datagridview.Rows[i].Cells["GIA"].Value?.ToString();
+                worksheet.Cells[i + 2, 1] = Datagridview.Rows[i].Cells[0].Value?.ToString();
+                worksheet.Cells[i + 2, 2] = Datagridview.Rows[i].Cells[1].Value?.ToString();
+                worksheet.Cells[i + 2, 3] = Datagridview.Rows[i].Cells[2].Value?.ToString();
+                worksheet.Cells[i + 2, 4] = Datagridview.Rows[i].Cells[3].Value?.ToString();
             }
 
             // Hộp thoại lưu file

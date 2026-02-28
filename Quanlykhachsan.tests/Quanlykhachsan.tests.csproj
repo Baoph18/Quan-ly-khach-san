@@ -79,9 +79,11 @@
     <Compile Include="TestThanhToanWinappdriver.cs" />
     <Compile Include="TestThemNhanVienWinappdriver.cs" />
     <Compile Include="TestThemPhongWinappdriver.cs" />
+    <Compile Include="TestThongKeWinappdriver.cs" />
     <Compile Include="TestXoaKhachHangWinappdriver.cs" />
     <Compile Include="TestXoaNhanVienWinappdriver.cs" />
     <Compile Include="TestXuatHoaDonWinappdriver.cs" />
+    <Compile Include="TestXuatTTPhongExcelWinappdriver.cs" />
     <Compile Include="Test_DangKyKhachHang.cs" />
     <Compile Include="Test_Dangnhap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
