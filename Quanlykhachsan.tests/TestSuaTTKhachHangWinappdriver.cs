@@ -177,9 +177,6 @@ namespace Quanlykhachsan.tests
 
 
 
-            // ===== CLICK SỬA =====
-            session.FindElementByAccessibilityId("btnRepair").Click();
-            Thread.Sleep(1500);
 
 
 
