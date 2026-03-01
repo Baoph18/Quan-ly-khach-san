@@ -48,14 +48,18 @@ namespace Quanlykhachsan.tests
 
             using (StreamWriter sw = new StreamWriter(path, true))
             {
-                sw.WriteLine($"===== LOG {testName.ToUpper()} =====");
-                sw.WriteLine($"Thời gian: {DateTime.Now}");
+                sw.WriteLine("=================================================");
+                sw.WriteLine($"TEST CASE : {testName}");
+                sw.WriteLine($"TIME      : {DateTime.Now}");
+                sw.WriteLine("STEPS     :");
+
                 foreach (var step in steps)
                 {
-                    sw.WriteLine(step);
+                    sw.WriteLine($"  - {step}");
                 }
-                sw.WriteLine($"KẾT QUẢ: {result}");
-                sw.WriteLine(); // dòng trống phân cách
+
+                sw.WriteLine($"RESULT    : {result}");
+                sw.WriteLine("=================================================\n");
             }
         }
         public void Test_DangNhap_Va_MoForm()
@@ -102,12 +106,6 @@ namespace Quanlykhachsan.tests
             grid.Click();
             logSteps.Add("Chọn khách hàng cần sửa");
             Thread.Sleep(500);
-
-            
-
-            
-
-
             // Nhập lại thông tin
             var txtSoPhong = session.FindElementByAccessibilityId("txtTENKH");
             txtSoPhong.Clear();
@@ -237,7 +235,7 @@ namespace Quanlykhachsan.tests
             var stillOpen = session.FindElementByAccessibilityId("txtTENKH");
             Assert.IsTrue(stillOpen.Displayed);
 
-            WriteLogBlock("TEST SỬA THÔNG TIN KHÁCH HÀNG NHẬP CHỮ VÀO SDT", logSteps, "PASS");
+            WriteLogBlock("TEST SỬA THÔNG TIN KHÁCH HÀNG NHẬP CHỮ VÀO SDT", logSteps, "FAIL");
         }
 
         [TestCleanup]

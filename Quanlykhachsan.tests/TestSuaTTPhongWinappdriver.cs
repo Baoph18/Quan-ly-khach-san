@@ -48,14 +48,18 @@ namespace Quanlykhachsan.tests
 
             using (StreamWriter sw = new StreamWriter(path, true))
             {
-                sw.WriteLine($"===== LOG {testName.ToUpper()} =====");
-                sw.WriteLine($"Thời gian: {DateTime.Now}");
+                sw.WriteLine("=================================================");
+                sw.WriteLine($"TEST CASE : {testName}");
+                sw.WriteLine($"TIME      : {DateTime.Now}");
+                sw.WriteLine("STEPS     :");
+
                 foreach (var step in steps)
                 {
-                    sw.WriteLine(step);
+                    sw.WriteLine($"  - {step}");
                 }
-                sw.WriteLine($"KẾT QUẢ: {result}");
-                sw.WriteLine(); // dòng trống phân cách
+
+                sw.WriteLine($"RESULT    : {result}");
+                sw.WriteLine("=================================================\n");
             }
         }
         public void Test_DangNhap_Va_MoForm()
@@ -103,10 +107,6 @@ namespace Quanlykhachsan.tests
             // Click vào grid
             grid.Click();
             Thread.Sleep(500);
-
-            
-
-            
 
             // Nhập lại thông tin
             var txtSoPhong = session.FindElementByAccessibilityId("txtSophong");
@@ -179,7 +179,7 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Hiển thị thông báo:Chỉ được số. Không cho phép chữ hoặc ký tự đặc biệt");
             btnOK1.Click();
             logSteps.Add("Nhấn ok");
-            WriteLogBlock("TEST SỬA THÔNG TIN PHÒNG NHẬP SỐ TIỀN ÂM", logSteps, "PASS");
+            WriteLogBlock("TEST SỬA THÔNG TIN PHÒNG NHẬP SỐ TIỀN ÂM", logSteps, "FAIL");
         }
 
 
@@ -225,7 +225,7 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Hiển thị thông báo:Dữ liệu nhập không hợp lệ");
             btnOK2.Click();
             logSteps.Add("Nhấn ok");
-            WriteLogBlock("TEST SỬA THÔNG TIN PHÒNG BỎ TRỐNG DỮ LIỆU", logSteps, "PASS");
+            WriteLogBlock("TEST SỬA THÔNG TIN PHÒNG BỎ TRỐNG DỮ LIỆU", logSteps, "FAIL");
         }
         [TestCleanup]
         public void Cleanup()

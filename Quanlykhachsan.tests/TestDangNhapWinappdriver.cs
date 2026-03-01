@@ -41,23 +41,22 @@ namespace Quanlykhachsan.tests
         {
             string path = @"D:\DangNhap_test.txt";
 
-            Directory.CreateDirectory(Path.GetDirectoryName(path));
-
             using (StreamWriter sw = new StreamWriter(path, true))
             {
-                sw.WriteLine($"===== LOG {testName.ToUpper()} =====");
-                sw.WriteLine($"Thời gian: {DateTime.Now}");
+                sw.WriteLine("=================================================");
+                sw.WriteLine($"TEST CASE : {testName}");
+                sw.WriteLine($"TIME      : {DateTime.Now}");
+                sw.WriteLine("STEPS     :");
+
                 foreach (var step in steps)
                 {
-                    sw.WriteLine(step);
+                    sw.WriteLine($"  - {step}");
                 }
-                sw.WriteLine($"KẾT QUẢ: {result}");
-                sw.WriteLine(); // dòng trống phân cách
+
+                sw.WriteLine($"RESULT    : {result}");
+                sw.WriteLine("=================================================\n");
             }
         }
-        
-
-        
 
         [TestMethod]
         public void Test_DangNhap_ThanhCong()
@@ -68,7 +67,7 @@ namespace Quanlykhachsan.tests
             session.FindElementByAccessibilityId("txtUserName").SendKeys("b");
             session.FindElementByAccessibilityId("txtPassword").SendKeys("123");
             logSteps.Add("Nhập username(b) và password(123)");
-
+            
             session.FindElementByAccessibilityId("btnLogin").Click();
             logSteps.Add("Nhấn nút đăng nhập");
             // Đợi form Trang Chủ load (có thể lâu hơn tùy kết nối DB)
@@ -83,6 +82,7 @@ namespace Quanlykhachsan.tests
             var mainForm = session.FindElementByName("TrangChủ");
             WriteLogBlock("TEST ĐĂNG NHẬP THÀNH CÔNG", logSteps, "PASS");
             Assert.IsNotNull(mainForm);
+           
         }
 
 
@@ -115,7 +115,7 @@ namespace Quanlykhachsan.tests
                 errorMessage.Text.Trim()
             );
             
-            WriteLogBlock("TEST ĐĂNG NHẬP SAI THÔNG TIN", logSteps, "PASS");
+            WriteLogBlock("TEST ĐĂNG NHẬP SAI THÔNG TIN", logSteps, "FAIL");
 
         }
 
@@ -148,7 +148,7 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Hiện thông báo lỗi:Vui lòng nhập đầy đủ thông tin");
             logSteps.Add("Nhấn Ok");
             btnOK1.Click();
-            WriteLogBlock("TEST ĐĂNG NHẬP KHÔNG NHẬP MẬT KHẨU", logSteps, "PASS");
+            WriteLogBlock("TEST ĐĂNG NHẬP KHÔNG NHẬP MẬT KHẨU", logSteps, "FAIL");
         }
 
         [TestMethod]
@@ -177,7 +177,7 @@ namespace Quanlykhachsan.tests
             btnOK1.Click();
             logSteps.Add("Hiện thông báo lỗi:Vui lòng nhập đầy đủ thông tin");
             logSteps.Add("Nhấn Ok");
-            WriteLogBlock("TEST ĐĂNG NHẬP KHÔNG NHẬP USER VÀ PASS", logSteps, "PASS");
+            WriteLogBlock("TEST ĐĂNG NHẬP KHÔNG NHẬP USER VÀ PASS", logSteps, "FAIL");
         }
 
         [TestCleanup]

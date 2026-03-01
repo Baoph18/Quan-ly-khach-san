@@ -49,14 +49,18 @@ namespace Quanlykhachsan.tests
 
             using (StreamWriter sw = new StreamWriter(path, true))
             {
-                sw.WriteLine($"===== LOG {testName.ToUpper()} =====");
-                sw.WriteLine($"Thời gian: {DateTime.Now}");
+                sw.WriteLine("=================================================");
+                sw.WriteLine($"TEST CASE : {testName}");
+                sw.WriteLine($"TIME      : {DateTime.Now}");
+                sw.WriteLine("STEPS     :");
+
                 foreach (var step in steps)
                 {
-                    sw.WriteLine(step);
+                    sw.WriteLine($"  - {step}");
                 }
-                sw.WriteLine($"KẾT QUẢ: {result}");
-                sw.WriteLine(); // dòng trống phân cách
+
+                sw.WriteLine($"RESULT    : {result}");
+                sw.WriteLine("=================================================\n");
             }
         }
         public void Test_DangNhap_Va_MoFormNhanVien()
@@ -205,7 +209,7 @@ namespace Quanlykhachsan.tests
             logSteps.Add("HIển thị thông báo:Vui lòng nhập đầy đủ thông tin");
             btnOK1.Click();
             logSteps.Add("Nhấn ok");
-            WriteLogBlock("TEST SỬA THÔNG TIN NHÂN VIÊN BỎ TRỐNG TÊN", logSteps, "PASS");
+            WriteLogBlock("TEST SỬA THÔNG TIN NHÂN VIÊN BỎ TRỐNG TÊN", logSteps, "FAIL");
         }
 
         [TestMethod]
@@ -263,7 +267,7 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Email vừa nhập không hợp lệ");
             btnOK2.Click();
             logSteps.Add("Nhấn ok");
-            WriteLogBlock("TEST SỬA THÔNG TIN NHÂN VIÊN NHẬP SAI EMAIL", logSteps, "PASS");
+            WriteLogBlock("TEST SỬA THÔNG TIN NHÂN VIÊN NHẬP SAI EMAIL", logSteps, "FAIL");
         }
         [TestCleanup]
         public void Cleanup()

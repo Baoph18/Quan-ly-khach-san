@@ -61,18 +61,20 @@ namespace Quanlykhachsan.tests
         {
             string path = @"D:\ThemNhanVien_test.txt";
 
-            Directory.CreateDirectory(Path.GetDirectoryName(path));
-
             using (StreamWriter sw = new StreamWriter(path, true))
             {
-                sw.WriteLine($"===== LOG {testName.ToUpper()} =====");
-                sw.WriteLine($"Thời gian: {DateTime.Now}");
+                sw.WriteLine("=================================================");
+                sw.WriteLine($"TEST CASE : {testName}");
+                sw.WriteLine($"TIME      : {DateTime.Now}");
+                sw.WriteLine("STEPS     :");
+
                 foreach (var step in steps)
                 {
-                    sw.WriteLine(step);
+                    sw.WriteLine($"  - {step}");
                 }
-                sw.WriteLine($"KẾT QUẢ: {result}");
-                sw.WriteLine(); // dòng trống phân cách
+
+                sw.WriteLine($"RESULT    : {result}");
+                sw.WriteLine("=================================================\n");
             }
         }
         public TestContext TestContext { get; set; }
@@ -153,7 +155,7 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Hiển thị thông báo:Chỉ được số. Không cho phép chữ hoặc ký tự đặc biệt");
             btnOK1.Click();
             logSteps.Add("Nhấn ok");
-            WriteLogBlock("TEST THÊM NHÂN VIÊN NHẬP CHỮ VÀO SDT", logSteps, "PASS");
+            WriteLogBlock("TEST THÊM NHÂN VIÊN NHẬP CHỮ VÀO SDT", logSteps, "FAIL");
 
         }
 
@@ -191,7 +193,7 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Hiển thị thông báo:Vui lòng nhập thông tin đầy đủ");
             btnOK1.Click();
             logSteps.Add("Nhấn ok");
-            WriteLogBlock("TEST THÊM NHÂN VIÊN BỎ TRỐNG TÊN", logSteps, "PASS");
+            WriteLogBlock("TEST THÊM NHÂN VIÊN BỎ TRỐNG TÊN", logSteps, "FAIL");
         }
         [TestMethod]
         public void UI_AddNhanVien_SaiEmail_HienThongBaoDungNoiDung()
@@ -229,7 +231,7 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Nhấn ok");
 
             
-            WriteLogBlock("TEST THÊM NHÂN VIÊN NHẬP SAI EMAIL", logSteps, "PASS");
+            WriteLogBlock("TEST THÊM NHÂN VIÊN NHẬP SAI EMAIL", logSteps, "FAIL");
         }
         [TestCleanup]
         public void Cleanup()

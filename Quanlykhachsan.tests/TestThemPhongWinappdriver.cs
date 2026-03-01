@@ -47,14 +47,18 @@ namespace Quanlykhachsan.tests
 
             using (StreamWriter sw = new StreamWriter(path, true))
             {
-                sw.WriteLine($"===== LOG {testName.ToUpper()} =====");
-                sw.WriteLine($"Thời gian: {DateTime.Now}");
+                sw.WriteLine("=================================================");
+                sw.WriteLine($"TEST CASE : {testName}");
+                sw.WriteLine($"TIME      : {DateTime.Now}");
+                sw.WriteLine("STEPS     :");
+
                 foreach (var step in steps)
                 {
-                    sw.WriteLine(step);
+                    sw.WriteLine($"  - {step}");
                 }
-                sw.WriteLine($"KẾT QUẢ: {result}");
-                sw.WriteLine(); // dòng trống phân cách
+
+                sw.WriteLine($"RESULT    : {result}");
+                sw.WriteLine("=================================================\n");
             }
         }
         public void Test_DangNhap_Va_MoForm()
@@ -113,6 +117,43 @@ namespace Quanlykhachsan.tests
             WriteLogBlock("TEST THÊM PHÒNG THÀNH CÔNG", logSteps, "PASS");
         }
 
+        [TestMethod]
+        public void ThemPhong_TrungSoPhong_KhongThanhCong()
+        {
+            var logSteps = new List<string>();
+            Test_DangNhap_Va_MoForm();
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Thêm phòng");
+            // Nhập thông tin khách
+            session.FindElementByAccessibilityId("txtSophong")
+                   .SendKeys("1");
+
+            session.FindElementByAccessibilityId("txtLoaiphong")
+                   .SendKeys("Thường");
+
+            session.FindElementByAccessibilityId("txtLoaigiuong")
+                   .SendKeys("Đơn");
+
+            session.FindElementByAccessibilityId("txtGiatien")
+                   .SendKeys("260000");
+            logSteps.Add("Nhập thông tin phòng");
+
+
+            // Bấm đăng ký
+            session.FindElementByAccessibilityId("btnAddRoom").Click();
+            session.FindElementByAccessibilityId("btnAddRoom").Click();
+            logSteps.Add("Nhấn nút Thêm phòng");
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
+
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiển thị thông báo:Số phòng đã tồn tại!Vui lòng nhập số khác");
+            btnOK1.Click();
+            logSteps.Add("Nhấn ok");
+            WriteLogBlock("TEST THÊM PHÒNG TRÙNG SỐ PHÒNG", logSteps, "FAIL");
+        }
 
         [TestMethod]
         public void ThemPhong_KhongHopLe_ThatBai()
@@ -153,7 +194,7 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Hiển thị thông báo:Chỉ được số. Không cho phép chữ hoặc ký tự đặc biệt");
             btnOK1.Click();
             logSteps.Add("Nhấn ok");
-            WriteLogBlock("TEST THÊM PHÒNG NHẬP TIỀN ÂM", logSteps, "PASS");
+            WriteLogBlock("TEST THÊM PHÒNG NHẬP TIỀN ÂM", logSteps, "FAIL");
         }
 
         [TestMethod]
@@ -197,7 +238,7 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Hiển thị thông báo:Vui lòng nhập đầy đủ thông tin");
             btnOK1.Click();
             logSteps.Add("Nhấn ok");
-            WriteLogBlock("TEST THÊM PHÒNG BỎ TRỐNG DỮ LIỆU", logSteps, "PASS");
+            WriteLogBlock("TEST THÊM PHÒNG BỎ TRỐNG DỮ LIỆU", logSteps, "FAIL");
 
         }
 
@@ -230,7 +271,7 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Hiển thị thông báo:Chỉ được số. Không cho phép chữ hoặc ký tự đặc biệt");
             btnOK1.Click();
             logSteps.Add("Nhấn ok");
-            WriteLogBlock("TEST THÊM PHÒNG NHẬP CHỮ VÀO SỐ PHÒNG", logSteps, "PASS");
+            WriteLogBlock("TEST THÊM PHÒNG NHẬP CHỮ VÀO SỐ PHÒNG", logSteps, "FAIL");
         }
 
        

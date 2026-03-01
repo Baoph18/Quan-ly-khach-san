@@ -46,14 +46,18 @@ namespace Quanlykhachsan.tests
 
             using (StreamWriter sw = new StreamWriter(path, true))
             {
-                sw.WriteLine($"===== LOG {testName.ToUpper()} =====");
-                sw.WriteLine($"Thời gian: {DateTime.Now}");
+                sw.WriteLine("=================================================");
+                sw.WriteLine($"TEST CASE : {testName}");
+                sw.WriteLine($"TIME      : {DateTime.Now}");
+                sw.WriteLine("STEPS     :");
+
                 foreach (var step in steps)
                 {
-                    sw.WriteLine(step);
+                    sw.WriteLine($"  - {step}");
                 }
-                sw.WriteLine($"KẾT QUẢ: {result}");
-                sw.WriteLine(); // dòng trống phân cách
+
+                sw.WriteLine($"RESULT    : {result}");
+                sw.WriteLine("=================================================\n");
             }
         }
         public void Test_DangNhap_Va_MoFormDKKH()
@@ -184,7 +188,7 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Hiển thị thông báo:Vui lòng nhập đầy đủ thông tin");
             btnOK1.Click();
             logSteps.Add("Nhấn Ok");
-            WriteLogBlock("TEST ĐĂNG KÝ KHÁCH HÀNG BỎ TRỐNG TÊN", logSteps, "PASS");
+            WriteLogBlock("TEST ĐĂNG KÝ KHÁCH HÀNG BỎ TRỐNG TÊN", logSteps, "FAIL");
         }
         public TestContext TestContext { get; set; }
         [TestMethod]
@@ -232,7 +236,7 @@ namespace Quanlykhachsan.tests
             }
             catch { }
             logSteps.Add("Nhấn Ok");
-            WriteLogBlock("TEST ĐĂNG KÝ KHÁCH HÀNG NHẬP SỐ VÀO TÊN", logSteps, "PASS");
+            WriteLogBlock("TEST ĐĂNG KÝ KHÁCH HÀNG NHẬP SỐ VÀO TÊN", logSteps, "FAIL");
         }
 
         [TestMethod]
@@ -263,7 +267,7 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Hiển thị thông báo:Chỉ được số. Không cho phép chữ hoặc ký tự đặc biệt");
             btnOK1.Click();
             logSteps.Add("Nhấn Ok");
-            WriteLogBlock("TEST ĐĂNG KÝ KHÁCH HÀNG NHẬP CHỮ VÀO SDT", logSteps, "PASS");
+            WriteLogBlock("TEST ĐĂNG KÝ KHÁCH HÀNG NHẬP CHỮ VÀO SDT", logSteps, "FAIL");
         }
         [TestCleanup]
         public void Cleanup()
