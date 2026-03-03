@@ -94,9 +94,19 @@ namespace Quản_lí_khách_sạn.ksquanli
         }
         private void btnThanhToan_Click(object sender, EventArgs e)
         {
+            
             if (!XacNhanThanhToan())
                 return;
-
+            // ✅ Kiểm tra phương thức thanh toán
+            if (cboPhuongthuc.SelectedIndex == -1 || string.IsNullOrWhiteSpace(cboPhuongthuc.Text))
+            {
+                MessageBox.Show("Vui lòng chọn phương thức thanh toán!",
+                                "Thông báo",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning);
+                cboPhuongthuc.Focus();
+                return;
+            }
             try
             {
                 // Gom tham số vào đối tượng ThanhToanInfo
@@ -295,6 +305,19 @@ namespace Quản_lí_khách_sạn.ksquanli
             }
         }
 
-        
+        private void cboPhuongthuc_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cboPhuongthuc.SelectedIndex == -1)
+            {
+                MessageBox.Show("Vui lòng chọn phương thức thanh toán!",
+                                "Thông báo",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning);
+                cboPhuongthuc.Focus();
+                return;
+            }
+
+            
+        }
     }
 }

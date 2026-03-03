@@ -90,6 +90,7 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Mở form Thanh Toán");
             WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(20));
 
+            
             // Switch sang window mới nhất
             wait.Until(d => session.WindowHandles.Count > 0);
             session.SwitchTo().Window(session.WindowHandles.Last());
@@ -110,7 +111,12 @@ namespace Quanlykhachsan.tests
             grid.Click();
             logSteps.Add("Chọn đơn cần thanh toán");
             Thread.Sleep(500);
-
+            var cbo = session.FindElementByAccessibilityId("cboPhuongthuc");
+            cbo.Click();
+            cbo.SendKeys("Visa");
+            cbo.SendKeys(OpenQA.Selenium.Keys.Enter);
+            logSteps.Add("Chọn phương thức thanh toán");
+            Thread.Sleep(500);
             var btnThanhToan = wait.Until(d =>
                 session.FindElementByAccessibilityId("btnThanhToan"));
 
@@ -135,6 +141,61 @@ namespace Quanlykhachsan.tests
             btnOK2.Click();
             logSteps.Add("Nhấn ok");
             WriteLogBlock("TEST THANH TOÁN THÀNH CÔNG", logSteps, "PASS");
+        }
+
+        [TestMethod]
+        public void UI_ThanhToan_BoTrongPTTTH_KhongThanhCong()
+        {
+            var logSteps = new List<string>();
+            Test_DangNhap_Va_MoFormThanhToan();
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Thanh Toán");
+            WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(20));
+
+            // Switch sang window mới nhất
+            wait.Until(d => session.WindowHandles.Count > 0);
+            session.SwitchTo().Window(session.WindowHandles.Last());
+
+            // Đợi grid xuất hiện
+            var grid = wait.Until(d =>
+                session.FindElementByAccessibilityId("dataGridView1"));
+
+            // Lấy tất cả dòng
+            var rows = grid.FindElementsByClassName("DataItem");
+
+            // Lấy tất cả phần tử con trong grid
+            var children = grid.FindElementsByXPath(".//*");
+
+            Assert.IsTrue(children.Count > 0, "Grid không có dữ liệu hoặc chưa load xong");
+
+            // Click vào grid (không click row cụ thể nữa)
+            grid.Click();
+            logSteps.Add("Chọn đơn cần thanh toán");
+            Thread.Sleep(500);
+            logSteps.Add("Không chọn phương thức thanh toán");
+            var btnThanhToan = wait.Until(d =>
+                session.FindElementByAccessibilityId("btnThanhToan"));
+
+            btnThanhToan.Click();
+            logSteps.Add("Nhấn nút thanh toán");
+            Thread.Sleep(1000);
+
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
+
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            btnOK1.Click();
+            // ===== POPUP 1 =====
+            var btnOK2 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiển thị thông báo:Vui lòng chọn phương thứ thanh toán");
+            btnOK2.Click();
+            logSteps.Add("Nhấn ok");
+            
+            WriteLogBlock("TEST THANH TOÁN BỎ TRỐNG PHƯƠNG THỨC THANH TOÁN", logSteps, "FAIL");
         }
 
         [TestMethod]
