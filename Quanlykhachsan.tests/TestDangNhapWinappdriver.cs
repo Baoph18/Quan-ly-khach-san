@@ -5,7 +5,6 @@ using OpenQA.Selenium.Appium.Windows;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -62,7 +61,7 @@ namespace Quanlykhachsan.tests
         public void Test_DangNhap_ThanhCong()
         {
             var logSteps = new List<string>();
-
+            session.FindElementByAccessibilityId("txtUserName").Clear();
             logSteps.Add("Mở form đăng nhập");
             session.FindElementByAccessibilityId("txtUserName").SendKeys("b");
             session.FindElementByAccessibilityId("txtPassword").SendKeys("123");
@@ -180,8 +179,8 @@ namespace Quanlykhachsan.tests
             WriteLogBlock("TEST ĐĂNG NHẬP KHÔNG NHẬP USER VÀ PASS", logSteps, "FAIL");
         }
 
-        [TestCleanup]
-        public void Cleanup()
+        [ClassCleanup]
+        public static void Cleanup()
         {
             try
             {
@@ -200,43 +199,3 @@ namespace Quanlykhachsan.tests
     }
 }
 
-//        [TestInitialize]
-//        public void ClearFields()
-//        {
-//            // Xóa dữ liệu cũ trước mỗi test case
-//            session.FindElementByAccessibilityId("txtUserName").Clear();
-//            session.FindElementByAccessibilityId("txtPassword").Clear();
-//        }
-
-//        //[TestMethod]
-//        //public void Test_BoTrongThongTin_HienThiCanhBao()
-//        //{
-//        //    // Hành động: Bấm nút đăng nhập mà không nhập gì
-//        //    session.FindElementByAccessibilityId("btnLogin").Click();
-//        //    Thread.Sleep(500); // Đợi MessageBox hiện lên
-
-//        //    // Kiểm tra: MessageBox "Cảnh báo" có xuất hiện không
-//        //    var warningDialog = session.FindElementByName("Cảnh báo");
-//        //    Assert.IsNotNull(warningDialog);
-
-//        //    // Bấm OK để đóng MessageBox
-//        //    session.FindElementByName("OK").Click();
-//        //}
-
-//        //[TestMethod]
-//        //public void Test_DangNhapSai_HienThiLabelError()
-//        //{
-//        //    // Hành động: Nhập sai tài khoản và mật khẩu
-//        //    session.FindElementByAccessibilityId("txtUserName").SendKeys("saikhoan");
-//        //    session.FindElementByAccessibilityId("txtPassword").SendKeys("saimatkhau");
-//        //    session.FindElementByAccessibilityId("btnLogin").Click();
-//        //    Thread.Sleep(500);
-
-//        //    // Kiểm tra: LabelError hiển thị (nếu Label có text là "Tên đăng nhập hoặc mật khẩu không đúng", bạn có thể dùng FindElementByName)
-//        //    var labelError = session.FindElementByAccessibilityId("LabelError");
-//        //    Assert.IsTrue(labelError.Displayed);
-//        //}
-
-
-//    }
-//}

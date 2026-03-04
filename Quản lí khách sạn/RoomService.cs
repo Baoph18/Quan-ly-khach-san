@@ -16,23 +16,22 @@ namespace Quản_lí_khách_sạn
         public decimal Gia { get; set; }
         public string TrangThai { get; set; } = "Trống";
     }
+
     public class RoomService
     {
-
-        public bool IsTesting { get; set; } = false;
-        private readonly Function fn = new Function();
+        // Danh sách phòng lưu tạm trong RAM
+        private List<Room> danhSachPhong = new List<Room>();
 
         public bool AddRoom(Room room)
         {
-            // Kiểm tra dữ liệu
             if (IsInvalid(room))
                 return false;
 
-            // Bỏ qua DB nếu đang test
-            if (!IsTesting && IsDuplicate(room.SoPhong))
+            if (IsDuplicate(room.SoPhong))
                 return false;
 
-            return Insert(room);
+            danhSachPhong.Add(room);
+            return true;
         }
 
         private bool IsInvalid(Room r)
@@ -45,48 +44,29 @@ namespace Quản_lí_khách_sạn
 
         private bool IsDuplicate(string soPhong)
         {
-            if (IsTesting)
-                return false;   // Test: luôn không trùng
-
-            string q = $"SELECT COUNT(*) FROM PHONG WHERE SOPHONG = '{soPhong}'";
-            DataSet ds = fn.getdata(q);
-
-            return Convert.ToInt32(ds.Tables[0].Rows[0][0]) > 0;
+            return danhSachPhong.Any(p => p.SoPhong == soPhong);
         }
 
-        private bool Insert(Room r)
+        public bool UpdateRoom(Room room)
         {
-            if (IsTesting)
-                return true;   // Test: luôn thành công
-
-            try
-            {
-                string q = $"INSERT INTO PHONG (SOPHONG, LOAIPHONG, GIUONG, GIA, DATPHONG) " +
-                           $"VALUES ('{r.SoPhong}', N'{r.LoaiPhong}', N'{r.Giuong}', {r.Gia}, N'{r.TrangThai}')";
-
-                fn.setdata(q, "Đã thêm phòng");
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-
-        public bool SuaPhong(int maPhong, string soPhongMoi, string loaiPhongMoi, string giuongMoi, long giaMoi)
-        {
-           
-            if (maPhong <= 0 || string.IsNullOrWhiteSpace(soPhongMoi) ||
-                string.IsNullOrWhiteSpace(loaiPhongMoi) || string.IsNullOrWhiteSpace(giuongMoi) || giaMoi <= 0)
+            if (IsInvalid(room))
                 return false;
 
-            
+            var phong = danhSachPhong.FirstOrDefault(p => p.SoPhong == room.SoPhong);
+
+            if (phong == null)
+                return false;
+
+            phong.LoaiPhong = room.LoaiPhong;
+            phong.Giuong = room.Giuong;
+            phong.Gia = room.Gia;
+            phong.TrangThai = room.TrangThai;
+
             return true;
-
-
-
         }
     }
+
+
+
 }
 

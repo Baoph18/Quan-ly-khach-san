@@ -269,8 +269,8 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Nhấn Ok");
             WriteLogBlock("TEST ĐĂNG KÝ KHÁCH HÀNG NHẬP CHỮ VÀO SDT", logSteps, "FAIL");
         }
-        [TestCleanup]
-        public void Cleanup()
+        [ClassCleanup]
+        public static void Cleanup()
         {
             try
             {

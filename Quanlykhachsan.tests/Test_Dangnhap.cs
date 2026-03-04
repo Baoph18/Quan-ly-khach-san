@@ -57,5 +57,13 @@ namespace Quản_lí_khách_sạn
 
             Assert.AreEqual("Thiếu thông tin", ketQua);
         }
+
+        [TestMethod]
+        public void DangNhap_KhongNhapDuLieu_TraVeLoi()
+        {
+            var ketQua = service.DangNhap("", "");
+
+            Assert.AreEqual("Thiếu thông tin", ketQua);
+        }
     }
 }

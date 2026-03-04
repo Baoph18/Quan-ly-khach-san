@@ -6,7 +6,7 @@ using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
+
 using System.Threading;
 
 namespace Quanlykhachsan.tests
@@ -238,8 +238,8 @@ namespace Quanlykhachsan.tests
             WriteLogBlock("TEST SỬA THÔNG TIN KHÁCH HÀNG NHẬP CHỮ VÀO SDT", logSteps, "FAIL");
         }
 
-        [TestCleanup]
-        public void Cleanup()
+        [ClassCleanup]
+        public static void Cleanup()
         {
             try
             {
