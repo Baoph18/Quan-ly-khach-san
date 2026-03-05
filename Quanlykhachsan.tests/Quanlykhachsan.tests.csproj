@@ -88,10 +88,12 @@
     <Compile Include="Test_DangKyKhachHang.cs" />
     <Compile Include="Test_Dangnhap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Test_SuaKhachHang.cs" />
     <Compile Include="Test_SuaPhong.cs" />
     <Compile Include="Test_ThanhToan.cs" />
     <Compile Include="Test_ThemNhanVien.cs" />
     <Compile Include="Test_ThemPhong.cs" />
+    <Compile Include="Test_XoaKhachHang.cs" />
     <Compile Include="Test_XoaNhanVien.cs" />
   </ItemGroup>
   <ItemGroup>
