@@ -90,11 +90,16 @@ namespace Quanlykhachsan.tests
             session.FindElementByAccessibilityId("txtSophong")
                    .SendKeys("99");
 
-            session.FindElementByAccessibilityId("txtLoaiphong")
-                   .SendKeys("Thường");
+            var cbo = session.FindElementByAccessibilityId("txtLoaiphong");
+            cbo.Click();
+            cbo.SendKeys("Thường");
+            cbo.SendKeys(OpenQA.Selenium.Keys.Enter);
 
-            session.FindElementByAccessibilityId("txtLoaigiuong")
-                   .SendKeys("Đơn");
+            var cbo1 = session.FindElementByAccessibilityId("txtLoaigiuong");
+            cbo1.Click();
+            cbo1.SendKeys("Đơn");
+            cbo1.SendKeys(OpenQA.Selenium.Keys.Enter);
+            
 
             session.FindElementByAccessibilityId("txtGiatien")
                    .SendKeys("260000");
@@ -128,11 +133,15 @@ namespace Quanlykhachsan.tests
             session.FindElementByAccessibilityId("txtSophong")
                    .SendKeys("99");
 
-            session.FindElementByAccessibilityId("txtLoaiphong")
-                   .SendKeys("Thường");
+            var cbo = session.FindElementByAccessibilityId("txtLoaiphong");
+            cbo.Click();
+            cbo.SendKeys("Thường");
+            cbo.SendKeys(OpenQA.Selenium.Keys.Enter);
 
-            session.FindElementByAccessibilityId("txtLoaigiuong")
-                   .SendKeys("Đơn");
+            var cbo1 = session.FindElementByAccessibilityId("txtLoaigiuong");
+            cbo1.Click();
+            cbo1.SendKeys("Đơn");
+            cbo1.SendKeys(OpenQA.Selenium.Keys.Enter);
 
             session.FindElementByAccessibilityId("txtGiatien")
                    .SendKeys("260000");
@@ -169,13 +178,16 @@ namespace Quanlykhachsan.tests
             session.FindElementByAccessibilityId("txtSophong")
                    .SendKeys("100");
 
-            
-            session.FindElementByAccessibilityId("txtLoaiphong")
-                   .SendKeys("Vip");
 
-            // Loại giường hợp lệ
-            session.FindElementByAccessibilityId("txtLoaigiuong")
-                   .SendKeys("Đơn");
+            var cbo = session.FindElementByAccessibilityId("txtLoaiphong");
+            cbo.Click();
+            cbo.SendKeys("Vip");
+            cbo.SendKeys(OpenQA.Selenium.Keys.Enter);
+
+            var cbo1 = session.FindElementByAccessibilityId("txtLoaigiuong");
+            cbo1.Click();
+            cbo1.SendKeys("Đơn");
+            cbo1.SendKeys(OpenQA.Selenium.Keys.Enter);
 
             // Giá âm → sai dữ liệu
             session.FindElementByAccessibilityId("txtGiatien")
@@ -215,9 +227,12 @@ namespace Quanlykhachsan.tests
             var loaiphong = session.FindElementByAccessibilityId("txtLoaiphong");
             loaiphong.Clear();
 
-            // Loại giường hợp lệ
-            session.FindElementByAccessibilityId("txtLoaigiuong")
-                   .SendKeys("Đơn");
+            
+
+            var cbo1 = session.FindElementByAccessibilityId("txtLoaigiuong");
+            cbo1.Click();
+            cbo1.SendKeys("Đơn");
+            cbo1.SendKeys(OpenQA.Selenium.Keys.Enter);
 
             // Giá âm → sai dữ liệu
             session.FindElementByAccessibilityId("txtGiatien")

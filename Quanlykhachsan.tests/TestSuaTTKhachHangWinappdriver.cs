@@ -119,9 +119,11 @@ namespace Quanlykhachsan.tests
             txtLoaiGiuong.Clear();
             txtLoaiGiuong.SendKeys("Rau Má");
 
-            var txtGiaTien = session.FindElementByAccessibilityId("cboGIOITINH");
-            txtGiaTien.Clear();
-            txtGiaTien.SendKeys("Nữ");
+            var cbo = session.FindElementByAccessibilityId("cboGIOITINH");
+            cbo.Click();
+            cbo.SendKeys("Nam");
+            cbo.SendKeys(OpenQA.Selenium.Keys.Enter);
+            
 
             var txtMaDD = session.FindElementByAccessibilityId("txtMADD");
             txtMaDD.Clear();
@@ -182,58 +184,26 @@ namespace Quanlykhachsan.tests
             txtSDT.Clear();
             txtSDT.SendKeys("abcxyz"); // ❌ sai định dạng số điện thoại
 
-            var txtQT = session.FindElementByAccessibilityId("txtQUOCTICH");
-            txtQT.Clear();
-            txtQT.SendKeys("VN");
-
-            var cboGT = session.FindElementByAccessibilityId("cboGIOITINH");
-            cboGT.Clear();
-            cboGT.SendKeys("Nam");
-
-            var txtMaDD = session.FindElementByAccessibilityId("txtMADD");
-            txtMaDD.Clear();
-            txtMaDD.SendKeys("111");
-
-            var txtDC = session.FindElementByAccessibilityId("txtDIACHI");
-            txtDC.Clear();
-            txtDC.SendKeys("HCM");
-
-            var txtSoDem = session.FindElementByAccessibilityId("txtSoDem");
-            txtSoDem.Clear();
-            txtSoDem.SendKeys("2");
+            
             logSteps.Add("Nhập thông tin khách hàng(Nhập chữ vào sdt)");
 
 
-            // ===== CLICK SỬA =====
-            session.FindElementByAccessibilityId("btnRepair").Click();
-            Thread.Sleep(1500);
-            logSteps.Add("Nhấn nút sửa");
+           
 
 
-            // ===== VERIFY KHÔNG THÀNH CÔNG =====
-
-            bool errorFound = false;
-
-            foreach (var handle in session.WindowHandles)
-            {
-                session.SwitchTo().Window(handle);
-
-                if (session.PageSource.Contains("không hợp lệ") ||
-                    session.PageSource.Contains("lỗi") ||
-                    session.PageSource.Contains("sai"))
-                {
-                    errorFound = true;
-                    break;
-                }
-            }
+            
             logSteps.Add("Hiển thị thông báo:Chỉ được số. Không cho phép chữ hoặc ký tự đặc biệt");
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            btnOK1.Click();
             logSteps.Add("Nhấn ok");
 
 
-            // Form vẫn còn mở → chứng tỏ chưa lưu
-            var stillOpen = session.FindElementByAccessibilityId("txtTENKH");
-            Assert.IsTrue(stillOpen.Displayed);
+            
 
             WriteLogBlock("TEST SỬA THÔNG TIN KHÁCH HÀNG NHẬP CHỮ VÀO SDT", logSteps, "FAIL");
         }

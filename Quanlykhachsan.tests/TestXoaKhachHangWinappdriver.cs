@@ -142,33 +142,43 @@ namespace Quanlykhachsan.tests
             WriteLogBlock("TEST XÓA KHÁCH HÀNG THÀNH CÔNG", logSteps, "PASS");
         }
 
-        //[TestMethod]
-        //public void XoaKhachHang_KhongChonDong_ThatBai()
-        //{
-        //    Test_DangNhap_Va_MoForm();
+        [TestMethod]
+        public void XoaKhachHang_KhongCoDuLieu_ThatBai()
+        {
+            var logSteps = new List<string>();
+            Test_DangNhap_Va_MoForm();
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Thông tin khách hàng");
+            WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(15));
 
-        //    WebDriverWait wait = new WebDriverWait(session, TimeSpan.FromSeconds(15));
+            // Chờ DataGrid xuất hiện
+            var grid = wait.Until(d =>
+                session.FindElementByAccessibilityId("dataGridView1")); // kiểm tra lại AutomationId
+            logSteps.Add("Chọn khách hàng cần xóa");
+            // Click vào grid
+            grid.Click();
+            Thread.Sleep(500);
 
-        //    // Chờ DataGrid load
-        //    var grid = wait.Until(d =>
-        //        session.FindElementByAccessibilityId("dataGridView1"));
+            session.FindElementByAccessibilityId("btnDelete").Click();
+            logSteps.Add("Nhấn xóa");
+            // Chờ dialog xuất hiện
+            Thread.Sleep(1000);
 
-        //    // KHÔNG click grid → không chọn khách
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
-        //    // Click nút Xóa luôn
-        //    session.FindElementByAccessibilityId("btnDelete").Click();
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiện thị thông báo:Vui lòng chọn khách hàng đẻ xóa");
+            btnOK1.Click();
+            logSteps.Add("Nhấn ok");
 
-        //    Thread.Sleep(1500);
-        //    WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
-        //    // ===== POPUP 1 =====
-        //    var btnOK1 = waitPopup.Until(d =>
-        //        d.FindElement(By.Name("OK"))
-        //    );
+            
+            WriteLogBlock("TEST XÓA KHÁCH HÀNG KHÔNG CÓ DỮ LIỆU", logSteps, "FAIL");
 
-        //    btnOK1.Click();
-
-        //}
+        }
 
         [ClassCleanup]
         public static void Cleanup()

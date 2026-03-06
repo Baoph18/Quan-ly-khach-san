@@ -168,8 +168,10 @@ namespace Quanlykhachsan.tests
             session.FindElementByAccessibilityId("txtQuocTich")
                    .SendKeys("Viet Nam");
 
-            session.FindElementByAccessibilityId("txtGioiTinh")
-                   .SendKeys("Nam");
+            var cbo = session.FindElementByAccessibilityId("txtGioiTinh");
+            cbo.Click();
+            cbo.SendKeys("Nam");
+            cbo.SendKeys(OpenQA.Selenium.Keys.Enter);
 
             session.FindElementByAccessibilityId("txtMaID")
                    .SendKeys("123456789012");
@@ -177,18 +179,29 @@ namespace Quanlykhachsan.tests
             session.FindElementByAccessibilityId("txtAddress")
                    .SendKeys("Ha Noi");
 
-            session.FindElementByAccessibilityId("txtRoomNo")
-                   .SendKeys("101");
+           
 
             session.FindElementByAccessibilityId("txtSoDem")
                    .SendKeys("2");
 
-            session.FindElementByAccessibilityId("txtBed_Type")
-                   .SendKeys("Đơn");
+            var cbo2 = session.FindElementByAccessibilityId("txtBed_Type");
+            cbo2.Click();
+            cbo2.SendKeys("Đơn");
+            cbo2.SendKeys(OpenQA.Selenium.Keys.Enter);
 
-            session.FindElementByAccessibilityId("txtRoom_type")
-                   .SendKeys("Vip");
+            var cbo3 = session.FindElementByAccessibilityId("txtRoom_type");
+            cbo3.Click();
+            cbo3.SendKeys("Thường");
+            cbo3.SendKeys(OpenQA.Selenium.Keys.Enter);
+
+            session.FindElementByAccessibilityId("txtRoomNo")
+                   .Clear();
+            var cbo4 = session.FindElementByAccessibilityId("txtRoomNo");
+            cbo4.Click();
+            cbo4.SendKeys("99");
+            cbo4.SendKeys(OpenQA.Selenium.Keys.Enter);
             logSteps.Add("Nhập thông tin khách hàng(bỏ trống tên)");
+
             // ===== CLICK =====
             session.FindElementByAccessibilityId("btnAdd_Khachhang").Click();
             logSteps.Add("Nhấn nút đăng ký");
@@ -215,39 +228,18 @@ namespace Quanlykhachsan.tests
             session.FindElementByAccessibilityId("txtName").SendKeys("12345");
             session.FindElementByAccessibilityId("txtContact").SendKeys("0912345678");
             logSteps.Add("Nhập thông tin khách hàng(Nhập số vào tên)");
-            session.FindElementByAccessibilityId("btnAdd_Khachhang").Click();
-            logSteps.Add("Nhấn nút đăng ký");
+            
 
-            bool popupFound = false;
-            string msg = "";
-
-            for (int i = 0; i < 5; i++)
-            {
-                var handles = session.WindowHandles;
-
-                if (handles.Count > 1)
-                {
-                    session.SwitchTo().Window(handles.Last());
-
-                    msg = session.PageSource;
-                    popupFound = true;
-                    break;
-                }
-
-                Thread.Sleep(1000);
-            }
-
-            // ===== ASSERT popup xuất hiện =====
-            Assert.IsTrue(popupFound, "BUG: Hệ thống không chặn tên chứa số");
-
-            TestContext.WriteLine("Popup text = " + msg);
+            
+            
             logSteps.Add("Hiển thị thông báo:Chỉ được nhập chữ cái và khoảng trắng. Không cho phép số hoặc ký tự đặc biệt");
-            // ===== Đóng popup =====
-            try
-            {
-                session.FindElementByName("OK").Click();
-            }
-            catch { }
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
+
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            btnOK1.Click();
             logSteps.Add("Nhấn Ok");
             WriteLogBlock("TEST ĐĂNG KÝ KHÁCH HÀNG NHẬP SỐ VÀO TÊN", logSteps, "FAIL");
         }

@@ -113,13 +113,15 @@ namespace Quanlykhachsan.tests
             txtSoPhong.Clear();
             txtSoPhong.SendKeys("1");
 
-            var txtLoaiPhong = session.FindElementByAccessibilityId("txtLoaiphong");
-            txtLoaiPhong.Clear();
-            txtLoaiPhong.SendKeys("Thường");
+            var cbo = session.FindElementByAccessibilityId("txtLoaiphong");
+            cbo.Click();
+            cbo.SendKeys("Thường");
+            cbo.SendKeys(OpenQA.Selenium.Keys.Enter);
 
-            var txtLoaiGiuong = session.FindElementByAccessibilityId("txtLoaigiuong");
-            txtLoaiGiuong.Clear();
-            txtLoaiGiuong.SendKeys("Đơn");
+            var cbo1 = session.FindElementByAccessibilityId("txtLoaigiuong");
+            cbo1.Click();
+            cbo1.SendKeys("Đơn");
+            cbo1.SendKeys(OpenQA.Selenium.Keys.Enter);
 
             var txtGiaTien = session.FindElementByAccessibilityId("txtGiatien");
             txtGiaTien.Clear();

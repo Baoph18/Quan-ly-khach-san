@@ -181,7 +181,10 @@ namespace Quanlykhachsan.tests
             // ===== NHẬP DỮ LIỆU SAI =====
 
             var txtTenNV = session.FindElementByAccessibilityId("txtTenNV");
-            txtTenNV.Clear(); // bỏ trống tên
+
+            txtTenNV.Click();
+            txtTenNV.SendKeys(OpenQA.Selenium.Keys.Control + "a");
+            txtTenNV.SendKeys(OpenQA.Selenium.Keys.Delete);
 
             var txtSDTNV = session.FindElementByAccessibilityId("txtSDTNV");
             txtSDTNV.Clear();
