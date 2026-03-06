@@ -98,8 +98,11 @@ namespace Quanlykhachsan.tests
             session.FindElementByAccessibilityId("txtQuocTich")
                    .SendKeys("Viet Nam");
 
-            session.FindElementByAccessibilityId("txtGioiTinh")
-                   .SendKeys("Nam");
+            var cbo = session.FindElementByAccessibilityId("txtGioiTinh");
+            cbo.Click();
+            cbo.SendKeys("Nam");
+            cbo.SendKeys(OpenQA.Selenium.Keys.Enter);
+            
 
             session.FindElementByAccessibilityId("txtMaID")
                    .SendKeys("123456789012");
@@ -110,17 +113,27 @@ namespace Quanlykhachsan.tests
             session.FindElementByAccessibilityId("txtSoDem")
                    .SendKeys("2");
 
-            session.FindElementByAccessibilityId("txtBed_Type")
-                   .SendKeys("Đơn");
+           
 
-            session.FindElementByAccessibilityId("txtRoom_type")
-                   .SendKeys("Vip");
+            var cbo2 = session.FindElementByAccessibilityId("txtBed_Type");
+            cbo2.Click();
+            cbo2.SendKeys("Đơn");
+            cbo2.SendKeys(OpenQA.Selenium.Keys.Enter);
+
+            var cbo3 = session.FindElementByAccessibilityId("txtRoom_type");
+            cbo3.Click();
+            cbo3.SendKeys("Thường");
+            cbo3.SendKeys(OpenQA.Selenium.Keys.Enter);
+            
 
             session.FindElementByAccessibilityId("txtRoomNo")
                    .Clear();
 
-            session.FindElementByAccessibilityId("txtRoomNo")
-                   .SendKeys("53");
+            var cbo4 = session.FindElementByAccessibilityId("txtRoomNo");
+            cbo4.Click();
+            cbo4.SendKeys("99");
+            cbo4.SendKeys(OpenQA.Selenium.Keys.Enter);
+            
             logSteps.Add("Nhập thông tin khách hàng");
 
             // ===== Click đăng ký =====

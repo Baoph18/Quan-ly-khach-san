@@ -126,7 +126,7 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Mở form Thêm phòng");
             // Nhập thông tin khách
             session.FindElementByAccessibilityId("txtSophong")
-                   .SendKeys("1");
+                   .SendKeys("99");
 
             session.FindElementByAccessibilityId("txtLoaiphong")
                    .SendKeys("Thường");

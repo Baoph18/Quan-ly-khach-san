@@ -330,7 +330,7 @@ namespace Quản_lí_khách_sạn.ksquanli
             txtRoomNo.Text = "";
             txtPrice.Clear();
 
-            query = "SELECT SOPHONG FROM PHONG WHERE GIUONG = '" + txtBed_Type.Text + "' AND LOAIPHONG = N'" + txtRoom_type.Text + "' AND DATPHONG = 'NO'";
+            query = "SELECT SOPHONG FROM PHONG WHERE GIUONG = N'" + txtBed_Type.Text + "' AND LOAIPHONG = N'" + txtRoom_type.Text + "' AND DATPHONG = 'NO'";
             SetComboBox(query, txtRoomNo);
         }
 
