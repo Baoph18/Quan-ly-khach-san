@@ -227,8 +227,8 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Nhấn ok");
             WriteLogBlock("TEST SỬA THÔNG TIN PHÒNG BỎ TRỐNG DỮ LIỆU", logSteps, "FAIL");
         }
-        [TestCleanup]
-        public void Cleanup()
+        [ClassCleanup]
+        public static void Cleanup()
         {
             try
             {

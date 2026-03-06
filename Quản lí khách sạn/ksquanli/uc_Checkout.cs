@@ -94,9 +94,10 @@ namespace Quản_lí_khách_sạn.ksquanli
         }
         private void btnThanhToan_Click(object sender, EventArgs e)
         {
-            
+
             if (!XacNhanThanhToan())
                 return;
+
             // ✅ Kiểm tra phương thức thanh toán
             if (cboPhuongthuc.SelectedIndex == -1 || string.IsNullOrWhiteSpace(cboPhuongthuc.Text))
             {
@@ -107,8 +108,19 @@ namespace Quản_lí_khách_sạn.ksquanli
                 cboPhuongthuc.Focus();
                 return;
             }
+
             try
             {
+                // ✅ xử lý tiền an toàn
+                decimal tongTien = 0;
+                string tienText = txtTongSoTien.Text
+                                    .Replace("VNĐ", "")
+                                    .Replace("VND", "")
+                                    .Replace(",", "")
+                                    .Trim();
+
+                decimal.TryParse(tienText, out tongTien);
+
                 // Gom tham số vào đối tượng ThanhToanInfo
                 ThanhToanInfo info = new ThanhToanInfo
                 {
@@ -117,10 +129,11 @@ namespace Quản_lí_khách_sạn.ksquanli
                     SoPhong = txtRoomNo.Text.Trim(),
                     PhuongThuc = cboPhuongthuc.Text.Trim(),
                     NgayCheckout = txtCheckout.Value,
-                    TongTien = decimal.Parse(txtTongSoTien.Text.Replace(" VNĐ", "").Replace(",", "").Trim())
+                    TongTien = tongTien
                 };
 
                 int maPhong = LayMaPhongTheoSoPhong(info.SoPhong);
+
                 ThucHienThanhToan(info, maPhong);
 
                 // Làm mới giao diện
@@ -129,7 +142,10 @@ namespace Quản_lí_khách_sạn.ksquanli
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi thanh toán:\n" + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi khi thanh toán:\n" + ex.Message,
+                                "Lỗi",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
             }
         }
 
@@ -201,6 +217,7 @@ namespace Quản_lí_khách_sạn.ksquanli
             txtRoomNo.Clear();
             txtName.Clear();
             txtSoDem.Clear();
+            cboPhuongthuc.SelectedIndex = -1;
             txtTongSoTien.Clear();
             txtCheckout.ResetText();
         }
@@ -286,36 +303,36 @@ namespace Quản_lí_khách_sạn.ksquanli
         private void dataGridView1_SelectionChanged(object sender, EventArgs e)
         {
             if (dataGridView1.CurrentRow != null
-        && dataGridView1.CurrentRow.Index >= 0
+        && !dataGridView1.CurrentRow.IsNewRow
         && dataGridView1.CurrentRow.Cells[0].Value != null)
             {
                 var row = dataGridView1.CurrentRow;
 
-                id = int.Parse(row.Cells[0].Value.ToString());
-                txtName.Text = row.Cells[1].Value.ToString();
-                txtRoomNo.Text = row.Cells[9].Value.ToString();
+                // ID khách hàng
+                int.TryParse(row.Cells[0].Value?.ToString(), out id);
 
-                int soDem = int.Parse(row.Cells[11].Value.ToString());
-                decimal gia = decimal.Parse(row.Cells[13].Value.ToString());
+                txtName.Text = row.Cells[1].Value?.ToString();
+                txtRoomNo.Text = row.Cells[9].Value?.ToString();
+
+                // số đêm
+                int soDem = 0;
+                int.TryParse(row.Cells[11].Value?.ToString(), out soDem);
+
+                // giá
+                decimal gia = 0;
+                decimal.TryParse(row.Cells[13].Value?.ToString(), out gia);
 
                 txtSoDem.Text = soDem.ToString();
 
                 decimal tongTien = soDem * gia;
-                txtTongSoTien.Text = tongTien.ToString("N0") + " VNĐ";
+
+                txtTongSoTien.Text = tongTien.ToString("N0") + " VND";
             }
         }
 
         private void cboPhuongthuc_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (cboPhuongthuc.SelectedIndex == -1)
-            {
-                MessageBox.Show("Vui lòng chọn phương thức thanh toán!",
-                                "Thông báo",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Warning);
-                cboPhuongthuc.Focus();
-                return;
-            }
+            
 
             
         }

@@ -126,8 +126,8 @@ namespace Quanlykhachsan.tests
             WriteLogBlock("TEST LƯU THÔNG TIN PHONG VÀO EXCEL THÀNH CÔNG", logSteps, "PASS");
         }
 
-        [TestCleanup]
-        public void Cleanup()
+        [ClassCleanup]
+        public static void Cleanup()
         {
             try
             {

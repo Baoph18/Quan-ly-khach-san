@@ -51,14 +51,16 @@ namespace Quản_lí_khách_sạn.ksquanli
             {
                 DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
 
-                txtMAKH.Text = row.Cells[0].Value.ToString(); // Mã Khách Hàng
-                txtTENKH.Text = row.Cells[1].Value.ToString(); // Tên Khách Hàng
-                txtSDT.Text = row.Cells[2].Value.ToString(); // Số điện thoại
-                txtQUOCTICH.Text = row.Cells[3].Value.ToString(); // Nước
-                cboGIOITINH.Text = row.Cells[4].Value.ToString(); // Giới Tính
-                txtMADD.Text = row.Cells[5].Value.ToString(); // Mã Định Danh
-                txtDIACHI.Text = row.Cells[6].Value.ToString(); // Địa Chỉ
-                txtSoDem.Text = row.Cells[7].Value.ToString(); // Số Đêm
+                txtMAKH.Text = row.Cells[0].Value?.ToString();
+                txtTENKH.Text = row.Cells[1].Value?.ToString();
+                txtSDT.Text = row.Cells[2].Value?.ToString();
+                txtQUOCTICH.Text = row.Cells[3].Value?.ToString();
+
+                cboGIOITINH.SelectedItem = row.Cells[4].Value?.ToString(); // sửa chỗ này
+
+                txtMADD.Text = row.Cells[5].Value?.ToString();
+                txtDIACHI.Text = row.Cells[6].Value?.ToString();
+                txtSoDem.Text = row.Cells[7].Value?.ToString();
             }
         }
         /// <summary>
@@ -292,13 +294,25 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         private void uc_CustomerDetails_Load(object sender, EventArgs e)
         {
+            // thêm dữ liệu cho combobox
+            cboGIOITINH.Items.Clear();
+            cboGIOITINH.Items.Add("Nam");
+            cboGIOITINH.Items.Add("Nữ");
+
             query = "SELECT KHACHHANG.MAKH AS[Mã Khách Hàng], KHACHHANG.TENKH AS [Tên Khách Hàng], KHACHHANG.SDT AS [Số điện thoại], KHACHHANG.NUOC AS[Nước], KHACHHANG.GIOITINH AS[Giới Tính], KHACHHANG.MADD AS[Mã Định Danh], KHACHHANG.DIACHI AS[Địa Chỉ],KHACHHANG.SODEM AS[Số Đêm], KHACHHANG.CHECKIN AS[Ngày đặt phòng], KHACHHANG.CHECKOU AS[Ngày Thanh Toán], KHACHHANG.TONGTIEN AS[Tổng Tiền], PHONG.SOPHONG AS[Số Phòng], PHONG.LOAIPHONG AS[Loại Phòng], PHONG.GIUONG AS[Giường], PHONG.GIA AS[Gía] FROM KHACHHANG INNER JOIN PHONG ON KHACHHANG.MAPHONG = PHONG.MAPHONG WHERE CHECKOU IS NULL";
+
             getrecord(query);
         }
 
         public void load()
         {
+            // thêm dữ liệu cho combobox
+            cboGIOITINH.Items.Clear();
+            cboGIOITINH.Items.Add("Nam");
+            cboGIOITINH.Items.Add("Nữ");
+
             query = "SELECT KHACHHANG.MAKH AS[Mã Khách Hàng], KHACHHANG.TENKH AS [Tên Khách Hàng], KHACHHANG.SDT AS [Số điện thoại], KHACHHANG.NUOC AS[Nước], KHACHHANG.GIOITINH AS[Giới Tính], KHACHHANG.MADD AS[Mã Định Danh], KHACHHANG.DIACHI AS[Địa Chỉ],KHACHHANG.SODEM AS[Số Đêm], KHACHHANG.CHECKIN AS[Ngày đặt phòng], KHACHHANG.CHECKOU AS[Ngày Thanh Toán], KHACHHANG.TONGTIEN AS[Tổng Tiền], PHONG.SOPHONG AS[Số Phòng], PHONG.LOAIPHONG AS[Loại Phòng], PHONG.GIUONG AS[Giường], PHONG.GIA AS[Gía] FROM KHACHHANG INNER JOIN PHONG ON KHACHHANG.MAPHONG = PHONG.MAPHONG WHERE CHECKOU IS NULL";
+
             getrecord(query);
         }
 
@@ -483,7 +497,9 @@ namespace Quản_lí_khách_sạn.ksquanli
                 txtTENKH.Text = row.Cells[1].Value?.ToString();
                 txtSDT.Text = row.Cells[2].Value?.ToString();
                 txtQUOCTICH.Text = row.Cells[3].Value?.ToString();
-                cboGIOITINH.Text = row.Cells[4].Value?.ToString();
+
+                cboGIOITINH.SelectedItem = row.Cells[4].Value?.ToString(); // sửa
+
                 txtMADD.Text = row.Cells[5].Value?.ToString();
                 txtDIACHI.Text = row.Cells[6].Value?.ToString();
                 txtSoDem.Text = row.Cells[7].Value?.ToString();

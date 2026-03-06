@@ -61,7 +61,7 @@ namespace Quản_lí_khách_sạn.ksquanli
                 }
 
                 string insertQuery = $"INSERT INTO PHONG (SOPHONG, LOAIPHONG, GIUONG, GIA) " +
-                                     $"VALUES ('{sophong}', N'{loaiphong}', '{loaigiuong}', '{giatien}')";
+                                     $"VALUES ('{sophong}', N'{loaiphong}', N'{loaigiuong}', '{giatien}')";
 
                 _function.setdata(insertQuery, "Đã thêm phòng thành công!");
 
@@ -135,16 +135,18 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         private void Datagridview1_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if (e.RowIndex >= 0 && Datagridview.Rows[e.RowIndex].Cells[0].Value != null)
+            if (e.RowIndex >= 0)
             {
-                // lấy dữ liệu từ dòng đc chọn gán vào biến row
                 DataGridViewRow row = Datagridview.Rows[e.RowIndex];
 
-                selectedRoomId = Convert.ToInt32(row.Cells[0].Value); // MAPHONG
-                txtSophong.Text = row.Cells[1].Value.ToString();      // SOPHONG
-                txtLoaiphong.Text = row.Cells[2].Value.ToString();    // LOAIPHONG
-                txtLoaigiuong.Text = row.Cells[3].Value.ToString();   // GIUONG
-                txtGiatien.Text = row.Cells[4].Value.ToString();      // GIA
+                if (!row.IsNewRow && row.Cells[0].Value != DBNull.Value)
+                {
+                    selectedRoomId = Convert.ToInt32(row.Cells[0].Value); // MAPHONG
+                    txtSophong.Text = row.Cells[1].Value?.ToString();
+                    txtLoaiphong.Text = row.Cells[2].Value?.ToString();
+                    txtLoaigiuong.Text = row.Cells[3].Value?.ToString();
+                    txtGiatien.Text = row.Cells[4].Value?.ToString();
+                }
             }
         }
 
@@ -256,7 +258,7 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         private void txtLoaiphong_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            
         }
 
         private void label4_Click(object sender, EventArgs e)
@@ -393,15 +395,16 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         private void Datagridview_SelectionChanged(object sender, EventArgs e)
         {
-            if (Datagridview.CurrentRow != null)
+            if (Datagridview.CurrentRow != null && !Datagridview.CurrentRow.IsNewRow)
             {
                 DataGridViewRow row = Datagridview.CurrentRow;
 
-                selectedRoomId = Convert.ToInt32(row.Cells[0].Value);
+                if (row.Cells[0].Value != null)
+                {
+                    selectedRoomId = Convert.ToInt32(row.Cells[0].Value);
+                }
+
                 txtSophong.Text = row.Cells[1].Value?.ToString();
-                txtLoaiphong.Text = row.Cells[2].Value?.ToString();
-                txtLoaigiuong.Text = row.Cells[3].Value?.ToString();
-                txtGiatien.Text = row.Cells[4].Value?.ToString();
             }
         }
     }

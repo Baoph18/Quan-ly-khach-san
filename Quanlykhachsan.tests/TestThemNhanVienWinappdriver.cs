@@ -233,8 +233,8 @@ namespace Quanlykhachsan.tests
             
             WriteLogBlock("TEST THÊM NHÂN VIÊN NHẬP SAI EMAIL", logSteps, "FAIL");
         }
-        [TestCleanup]
-        public void Cleanup()
+        [ClassCleanup]
+        public static void Cleanup()
         {
             try
             {

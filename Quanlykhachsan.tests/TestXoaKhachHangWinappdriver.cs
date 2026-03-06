@@ -170,8 +170,8 @@ namespace Quanlykhachsan.tests
 
         //}
 
-        [TestCleanup]
-        public void Cleanup()
+        [ClassCleanup]
+        public static void Cleanup()
         {
             try
             {

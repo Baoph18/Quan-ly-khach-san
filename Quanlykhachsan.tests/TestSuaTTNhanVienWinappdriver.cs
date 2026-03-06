@@ -269,8 +269,8 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Nhấn ok");
             WriteLogBlock("TEST SỬA THÔNG TIN NHÂN VIÊN NHẬP SAI EMAIL", logSteps, "FAIL");
         }
-        [TestCleanup]
-        public void Cleanup()
+        [ClassCleanup]
+        public static void Cleanup()
         {
             try
             {

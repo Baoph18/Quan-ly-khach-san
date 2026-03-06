@@ -103,8 +103,8 @@ namespace Quanlykhachsan.tests
             WriteLogBlock("TEST XUẤT HÓA ĐƠN THÀNH CÔNG", logSteps, "PASS");
         }
 
-        [TestCleanup]
-        public void Cleanup()
+        [ClassCleanup]
+        public static void Cleanup()
         {
             try
             {

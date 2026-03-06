@@ -247,8 +247,8 @@ namespace Quanlykhachsan.tests
             
             WriteLogBlock("TEST THANH TOÁN KHÔNG CÓ DỮ LIỆU", logSteps, "FAIL");
         }
-        [TestCleanup]
-        public void Cleanup()
+        [ClassCleanup]
+        public static void Cleanup()
         {
             try
             {

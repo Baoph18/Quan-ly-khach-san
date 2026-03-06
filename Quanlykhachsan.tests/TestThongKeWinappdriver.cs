@@ -102,8 +102,8 @@ namespace Quanlykhachsan.tests
             WriteLogBlock("TEST THỐNG KÊ THÀNH CÔNG", logSteps, "PASS");
         }
 
-        [TestCleanup]
-        public void Cleanup()
+        [ClassCleanup]
+        public static void Cleanup()
         {
             try
             {
