@@ -10,6 +10,7 @@ using System.Windows.Forms;
 
 namespace Quản_lí_khách_sạn.ksquanli
 {
+    //siu
     public partial class ThongTinCaNhan: UserControl
     {
         Function fn = new Function();
@@ -75,14 +76,34 @@ namespace Quản_lí_khách_sạn.ksquanli
         }
 
 
+
+
         private void btnDangxuat_Click(object sender, EventArgs e)
         {
-            DialogResult result = MessageBox.Show("Bạn muốn đăng xuất?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            ConfirmAndLogout();
+        }
+        // Hiển thị hộp thoại xác nhận và đăng xuất nếu người dùng đồng ý.
+        private void ConfirmAndLogout()
+        {
+            var result = MessageBox.Show(
+                "Bạn có chắc muốn đăng xuất?",
+                "Xác nhận",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
             if (result == DialogResult.Yes)
             {
-                Application.OpenForms["TrangChủ"]?.Hide(); // Ẩn form chính nếu có
-                new ĐăngNhập().Show();  // Mở lại form đăng nhập
+                Logout();
             }
+        }
+
+        // Xử lý đăng xuất và mở lại form đăng nhập.
+        private void Logout()
+        {
+            Form mainForm = Application.OpenForms["TrangChủ"];
+            mainForm?.Hide();
+
+            new ĐăngNhập().Show();
         }
     }
 }

@@ -63,13 +63,16 @@
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Location = new System.Drawing.Point(37, 260);
             this.dataGridView1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
+            this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView1.Size = new System.Drawing.Size(1332, 347);
             this.dataGridView1.TabIndex = 7;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             this.dataGridView1.RowHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_RowHeaderMouseClick);
+            this.dataGridView1.SelectionChanged += new System.EventHandler(this.dataGridView1_SelectionChanged);
             // 
             // guna2Elipse1
             // 
@@ -92,6 +95,7 @@
             this.btnDelete.Size = new System.Drawing.Size(240, 55);
             this.btnDelete.TabIndex = 9;
             this.btnDelete.Text = "Xóa";
+            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click_1);
             // 
             // txtQUOCTICH
             // 
@@ -131,7 +135,7 @@
             this.txtMADD.Name = "txtMADD";
             this.txtMADD.PlaceholderText = "";
             this.txtMADD.SelectedText = "";
-            this.txtMADD.Size = new System.Drawing.Size(409, 63);
+            this.txtMADD.Size = new System.Drawing.Size(409, 62);
             this.txtMADD.TabIndex = 15;
             this.txtMADD.TextChanged += new System.EventHandler(this.txtMADD_TextChanged);
             // 
@@ -190,7 +194,7 @@
             this.cboGIOITINH.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(68)))), ((int)(((byte)(88)))), ((int)(((byte)(112)))));
             this.cboGIOITINH.ItemHeight = 45;
             this.cboGIOITINH.Items.AddRange(new object[] {
-            "Nam ",
+            "Nam",
             "Nữ",
             "Khác"});
             this.cboGIOITINH.Location = new System.Drawing.Point(499, 786);
@@ -344,7 +348,7 @@
             this.guna2Panel1.Location = new System.Drawing.Point(0, 0);
             this.guna2Panel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.guna2Panel1.Name = "guna2Panel1";
-            this.guna2Panel1.Size = new System.Drawing.Size(1421, 143);
+            this.guna2Panel1.Size = new System.Drawing.Size(1421, 142);
             this.guna2Panel1.TabIndex = 39;
             this.guna2Panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.guna2Panel1_Paint);
             // 
@@ -353,7 +357,7 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Segoe UI Variable Text", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
             this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(353, 11);
+            this.label1.Location = new System.Drawing.Point(354, 11);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(722, 126);
             this.label1.TabIndex = 22;

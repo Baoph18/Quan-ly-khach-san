@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             this.btnAddRoom = new Guna.UI2.WinForms.Guna2Button();
-            this.txtLoaigiuong = new Guna.UI2.WinForms.Guna2ComboBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.txtGiatien = new Guna.UI2.WinForms.Guna2TextBox();
@@ -44,6 +43,7 @@
             this.guna2Elipse2 = new Guna.UI2.WinForms.Guna2Elipse(this.components);
             this.txtLoaiphong = new Guna.UI2.WinForms.Guna2ComboBox();
             this.btnexporttoexel = new Guna.UI2.WinForms.Guna2Button();
+            this.txtLoaigiuong = new Guna.UI2.WinForms.Guna2ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.Datagridview)).BeginInit();
             this.guna2Panel1.SuspendLayout();
             this.SuspendLayout();
@@ -68,28 +68,6 @@
             this.btnAddRoom.TabIndex = 32;
             this.btnAddRoom.Text = "Thêm Phòng";
             this.btnAddRoom.Click += new System.EventHandler(this.btnAddRoom_Click);
-            // 
-            // txtLoaigiuong
-            // 
-            this.txtLoaigiuong.BackColor = System.Drawing.Color.Transparent;
-            this.txtLoaigiuong.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.txtLoaigiuong.BorderRadius = 10;
-            this.txtLoaigiuong.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.txtLoaigiuong.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.txtLoaigiuong.FocusedColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.txtLoaigiuong.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.txtLoaigiuong.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtLoaigiuong.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(68)))), ((int)(((byte)(88)))), ((int)(((byte)(112)))));
-            this.txtLoaigiuong.ItemHeight = 42;
-            this.txtLoaigiuong.Items.AddRange(new object[] {
-            "Đơn",
-            "Đôi"});
-            this.txtLoaigiuong.Location = new System.Drawing.Point(69, 833);
-            this.txtLoaigiuong.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.txtLoaigiuong.Name = "txtLoaigiuong";
-            this.txtLoaigiuong.Size = new System.Drawing.Size(361, 48);
-            this.txtLoaigiuong.TabIndex = 31;
-            this.txtLoaigiuong.SelectedIndexChanged += new System.EventHandler(this.txtLoaigiuong_SelectedIndexChanged);
             // 
             // label5
             // 
@@ -196,14 +174,17 @@
             this.Datagridview.GridColor = System.Drawing.Color.White;
             this.Datagridview.Location = new System.Drawing.Point(69, 186);
             this.Datagridview.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Datagridview.MultiSelect = false;
             this.Datagridview.Name = "Datagridview";
             this.Datagridview.RowHeadersWidth = 51;
             this.Datagridview.RowTemplate.Height = 24;
+            this.Datagridview.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.Datagridview.Size = new System.Drawing.Size(1281, 399);
             this.Datagridview.TabIndex = 33;
             this.Datagridview.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.Datagridview1_CellContentClick);
             this.Datagridview.RowHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.Datagridview1_RowHeaderMouseClick);
             this.Datagridview.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.Datagridview_RowPostPaint);
+            this.Datagridview.SelectionChanged += new System.EventHandler(this.Datagridview_SelectionChanged);
             // 
             // btnRepair
             // 
@@ -283,6 +264,28 @@
             this.btnexporttoexel.Text = "Lưu File Exel";
             this.btnexporttoexel.Click += new System.EventHandler(this.btnexporttoexel_Click);
             // 
+            // txtLoaigiuong
+            // 
+            this.txtLoaigiuong.BackColor = System.Drawing.Color.Transparent;
+            this.txtLoaigiuong.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.txtLoaigiuong.BorderRadius = 10;
+            this.txtLoaigiuong.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.txtLoaigiuong.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.txtLoaigiuong.FocusedColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.txtLoaigiuong.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.txtLoaigiuong.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.txtLoaigiuong.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(68)))), ((int)(((byte)(88)))), ((int)(((byte)(112)))));
+            this.txtLoaigiuong.ItemHeight = 42;
+            this.txtLoaigiuong.Items.AddRange(new object[] {
+            "Đơn",
+            "Đôi"});
+            this.txtLoaigiuong.Location = new System.Drawing.Point(69, 833);
+            this.txtLoaigiuong.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.txtLoaigiuong.Name = "txtLoaigiuong";
+            this.txtLoaigiuong.Size = new System.Drawing.Size(361, 48);
+            this.txtLoaigiuong.TabIndex = 31;
+            this.txtLoaigiuong.SelectedIndexChanged += new System.EventHandler(this.txtLoaigiuong_SelectedIndexChanged);
+            // 
             // uc_Addroom
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -318,7 +321,6 @@
         #endregion
 
         private Guna.UI2.WinForms.Guna2Button btnAddRoom;
-        private Guna.UI2.WinForms.Guna2ComboBox txtLoaigiuong;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label4;
         private Guna.UI2.WinForms.Guna2TextBox txtGiatien;
@@ -332,5 +334,6 @@
         private Guna.UI2.WinForms.Guna2Elipse guna2Elipse2;
         private Guna.UI2.WinForms.Guna2ComboBox txtLoaiphong;
         private Guna.UI2.WinForms.Guna2Button btnexporttoexel;
+        private Guna.UI2.WinForms.Guna2ComboBox txtLoaigiuong;
     }
 }

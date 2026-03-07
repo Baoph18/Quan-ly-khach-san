@@ -35,66 +35,181 @@ namespace Quản_lí_khách_sạn.ksquanli
        
 
         int id;
-      
+        /// <summary>
+        /// //////////////////////////////////////////////////////////
+        /// </summary>
+        public class ThanhToanInfo
+        {
+            public int MaKhachHang { get; set; }
+            public int MaNhanVien { get; set; }
+            public string SoPhong { get; set; }
+            public string PhuongThuc { get; set; }
+            public DateTime NgayCheckout { get; set; }
+            public decimal TongTien { get; set; }
+        }
 
-        private void btnThanhToan_Click(object sender, EventArgs e)
+        private bool XacNhanThanhToan()
         {
             if (string.IsNullOrWhiteSpace(txtName.Text))
             {
                 MessageBox.Show("Không có khách hàng để thanh toán!", "Thông Tin", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                return false;
             }
 
             if (MessageBox.Show("Bạn có chắc chắn muốn thanh toán?", "Xác nhận", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) != DialogResult.OK)
+                return false;
+
+            return true;
+        }
+
+        private int LayMaPhongTheoSoPhong(string soPhong)
+        {
+            string query = $"SELECT MAPHONG FROM PHONG WHERE SOPHONG = '{soPhong}'";
+            DataSet dsPhong = fn.getdata(query);
+
+            if (dsPhong.Tables[0].Rows.Count == 0)
+                throw new Exception($"Không tìm thấy phòng '{soPhong}'.");
+
+            return Convert.ToInt32(dsPhong.Tables[0].Rows[0]["MAPHONG"]);
+        }
+
+        private void ThucHienThanhToan(ThanhToanInfo info, int maPhong)
+        {
+            string checkoutStr = info.NgayCheckout.ToString("yyyy-MM-dd");
+
+            string query = $@"
+            UPDATE KHACHHANG 
+            SET CHEKOU = 'YES', CHECKOU = '{checkoutStr}', TONGTIEN = {info.TongTien}
+            WHERE MAKH = {info.MaKhachHang};
+
+            UPDATE PHONG 
+            SET DATPHONG = 'NO' 
+            WHERE MAPHONG = {maPhong};
+
+            INSERT INTO HOADON (MAKH, MANV, MAPHONG, NGAYTHANHTOAN, TONGTIEN, PHUONGTHUCTT)
+            VALUES ({info.MaKhachHang}, {info.MaNhanVien}, {maPhong}, '{checkoutStr}', {info.TongTien}, N'{info.PhuongThuc}');
+              ";
+
+            fn.setdata(query, "Thanh toán & cập nhật dữ liệu thành công!");
+        }
+        private void btnThanhToan_Click(object sender, EventArgs e)
+        {
+
+            if (!XacNhanThanhToan())
                 return;
+
+            // ✅ Kiểm tra phương thức thanh toán
+            if (cboPhuongthuc.SelectedIndex == -1 || string.IsNullOrWhiteSpace(cboPhuongthuc.Text))
+            {
+                MessageBox.Show("Vui lòng chọn phương thức thanh toán!",
+                                "Thông báo",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning);
+                cboPhuongthuc.Focus();
+                return;
+            }
 
             try
             {
-                int maKhachHang = id;
-                int maNhanVien = CurrentUser.Id;
-                string soPhong = txtRoomNo.Text.Trim();
-                string phuongThuc = cboPhuongthuc.Text.Trim();
-                string checkout = txtCheckout.Value.ToString("MM/dd/yyyy");
-                decimal tongTien = decimal.Parse(txtTongSoTien.Text.Replace(" VNĐ", "").Replace(",", "").Trim());
+                // ✅ xử lý tiền an toàn
+                decimal tongTien = 0;
+                string tienText = txtTongSoTien.Text
+                                    .Replace("VNĐ", "")
+                                    .Replace("VND", "")
+                                    .Replace(",", "")
+                                    .Trim();
 
-                // 🔍 Lấy MAPHONG từ SOPHONG
-                string getMaphongQuery = $"SELECT MAPHONG FROM PHONG WHERE SOPHONG = '{soPhong}'";
-                DataSet dsPhong = fn.getdata(getMaphongQuery);
+                decimal.TryParse(tienText, out tongTien);
 
-                if (dsPhong.Tables[0].Rows.Count == 0)
+                // Gom tham số vào đối tượng ThanhToanInfo
+                ThanhToanInfo info = new ThanhToanInfo
                 {
-                    MessageBox.Show("Không tìm thấy phòng '" + soPhong + "'.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-                // số nguyên 32 bit có dấu
-                int maPhong = Convert.ToInt32(dsPhong.Tables[0].Rows[0]["MAPHONG"]);
+                    MaKhachHang = id,
+                    MaNhanVien = CurrentUser.Id,
+                    SoPhong = txtRoomNo.Text.Trim(),
+                    PhuongThuc = cboPhuongthuc.Text.Trim(),
+                    NgayCheckout = txtCheckout.Value,
+                    TongTien = tongTien
+                };
 
-                // 🧾 Cập nhật khách hàng
-                string query = $@"
-                UPDATE KHACHHANG 
-                SET CHEKOU = 'YES', CHECKOU = '{checkout:yyyy-MM-dd}', TONGTIEN = {tongTien} 
-                WHERE MAKH = {maKhachHang};
+                int maPhong = LayMaPhongTheoSoPhong(info.SoPhong);
 
-                UPDATE PHONG 
-                SET DATPHONG = 'NO' 
-                WHERE MAPHONG = {maPhong};
+                ThucHienThanhToan(info, maPhong);
 
-                INSERT INTO HOADON (MAKH, MANV, MAPHONG, NGAYTHANHTOAN, TONGTIEN, PHUONGTHUCTT)
-                VALUES ({maKhachHang}, {maNhanVien}, {maPhong}, '{checkout:yyyy-MM-dd}', {tongTien}, N'{phuongThuc}');
-                ";
-
-                // ✅ Gọi setdata 1 lần duy nhất
-                fn.setdata(query, "Thanh toán & cập nhật dữ liệu thành công!");
-
-                // 🔁 Làm mới giao diện
+                // Làm mới giao diện
                 uc_Checkout_Load(this, null);
                 clearAll();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi thanh toán:\n" + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi khi thanh toán:\n" + ex.Message,
+                                "Lỗi",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
             }
         }
+
+        /// <summary>
+        /// ///////////////////////////////////////////////////////////////////////////////////
+        /// </summary>
+        //private void btnThanhToan_Click(object sender, EventArgs e)
+        //{
+        //    if (string.IsNullOrWhiteSpace(txtName.Text))
+        //    {
+        //        MessageBox.Show("Không có khách hàng để thanh toán!", "Thông Tin", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //        return;
+        //    }
+
+        //    if (MessageBox.Show("Bạn có chắc chắn muốn thanh toán?", "Xác nhận", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) != DialogResult.OK)
+        //        return;
+
+        //    try
+        //    {
+        //        int maKhachHang = id;
+        //        int maNhanVien = CurrentUser.Id;
+        //        string soPhong = txtRoomNo.Text.Trim();
+        //        string phuongThuc = cboPhuongthuc.Text.Trim();
+        //        string checkout = txtCheckout.Value.ToString("MM/dd/yyyy");
+        //        decimal tongTien = decimal.Parse(txtTongSoTien.Text.Replace(" VNĐ", "").Replace(",", "").Trim());
+
+        //         //🔍 Lấy MAPHONG từ SOPHONG
+        //        string getMaphongQuery = $"SELECT MAPHONG FROM PHONG WHERE SOPHONG = '{soPhong}'";
+        //        DataSet dsPhong = fn.getdata(getMaphongQuery);
+
+        //        if (dsPhong.Tables[0].Rows.Count == 0)
+        //        {
+        //            MessageBox.Show("Không tìm thấy phòng '" + soPhong + "'.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //            return;
+        //        }
+        //        //số nguyên 32 bit có dấu
+        //        int maPhong = Convert.ToInt32(dsPhong.Tables[0].Rows[0]["MAPHONG"]);
+
+        //        // 🧾 Cập nhật khách hàng
+        //        string query = $@"
+        //        UPDATE KHACHHANG 
+        //        SET CHEKOU = 'YES', CHECKOU = '{checkout:yyyy-MM-dd}', TONGTIEN = {tongTien} 
+        //        WHERE MAKH = {maKhachHang};
+
+        //        UPDATE PHONG 
+        //        SET DATPHONG = 'NO' 
+        //        WHERE MAPHONG = {maPhong};
+
+        //        INSERT INTO HOADON (MAKH, MANV, MAPHONG, NGAYTHANHTOAN, TONGTIEN, PHUONGTHUCTT)
+        //        VALUES ({maKhachHang}, {maNhanVien}, {maPhong}, '{checkout:yyyy-MM-dd}', {tongTien}, N'{phuongThuc}');
+        //        ";
+
+        //       //  ✅ Gọi setdata 1 lần duy nhất
+        //        fn.setdata(query, "Thanh toán & cập nhật dữ liệu thành công!");
+
+        //        // 🔁 Làm mới giao diện
+        //        uc_Checkout_Load(this, null);
+        //        clearAll();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show("Lỗi khi thanh toán:\n" + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //    }
+        //}
 
         public void clearAll()
         {
@@ -102,6 +217,7 @@ namespace Quản_lí_khách_sạn.ksquanli
             txtRoomNo.Clear();
             txtName.Clear();
             txtSoDem.Clear();
+            cboPhuongthuc.SelectedIndex = -1;
             txtTongSoTien.Clear();
             txtCheckout.ResetText();
         }
@@ -111,23 +227,7 @@ namespace Quản_lí_khách_sạn.ksquanli
             clearAll();
         }
 
-        private void dataGridView1_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
-        {
-            if (e.RowIndex >= 0 && dataGridView1.Rows[e.RowIndex].Cells[0].Value != null)
-            {
-                id = int.Parse(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString());
-                txtName.Text = dataGridView1.Rows[e.RowIndex].Cells[1].Value.ToString();
-                txtRoomNo.Text = dataGridView1.Rows[e.RowIndex].Cells[9].Value.ToString();
-
-                int soDem = int.Parse(dataGridView1.Rows[e.RowIndex].Cells[11].Value.ToString());
-                decimal gia = decimal.Parse(dataGridView1.Rows[e.RowIndex].Cells[13].Value.ToString());
-
-                txtSoDem.Text = soDem.ToString();
-                decimal tongTien = soDem * gia;
-                txtTongSoTien.Text = tongTien.ToString("N0") + " VNĐ"; // định dạng tiền Việt
-
-            }
-        }
+        
 
         private void txtCheckout_ValueChanged(object sender, EventArgs e)
         {
@@ -197,7 +297,44 @@ namespace Quản_lí_khách_sạn.ksquanli
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
+            
+        }
 
+        private void dataGridView1_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dataGridView1.CurrentRow != null
+        && !dataGridView1.CurrentRow.IsNewRow
+        && dataGridView1.CurrentRow.Cells[0].Value != null)
+            {
+                var row = dataGridView1.CurrentRow;
+
+                // ID khách hàng
+                int.TryParse(row.Cells[0].Value?.ToString(), out id);
+
+                txtName.Text = row.Cells[1].Value?.ToString();
+                txtRoomNo.Text = row.Cells[9].Value?.ToString();
+
+                // số đêm
+                int soDem = 0;
+                int.TryParse(row.Cells[11].Value?.ToString(), out soDem);
+
+                // giá
+                decimal gia = 0;
+                decimal.TryParse(row.Cells[13].Value?.ToString(), out gia);
+
+                txtSoDem.Text = soDem.ToString();
+
+                decimal tongTien = soDem * gia;
+
+                txtTongSoTien.Text = tongTien.ToString("N0") + " VND";
+            }
+        }
+
+        private void cboPhuongthuc_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            
+
+            
         }
     }
 }

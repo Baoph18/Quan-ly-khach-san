@@ -1,0 +1,324 @@
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Appium;
+using OpenQA.Selenium.Appium.Windows;
+using OpenQA.Selenium.Support.UI;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+
+namespace Quanlykhachsan.tests
+{
+    /// <summary>
+    /// Summary description for TestDKKhachHangWinappdriver
+    /// </summary>
+    [TestClass]
+    public class TestDKKhachHangWinappdriver
+    {
+        private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
+
+        private const string AppId =
+            @"D:\QLKS\Quản lí khách sạn\bin\x64\Debug\Quản lí khách sạn.exe";
+
+        private static WindowsDriver<WindowsElement> session;
+
+        [ClassInitialize]
+        public static void Setup(TestContext context)
+        {
+            var options = new AppiumOptions();
+            options.AddAdditionalCapability("app", AppId);
+
+            session = new WindowsDriver<WindowsElement>(
+                new Uri(WindowsApplicationDriverUrl),
+                options
+            );
+
+            Assert.IsNotNull(session);
+            Thread.Sleep(3000); // đợi app load
+        }
+        private void WriteLogBlock(string testName, List<string> steps, string result)
+        {
+            string path = @"D:\DangKyKhachHang_test.txt";
+
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+            using (StreamWriter sw = new StreamWriter(path, true))
+            {
+                sw.WriteLine("=================================================");
+                sw.WriteLine($"TEST CASE : {testName}");
+                sw.WriteLine($"TIME      : {DateTime.Now}");
+                sw.WriteLine("STEPS     :");
+
+                foreach (var step in steps)
+                {
+                    sw.WriteLine($"  - {step}");
+                }
+
+                sw.WriteLine($"RESULT    : {result}");
+                sw.WriteLine("=================================================\n");
+            }
+        }
+        public void Test_DangNhap_Va_MoFormDKKH()
+        {
+            session.FindElementByAccessibilityId("txtUserName").SendKeys("b");
+            session.FindElementByAccessibilityId("txtPassword").SendKeys("123");
+            session.FindElementByAccessibilityId("btnLogin").Click();
+
+            Thread.Sleep(3000);
+
+            var handles = session.WindowHandles;
+            session.SwitchTo().Window(handles.Last());
+
+            session.FindElementByAccessibilityId("btnDKKhachHang").Click();
+
+            Thread.Sleep(2000);
+
+            handles = session.WindowHandles;
+            session.SwitchTo().Window(handles.Last());
+        }
+
+        [TestMethod]
+        public void DangKy_KhachHopLe_ThanhCong()
+        {
+            var logSteps = new List<string>();
+            Test_DangNhap_Va_MoFormDKKH();
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Đăng ký khách hàng");
+
+
+            // ===== Nhập dữ liệu =====
+            session.FindElementByAccessibilityId("txtName")
+                   .SendKeys("Nguyen Van A");
+
+            session.FindElementByAccessibilityId("txtContact")
+                   .SendKeys("0912345678");
+
+            session.FindElementByAccessibilityId("txtQuocTich")
+                   .SendKeys("Viet Nam");
+
+            var cbo = session.FindElementByAccessibilityId("txtGioiTinh");
+            cbo.Click();
+            cbo.SendKeys("Nam");
+            cbo.SendKeys(OpenQA.Selenium.Keys.Enter);
+            
+
+            session.FindElementByAccessibilityId("txtMaID")
+                   .SendKeys("123456789012");
+
+            session.FindElementByAccessibilityId("txtAddress")
+                   .SendKeys("Ha Noi");
+
+            session.FindElementByAccessibilityId("txtSoDem")
+                   .SendKeys("2");
+
+           
+
+            var cbo2 = session.FindElementByAccessibilityId("txtBed_Type");
+            cbo2.Click();
+            cbo2.SendKeys("Đơn");
+            cbo2.SendKeys(OpenQA.Selenium.Keys.Enter);
+
+            var cbo3 = session.FindElementByAccessibilityId("txtRoom_type");
+            cbo3.Click();
+            cbo3.SendKeys("Thường");
+            cbo3.SendKeys(OpenQA.Selenium.Keys.Enter);
+            
+
+            session.FindElementByAccessibilityId("txtRoomNo")
+                   .Clear();
+
+            var cbo4 = session.FindElementByAccessibilityId("txtRoomNo");
+            cbo4.Click();
+            cbo4.SendKeys("99");
+            cbo4.SendKeys(OpenQA.Selenium.Keys.Enter);
+            
+            logSteps.Add("Nhập thông tin khách hàng");
+
+            // ===== Click đăng ký =====
+            session.FindElementByAccessibilityId("btnAdd_Khachhang").Click();
+            logSteps.Add("Nhấn nút đăng ký");
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
+
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Khách hàng đã được đăng ký và phòng 99 đã được đánh dấu là đã đặt!"))
+            );
+            Assert.AreEqual(
+                "Khách hàng đã được đăng ký và phòng 99 đã được đánh dấu là đã đặt!",
+                message.Text.Trim()
+            );
+
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiển thị thông báo:Đăng ký khách hàng thành công");
+            btnOK1.Click();
+            logSteps.Add("Nhấn Ok");
+            WriteLogBlock("TEST ĐĂNG KÝ KHÁCH HÀNG THÀNH CÔNG", logSteps, "PASS");
+        }
+
+        [TestMethod]
+        public void DangKy_KhachBoTrongTen_KhongThanhCong()
+        {
+            var logSteps = new List<string>();
+            Test_DangNhap_Va_MoFormDKKH();
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Đăng ký khách hàng");
+
+            // ===== NHẬP DATA =====
+            session.FindElementByAccessibilityId("txtName").Clear();
+
+            session.FindElementByAccessibilityId("txtContact")
+                   .SendKeys("0912345678");
+
+            session.FindElementByAccessibilityId("txtQuocTich")
+                   .SendKeys("Viet Nam");
+
+            var cbo = session.FindElementByAccessibilityId("txtGioiTinh");
+            cbo.Click();
+            cbo.SendKeys("Nam");
+            cbo.SendKeys(OpenQA.Selenium.Keys.Enter);
+
+            session.FindElementByAccessibilityId("txtMaID")
+                   .SendKeys("123456789012");
+
+            session.FindElementByAccessibilityId("txtAddress")
+                   .SendKeys("Ha Noi");
+
+           
+
+            session.FindElementByAccessibilityId("txtSoDem")
+                   .SendKeys("2");
+
+            var cbo2 = session.FindElementByAccessibilityId("txtBed_Type");
+            cbo2.Click();
+            cbo2.SendKeys("Đơn");
+            cbo2.SendKeys(OpenQA.Selenium.Keys.Enter);
+
+            var cbo3 = session.FindElementByAccessibilityId("txtRoom_type");
+            cbo3.Click();
+            cbo3.SendKeys("Thường");
+            cbo3.SendKeys(OpenQA.Selenium.Keys.Enter);
+
+            session.FindElementByAccessibilityId("txtRoomNo")
+                   .Clear();
+            var cbo4 = session.FindElementByAccessibilityId("txtRoomNo");
+            cbo4.Click();
+            cbo4.SendKeys("99");
+            cbo4.SendKeys(OpenQA.Selenium.Keys.Enter);
+            logSteps.Add("Nhập thông tin khách hàng(bỏ trống tên)");
+
+            // ===== CLICK =====
+            session.FindElementByAccessibilityId("btnAdd_Khachhang").Click();
+            logSteps.Add("Nhấn nút đăng ký");
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
+
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Vui lòng nhập đầy đủ thông tin"))
+            );
+            Assert.AreEqual(
+                "Vui lòng nhập đầy đủ thông tin",
+                message.Text.Trim()
+            );
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiển thị thông báo:Vui lòng nhập đầy đủ thông tin");
+            btnOK1.Click();
+            logSteps.Add("Nhấn Ok");
+            WriteLogBlock("TEST ĐĂNG KÝ KHÁCH HÀNG BỎ TRỐNG TÊN", logSteps, "FAIL");
+        }
+        public TestContext TestContext { get; set; }
+        [TestMethod]
+        public void DangKy_NhapSoVaoTen_KhongThanhCong()
+        {
+            var logSteps = new List<string>();
+            Test_DangNhap_Va_MoFormDKKH();
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Đăng ký khách hàng");
+
+            session.FindElementByAccessibilityId("txtName").SendKeys("12345");
+            session.FindElementByAccessibilityId("txtContact").SendKeys("0912345678");
+            logSteps.Add("Nhập thông tin khách hàng(Nhập số vào tên)");
+            
+
+            
+            
+            logSteps.Add("Hiển thị thông báo:Chỉ được nhập chữ cái và khoảng trắng. Không cho phép số hoặc ký tự đặc biệt");
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
+
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Chỉ được nhập chữ cái và khoảng trắng. Không cho phép số hoặc ký tự đặc biệt."))
+            );
+            Assert.AreEqual(
+                "Chỉ được nhập chữ cái và khoảng trắng. Không cho phép số hoặc ký tự đặc biệt.",
+                message.Text.Trim()
+            );
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            btnOK1.Click();
+            logSteps.Add("Nhấn Ok");
+            WriteLogBlock("TEST ĐĂNG KÝ KHÁCH HÀNG NHẬP SỐ VÀO TÊN", logSteps, "FAIL");
+        }
+
+        [TestMethod]
+        public void DangKy_NhapChuVaoSDT_KhongThanhCong()
+        {
+            var logSteps = new List<string>();
+            Test_DangNhap_Va_MoFormDKKH();
+            logSteps.Add("Đăng nhập thành công");
+            logSteps.Add("Mở form Đăng ký khách hàng");
+
+            
+
+            // Nhập sai SĐT
+            var txtContact = session.FindElementByAccessibilityId("txtContact");
+            txtContact.SendKeys("ABCXYZ");
+            logSteps.Add("Nhập thông tin khách hàng(Nhập chữ vào sdt)");
+            // Trigger validation bằng cách rời khỏi ô
+            txtContact.SendKeys(Keys.Tab);
+            // hoặc:
+            // session.FindElementByAccessibilityId("txtName").Click();
+
+            WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
+
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Chỉ được nhập số, không cho phép chữ hoặc ký tự đặc biệt."))
+            );
+            Assert.AreEqual(
+                "Chỉ được nhập số, không cho phép chữ hoặc ký tự đặc biệt.",
+                message.Text.Trim()
+            );
+            // ===== POPUP 1 =====
+            var btnOK1 = waitPopup.Until(d =>
+                d.FindElement(By.Name("OK"))
+            );
+            logSteps.Add("Hiển thị thông báo:Chỉ được số. Không cho phép chữ hoặc ký tự đặc biệt");
+            btnOK1.Click();
+            logSteps.Add("Nhấn Ok");
+            WriteLogBlock("TEST ĐĂNG KÝ KHÁCH HÀNG NHẬP CHỮ VÀO SDT", logSteps, "FAIL");
+        }
+        [ClassCleanup]
+        public static void Cleanup()
+        {
+            try
+            {
+                session?.Quit();
+            }
+            catch { }
+
+            System.Diagnostics.Process[] processes =
+                System.Diagnostics.Process.GetProcessesByName("Quản lí khách sạn");
+
+            foreach (var p in processes)
+            {
+                p.Kill();
+            }
+        }
+    }
+}

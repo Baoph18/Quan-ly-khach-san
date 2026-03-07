@@ -151,13 +151,15 @@
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Location = new System.Drawing.Point(31, 239);
             this.dataGridView1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
+            this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView1.Size = new System.Drawing.Size(1359, 288);
             this.dataGridView1.TabIndex = 20;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
-            this.dataGridView1.RowHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_RowHeaderMouseClick);
+            this.dataGridView1.SelectionChanged += new System.EventHandler(this.dataGridView1_SelectionChanged);
             // 
             // guna2Elipse1
             // 
@@ -346,6 +348,7 @@
             this.cboPhuongthuc.Name = "cboPhuongthuc";
             this.cboPhuongthuc.Size = new System.Drawing.Size(639, 51);
             this.cboPhuongthuc.TabIndex = 42;
+            this.cboPhuongthuc.SelectedIndexChanged += new System.EventHandler(this.cboPhuongthuc_SelectedIndexChanged);
             // 
             // uc_Checkout
             // 
