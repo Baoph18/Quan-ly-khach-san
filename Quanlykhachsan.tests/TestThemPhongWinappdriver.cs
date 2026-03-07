@@ -179,7 +179,7 @@ namespace Quanlykhachsan.tests
         }
 
         [TestMethod]
-        public void ThemPhong_KhongHopLe_ThatBai()
+        public void ThemPhong_NhapTienAm_KhongHopLe_ThatBai()
         {
             var logSteps = new List<string>();
             Test_DangNhap_Va_MoForm();

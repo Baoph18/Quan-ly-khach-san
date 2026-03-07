@@ -162,7 +162,7 @@ namespace Quanlykhachsan.tests
         }
 
         [TestMethod]
-        public void SuaTTKhachHang_KhongThanhCong()
+        public void SuaTTKhachHang_NhapChuVaoSDT_KhongThanhCong()
         {
             var logSteps = new List<string>();
             Test_DangNhap_Va_MoForm();
@@ -193,10 +193,6 @@ namespace Quanlykhachsan.tests
 
             
             logSteps.Add("Nhập thông tin khách hàng(Nhập chữ vào sdt)");
-
-
-           
-
 
             
             logSteps.Add("Hiển thị thông báo:Chỉ được số. Không cho phép chữ hoặc ký tự đặc biệt");

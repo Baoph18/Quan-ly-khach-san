@@ -104,7 +104,7 @@ namespace Quanlykhachsan.tests
         }
 
         [TestMethod]
-        public void UI_SuaTTNhanVien_HopLe_ThanhCong()
+        public void SuaTTNhanVien_HopLe_ThanhCong()
         {
             var logSteps = new List<string>();
             Test_DangNhap_Va_MoFormNhanVien();
@@ -171,7 +171,7 @@ namespace Quanlykhachsan.tests
         }
 
         [TestMethod]
-        public void UI_SuaTTNhanVien_BotrongTen_KhongThanhCong()
+        public void SuaTTNhanVien_BotrongTen_KhongThanhCong()
         {
             var logSteps = new List<string>();
             Test_DangNhap_Va_MoFormNhanVien();
@@ -230,7 +230,7 @@ namespace Quanlykhachsan.tests
         }
 
         [TestMethod]
-        public void UI_SuaTTNhanVien_VietSaiEmail_KhongThanhCong()
+        public void SuaTTNhanVien_VietSaiEmail_KhongThanhCong()
         {
             var logSteps = new List<string>();
             Test_DangNhap_Va_MoFormNhanVien();

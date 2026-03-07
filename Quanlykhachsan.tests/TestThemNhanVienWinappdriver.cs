@@ -79,7 +79,7 @@ namespace Quanlykhachsan.tests
         }
         public TestContext TestContext { get; set; }
         [TestMethod]
-        public void UI_AddNhanVien_HopLe_ThanhCong()
+        public void AddNhanVien_HopLe_ThanhCong()
         {
             var logSteps = new List<string>();
             Test_DangNhap_Va_MoFormNhanVien();
@@ -131,7 +131,7 @@ namespace Quanlykhachsan.tests
         }
 
         [TestMethod]
-        public void UI_AddNhanVien_KhongHopLe_ThatBai()
+        public void AddNhanVien_KhongHopLe_ThatBai()
         {
             var logSteps = new List<string>();
             Test_DangNhap_Va_MoFormNhanVien();
@@ -174,7 +174,7 @@ namespace Quanlykhachsan.tests
         }
 
         [TestMethod]
-        public void UI_AddNhanVien_BoTrongBatBuoc_HienThongBaoDungNoiDung()
+        public void AddNhanVien_BoTrongBatBuoc_HienThongBaoDungNoiDung()
         {
             // 1. Login & mở form nhân viên
             var logSteps = new List<string>();
@@ -217,7 +217,7 @@ namespace Quanlykhachsan.tests
             WriteLogBlock("TEST THÊM NHÂN VIÊN BỎ TRỐNG TÊN", logSteps, "FAIL");
         }
         [TestMethod]
-        public void UI_AddNhanVien_SaiEmail_HienThongBaoDungNoiDung()
+        public void AddNhanVien_SaiEmail_HienThongBaoDungNoiDung()
         {
             // 1. Login & mở form nhân viên
             var logSteps = new List<string>();

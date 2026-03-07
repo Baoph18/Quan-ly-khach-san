@@ -156,7 +156,7 @@ namespace Quanlykhachsan.tests
 
 
         [TestMethod]
-        public void SuaPhong_KhongThanhCong()
+        public void SuaPhong_NhapTienAm_KhongThanhCong()
         {
             var logSteps = new List<string>();
             Test_DangNhap_Va_MoForm();

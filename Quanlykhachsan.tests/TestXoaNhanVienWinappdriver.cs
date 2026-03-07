@@ -104,7 +104,7 @@ namespace Quanlykhachsan.tests
         }
 
         [TestMethod]
-        public void UI_XoaNhanVien_HopLe_ThanhCong()
+        public void XoaNhanVien_HopLe_ThanhCong()
         {
             var logSteps = new List<string>();
             Test_DangNhap_Va_MoFormNhanVien();
@@ -185,7 +185,7 @@ namespace Quanlykhachsan.tests
         }
 
         [TestMethod]
-        public void UI_XoaNhanVien_KhongNhapMa_ThatBai()
+        public void XoaNhanVien_KhongNhapMa_ThatBai()
         {
             var logSteps = new List<string>();
             Test_DangNhap_Va_MoFormNhanVien();
