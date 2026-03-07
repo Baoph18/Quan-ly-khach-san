@@ -112,6 +112,13 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Nhấn nút Thêm phòng");
             WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Đã thêm phòng thành công!"))
+            );
+            Assert.AreEqual(
+                "Đã thêm phòng thành công!",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK1 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))
@@ -154,6 +161,13 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Nhấn nút Thêm phòng");
             WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Số phòng đã tồn tại! Vui lòng nhập số khác."))
+            );
+            Assert.AreEqual(
+                "Số phòng đã tồn tại! Vui lòng nhập số khác.",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK1 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))
@@ -199,6 +213,13 @@ namespace Quanlykhachsan.tests
 
             WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Chỉ được nhập số, không cho phép chữ hoặc ký tự đặc biệt."))
+            );
+            Assert.AreEqual(
+                "Chỉ được nhập số, không cho phép chữ hoặc ký tự đặc biệt.",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK1 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))
@@ -246,6 +267,13 @@ namespace Quanlykhachsan.tests
 
             WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Vui lòng điền đầy đủ thông tin!"))
+            );
+            Assert.AreEqual(
+                "Vui lòng điền đầy đủ thông tin!",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK1 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))
@@ -279,6 +307,13 @@ namespace Quanlykhachsan.tests
 
             WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Chỉ được nhập số, không cho phép chữ hoặc ký tự đặc biệt."))
+            );
+            Assert.AreEqual(
+                "Chỉ được nhập số, không cho phép chữ hoặc ký tự đặc biệt.",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK1 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))

@@ -97,6 +97,13 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Nhấn nút đăng xuất");
             WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Bạn có chắc muốn đăng xuất?"))
+            );
+            Assert.AreEqual(
+                "Bạn có chắc muốn đăng xuất?",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK1 = waitPopup.Until(d =>
                 d.FindElement(By.Name("Yes"))

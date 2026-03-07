@@ -133,6 +133,13 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Nhấn ok");
             Thread.Sleep(1500);
 
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Đã xóa khách hàng thành công!"))
+            );
+            Assert.AreEqual(
+                "Đã xóa khách hàng thành công!",
+                message.Text.Trim()
+            );
             var btnOK3 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))
             );
@@ -166,6 +173,13 @@ namespace Quanlykhachsan.tests
 
             WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Vui lòng chọn khách hàng cần xóa!"))
+            );
+            Assert.AreEqual(
+                "Vui lòng chọn khách hàng cần xóa!",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK1 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))

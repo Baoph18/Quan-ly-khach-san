@@ -153,6 +153,13 @@ namespace Quanlykhachsan.tests
 
             WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Cập nhật thông tin nhân viên thành công!"))
+            );
+            Assert.AreEqual(
+                "Cập nhật thông tin nhân viên thành công!",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK1 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))
@@ -205,6 +212,13 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Nhấn nút sửa");
             WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Vui lòng nhập đầy đủ thông tin!"))
+            );
+            Assert.AreEqual(
+                "Vui lòng nhập đầy đủ thông tin!",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK1 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))
@@ -264,10 +278,18 @@ namespace Quanlykhachsan.tests
             btnOK1.Click();
             logSteps.Add("Nhấn ok");
 
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Email vừa nhập không hợp lệ!!!"))
+            );
+            Assert.AreEqual(
+                "Email vừa nhập không hợp lệ!!!",
+                message.Text.Trim()
+            );
+
             var btnOK2 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))
             );
-            logSteps.Add("Email vừa nhập không hợp lệ");
+            logSteps.Add("Hiển thị thông báo:Email vừa nhập không hợp lệ");
             btnOK2.Click();
             logSteps.Add("Nhấn ok");
             WriteLogBlock("TEST SỬA THÔNG TIN NHÂN VIÊN NHẬP SAI EMAIL", logSteps, "FAIL");

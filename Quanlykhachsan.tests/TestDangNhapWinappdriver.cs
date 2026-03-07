@@ -138,8 +138,17 @@ namespace Quanlykhachsan.tests
 
             // đợi UI cập nhật text
             Thread.Sleep(1500);
-
+            // kiểm tra nội dung thông báo
+            // tìm text của popup
+            
             WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Vui lòng nhập đầy đủ thông tin!"))
+            );
+            Assert.AreEqual(
+                "Vui lòng nhập đầy đủ thông tin!",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK1 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))
@@ -147,6 +156,8 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Hiện thông báo lỗi:Vui lòng nhập đầy đủ thông tin");
             logSteps.Add("Nhấn Ok");
             btnOK1.Click();
+
+
             WriteLogBlock("TEST ĐĂNG NHẬP KHÔNG NHẬP MẬT KHẨU", logSteps, "FAIL");
         }
 
@@ -167,7 +178,13 @@ namespace Quanlykhachsan.tests
             
 
             WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
-
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Vui lòng nhập đầy đủ thông tin!"))
+            );
+            Assert.AreEqual(
+                "Vui lòng nhập đầy đủ thông tin!",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK1 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))

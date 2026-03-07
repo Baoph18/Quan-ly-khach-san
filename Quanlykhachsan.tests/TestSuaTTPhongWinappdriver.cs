@@ -136,6 +136,13 @@ namespace Quanlykhachsan.tests
 
             WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Cập nhật thông tin phòng thành công!"))
+            );
+            Assert.AreEqual(
+                "Cập nhật thông tin phòng thành công!",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK1 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))
@@ -174,6 +181,13 @@ namespace Quanlykhachsan.tests
             
             WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Chỉ được nhập số, không cho phép chữ hoặc ký tự đặc biệt."))
+            );
+            Assert.AreEqual(
+                "Chỉ được nhập số, không cho phép chữ hoặc ký tự đặc biệt.",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK1 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))
@@ -211,6 +225,7 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Nhấn nút Sửa");
             WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
+            
             // ===== POPUP 1 =====
             var btnOK1 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))
@@ -219,7 +234,13 @@ namespace Quanlykhachsan.tests
             btnOK1.Click();
             logSteps.Add("Nhấn ok");
 
-
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Dữ liệu nhập không hợp lệ."))
+            );
+            Assert.AreEqual(
+                "Dữ liệu nhập không hợp lệ.",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK2 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))

@@ -133,6 +133,14 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Hiển thị thông báo:Bạn có chắc muốn thanh toán");
             btnOK1.Click();
             logSteps.Add("Nhấn ok");
+
+            //var message = waitPopup.Until(d =>
+            //    d.FindElement(By.Name("Thanh toán & cập nhật dữ liệu thành công!"))
+            //);
+            //Assert.AreEqual(
+            //    "Thanh toán & cập nhật dữ liệu thành công!",
+            //    message.Text.Trim()
+            //);
             // ===== POPUP 1 =====
             var btnOK2 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))
@@ -187,6 +195,14 @@ namespace Quanlykhachsan.tests
                 d.FindElement(By.Name("OK"))
             );
             btnOK1.Click();
+
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Vui lòng chọn phương thức thanh toán!"))
+            );
+            Assert.AreEqual(
+                "Vui lòng chọn phương thức thanh toán!",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK2 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))
@@ -237,6 +253,13 @@ namespace Quanlykhachsan.tests
 
             WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Không có khách hàng để thanh toán!"))
+            );
+            Assert.AreEqual(
+                "Không có khách hàng để thanh toán!",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK1 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))

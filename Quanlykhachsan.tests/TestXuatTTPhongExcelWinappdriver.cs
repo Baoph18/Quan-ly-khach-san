@@ -115,6 +115,13 @@ namespace Quanlykhachsan.tests
             btnSave.Click();
 
             WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Xuất file Excel thành công!"))
+            );
+            Assert.AreEqual(
+                "Xuất file Excel thành công!",
+                message.Text.Trim()
+            );
             var msgBox = waitPopup.Until(d =>
     d.FindElement(By.ClassName("#32770"))
 );

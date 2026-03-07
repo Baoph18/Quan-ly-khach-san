@@ -113,6 +113,13 @@ namespace Quanlykhachsan.tests
 
             Thread.Sleep(500); // cho popup 2 kịp xuất hiện
 
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Tạo tài khoản thành công!"))
+            );
+            Assert.AreEqual(
+                "Tạo tài khoản thành công!",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK2 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))
@@ -148,6 +155,13 @@ namespace Quanlykhachsan.tests
 
             WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Chỉ được nhập số, không cho phép chữ hoặc ký tự đặc biệt."))
+            );
+            Assert.AreEqual(
+                "Chỉ được nhập số, không cho phép chữ hoặc ký tự đặc biệt.",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK1 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))
@@ -186,6 +200,13 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Nhấn nút đăng ký");
             WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Vui lòng nhập đầy đủ thông tin!"))
+            );
+            Assert.AreEqual(
+                "Vui lòng nhập đầy đủ thông tin!",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK1 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))
@@ -222,6 +243,13 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Nhấn nút đăng ký");
             WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Email phải chứa '@'!"))
+            );
+            Assert.AreEqual(
+                "Email phải chứa '@'!",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK1 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))

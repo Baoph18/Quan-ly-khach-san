@@ -145,13 +145,7 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Nhập id vào textbox");
             Thread.Sleep(500);
 
-            var all = session.FindElementsByXPath("//*");
-
-            foreach (var el in all)
-            {
-                if (!string.IsNullOrEmpty(el.Text))
-                    Console.WriteLine("Element thấy: " + el.Text);
-            }
+            
             // Click nút Xóa
             session.FindElementByAccessibilityId("btnDelete").Click();
             session.FindElementByAccessibilityId("btnDelete").Click();
@@ -172,6 +166,13 @@ namespace Quanlykhachsan.tests
             
             Thread.Sleep(1500);
 
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Đã xóa nhân viên và tài khoản thành công!"))
+            );
+            Assert.AreEqual(
+                "Đã xóa nhân viên và tài khoản thành công!",
+                message.Text.Trim()
+            );
             var btnOK3 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))
             );
@@ -210,6 +211,13 @@ namespace Quanlykhachsan.tests
 
             WebDriverWait waitPopup = new WebDriverWait(session, TimeSpan.FromSeconds(10));
 
+            var message = waitPopup.Until(d =>
+                d.FindElement(By.Name("Vui lòng chọn nhân viên để xóa!"))
+            );
+            Assert.AreEqual(
+                "Vui lòng chọn nhân viên để xóa!",
+                message.Text.Trim()
+            );
             // ===== POPUP 1 =====
             var btnOK1 = waitPopup.Until(d =>
                 d.FindElement(By.Name("OK"))
