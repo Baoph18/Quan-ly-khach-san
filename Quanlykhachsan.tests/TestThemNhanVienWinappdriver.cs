@@ -143,7 +143,7 @@ namespace Quanlykhachsan.tests
             // Bỏ trống tên
             var txtName = session.FindElementByAccessibilityId("txtName");
             txtName.Clear();
-            txtName.SendKeys("sf");
+            txtName.SendKeys("Nguyễn Văn A");
             // SĐT nhập chữ → sai định dạng
             var txtMobile = session.FindElementByAccessibilityId("txtMobile");
             txtMobile.Clear();

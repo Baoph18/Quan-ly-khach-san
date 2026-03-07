@@ -109,6 +109,7 @@ namespace Quanlykhachsan.tests
             logSteps.Add("Hiển thị lỗi:Bạn đăng nhập không đúng hoặc mật khẩu sai");
             Assert.IsTrue(errorMessage.Displayed);
 
+            Thread.Sleep(1500);
             Assert.AreEqual(
                 "Bạn đăng nhập không đúng hoặc mật khẩu sai",
                 errorMessage.Text.Trim()

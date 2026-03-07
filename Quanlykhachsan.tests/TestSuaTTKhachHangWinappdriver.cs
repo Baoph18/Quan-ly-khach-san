@@ -109,15 +109,15 @@ namespace Quanlykhachsan.tests
             // Nhập lại thông tin
             var txtSoPhong = session.FindElementByAccessibilityId("txtTENKH");
             txtSoPhong.Clear();
-            txtSoPhong.SendKeys("Tam lo");
+            txtSoPhong.SendKeys("Tâm lê");
 
             var txtLoaiPhong = session.FindElementByAccessibilityId("txtSDT");
             txtLoaiPhong.Clear();
-            txtLoaiPhong.SendKeys("363636363636");
+            txtLoaiPhong.SendKeys("0336708057");
 
             var txtLoaiGiuong = session.FindElementByAccessibilityId("txtQUOCTICH");
             txtLoaiGiuong.Clear();
-            txtLoaiGiuong.SendKeys("Rau Má");
+            txtLoaiGiuong.SendKeys("Việt Nam");
 
             var cbo = session.FindElementByAccessibilityId("cboGIOITINH");
             cbo.Click();
@@ -127,11 +127,11 @@ namespace Quanlykhachsan.tests
 
             var txtMaDD = session.FindElementByAccessibilityId("txtMADD");
             txtMaDD.Clear();
-            txtMaDD.SendKeys("3636");
+            txtMaDD.SendKeys("2711");
 
             var txtDiaChi = session.FindElementByAccessibilityId("txtDIACHI");
             txtDiaChi.Clear();
-            txtDiaChi.SendKeys("36 Thanh Hóa");
+            txtDiaChi.SendKeys("72 Bà Rịa Vũng Tàu");
 
             var txtSoDem = session.FindElementByAccessibilityId("txtSoDem");
             txtSoDem.Clear();

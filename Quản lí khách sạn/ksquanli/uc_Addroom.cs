@@ -223,7 +223,7 @@ namespace Quản_lí_khách_sạn.ksquanli
 
 
             string query =
-                $"UPDATE PHONG SET SOPHONG='{sophong}', LOAIPHONG='{loaiphong}', GIUONG='{loaigiuong}', GIA={gia} WHERE MAPHONG={selectedRoomId}";
+                $"UPDATE PHONG SET SOPHONG='{sophong}', LOAIPHONG=N'{loaiphong}', GIUONG=N'{loaigiuong}', GIA={gia} WHERE MAPHONG={selectedRoomId}";
 
 
             fn.setdata(query, "Cập nhật thông tin phòng thành công!");
